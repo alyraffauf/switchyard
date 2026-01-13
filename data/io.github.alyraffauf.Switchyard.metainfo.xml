@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.alyraffauf.Switchyard</id>
+  <name>Switchyard</name>
+  <summary>Choose which browser opens each link</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <description>
+    <p>
+      Switchyard is a configurable default browser for Linux, inspired by Choosy for macOS.
+      When you click a link, it lets you choose which browser to open it with, or automatically
+      routes URLs to specific browsers based on rules you define.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Set rules to open specific domains in specific browsers</li>
+      <li>Support for exact domain, wildcard, keyword, and regex matching</li>
+      <li>Quick browser picker with keyboard shortcuts (1-9)</li>
+      <li>Simple TOML configuration file for power users</li>
+      <li>Live config reload when editing externally</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">io.github.alyraffauf.Switchyard.desktop</launchable>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#62a0ea</color>
+    <color type="primary" scheme_preference="dark">#1a5fb4</color>
+  </branding>
+
+  <url type="homepage">https://github.com/alyraffauf/switchyard</url>
+  <url type="bugtracker">https://github.com/alyraffauf/switchyard/issues</url>
+  <url type="vcs-browser">https://github.com/alyraffauf/switchyard</url>
+
+  <developer id="io.github.alyraffauf">
+    <name>Aly Raffauf</name>
+  </developer>
+
+  <provides>
+    <binary>switchyard</binary>
+    <mediatype>x-scheme-handler/http</mediatype>
+    <mediatype>x-scheme-handler/https</mediatype>
+  </provides>
+
+  <requires>
+    <display_length compare="ge">300</display_length>
+  </requires>
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+
+  <content_rating type="oars-1.1" />
+
+  <releases>
+    <release version="0.1.0" date="2026-01-13">
+      <description>
+        <p>Initial release</p>
+        <ul>
+          <li>Browser picker with libadwaita UI</li>
+          <li>Rule-based URL routing with multiple pattern types</li>
+          <li>Settings window for managing rules</li>
+          <li>Keyboard-first picker (1-9 shortcuts)</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+</component>
