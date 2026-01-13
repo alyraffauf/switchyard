@@ -3,7 +3,6 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
-  workflow_dispatch:
 name: CI
 jobs:
   flatpak:
@@ -18,5 +17,4 @@ jobs:
         with:
           bundle: switchyard.flatpak
           manifest-path: flatpak/io.github.alyraffauf.Switchyard.yml
-          cache-key: flatpak-builder-${{ github.sha }}
-          upload-artifact: true
+          cache-key: flatpak-builder-stable
