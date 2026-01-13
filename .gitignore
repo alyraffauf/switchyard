@@ -10,7 +10,7 @@ build-dir/
 repo/
 
 # Go
-vendor/
+# vendor/ - committed for Flatpak reproducible builds
 
 # IDE
 .idea/
