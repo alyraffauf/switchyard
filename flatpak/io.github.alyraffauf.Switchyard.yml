@@ -24,8 +24,9 @@ finish-args:
   - --filesystem=/var/lib/flatpak:ro
   - --filesystem=/var/lib/snapd:ro
 
-  # Allow GTK to find icons from flatpaks, snaps, and system packages
-  - --env=XDG_DATA_DIRS=/app/share:/usr/share:/var/lib/flatpak/exports/share:~/.local/share/flatpak/exports/share:/var/lib/snapd/desktop
+  # Extend XDG_DATA_DIRS to include flatpak and snap export paths
+  # This preserves the runtime defaults while adding browser icon locations
+  - --env=XDG_DATA_DIRS=/app/share:/usr/share:/usr/share/runtime/share:/run/host/user-share:/run/host/share:/var/lib/flatpak/exports/share:~/.local/share/flatpak/exports/share:/var/lib/snapd/desktop
 
   # Config storage
   - --filesystem=xdg-config/switchyard:create
