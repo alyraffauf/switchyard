@@ -220,6 +220,22 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	}
 
 	contentBox.Append(flowBox)
+
+	// Add URL display at bottom
+	urlBox := gtk.NewBox(gtk.OrientationVertical, 0)
+	urlBox.SetMarginTop(16)
+
+	// URL entry (read-only, centered text)
+	urlEntry := gtk.NewEntry()
+	urlEntry.SetText(url)
+	urlEntry.SetEditable(false)
+	urlEntry.SetCanFocus(false)
+	urlEntry.SetHAlign(gtk.AlignCenter)
+	urlEntry.SetAlignment(0.5) // Center text within the entry
+	urlEntry.SetMaxWidthChars(60)
+	urlBox.Append(urlEntry)
+
+	contentBox.Append(urlBox)
 	toolbarView.SetContent(contentBox)
 	win.SetContent(toolbarView)
 
