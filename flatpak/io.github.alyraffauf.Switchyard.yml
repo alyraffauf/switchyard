@@ -13,14 +13,19 @@ finish-args:
   - --socket=wayland
   - --device=dri
 
-  # Portal access for opening URLs in browsers
-  - --talk-name=org.freedesktop.portal.Desktop
+  # Flatpak spawn to launch browsers on the host
+  - --talk-name=org.freedesktop.Flatpak
 
-  # Read desktop files to detect installed browsers
-  - --filesystem=~/.local/share/applications:ro
-  - --filesystem=/usr/share/applications:ro
-  - --filesystem=/var/lib/flatpak/exports/share/applications:ro
-  - --filesystem=~/.local/share/flatpak/exports/share/applications:ro
+  # Read host filesystem to detect installed browsers
+  # Similar to Junction (re.sonny.Junction)
+  - --filesystem=host:ro
+  - --filesystem=xdg-data/applications:ro
+  - --filesystem=xdg-data/flatpak:ro
+  - --filesystem=/var/lib/flatpak:ro
+  - --filesystem=/var/lib/snapd:ro
+
+  # Allow GTK to find icons from flatpaks, snaps, and system packages
+  - --env=XDG_DATA_DIRS=/app/share:/usr/share:/var/lib/flatpak/exports/share:~/.local/share/flatpak/exports/share:/var/lib/snapd/desktop
 
   # Config storage
   - --filesystem=xdg-config/switchyard:create
@@ -31,11 +36,16 @@ modules:
     build-options:
       env:
         GOROOT: /usr/lib/sdk/golang
+        # Use flatpak-builder's cache directory for Go cache
         GOPATH: /run/build/switchyard/go
+        GOCACHE: /run/ccache/go-build-cache
         CGO_ENABLED: "1"
     build-commands:
       - |
         . /usr/lib/sdk/golang/enable.sh
+        # Ensure cache directory exists
+        mkdir -p "$GOCACHE"
+        # Build with vendor mode for reproducibility
         go build -mod=vendor -trimpath -ldflags="-s -w" -o switchyard ./src
       - install -Dm755 switchyard /app/bin/switchyard
       - install -Dm644 data/io.github.alyraffauf.Switchyard.desktop /app/share/applications/io.github.alyraffauf.Switchyard.desktop
