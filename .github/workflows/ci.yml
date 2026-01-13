@@ -18,3 +18,4 @@ jobs:
           bundle: switchyard.flatpak
           manifest-path: flatpak/io.github.alyraffauf.Switchyard.yml
           cache-key: flatpak-builder-${{ github.sha }}
+          upload-artifact: true
