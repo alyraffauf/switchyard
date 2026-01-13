@@ -50,24 +50,48 @@ func detectBrowsers() []*Browser {
 
 func getApplicationDirs() []string {
 	var dirs []string
+	seen := make(map[string]bool)
 
-	// If XDG_DATA_DIRS is set, use it exclusively
+	// Helper to add unique directories
+	addDir := func(path string) {
+		if !seen[path] {
+			dirs = append(dirs, path)
+			seen[path] = true
+		}
+	}
+
+	// Start with XDG_DATA_DIRS if set
 	if xdg := os.Getenv("XDG_DATA_DIRS"); xdg != "" {
 		for _, d := range strings.Split(xdg, ":") {
-			dirs = append(dirs, filepath.Join(d, "applications"))
+			addDir(filepath.Join(d, "applications"))
 		}
-		return dirs
 	}
 
-	// Fallback: hardcoded paths
-	home, _ := os.UserHomeDir()
-	if home != "" {
-		dirs = append(dirs, filepath.Join(home, ".local", "share", "applications"))
-		dirs = append(dirs, filepath.Join(home, ".local", "share", "flatpak", "exports", "share", "applications"))
+	// When running in a flatpak, also check host system paths
+	// The flatpak manifest grants read access to these via --filesystem
+	if os.Getenv("FLATPAK_ID") != "" {
+		home, _ := os.UserHomeDir()
+		if home != "" {
+			addDir(filepath.Join(home, ".local", "share", "applications"))
+			addDir(filepath.Join(home, ".local", "share", "flatpak", "exports", "share", "applications"))
+		}
+		addDir("/usr/share/applications")
+		addDir("/var/lib/flatpak/exports/share/applications")
+		addDir("/var/lib/snapd/desktop/applications")
 	}
-	dirs = append(dirs, "/usr/local/share/applications")
-	dirs = append(dirs, "/usr/share/applications")
-	dirs = append(dirs, "/var/lib/flatpak/exports/share/applications")
+
+	// If nothing was found, use fallback paths
+	if len(dirs) == 0 {
+		home, _ := os.UserHomeDir()
+		if home != "" {
+			addDir(filepath.Join(home, ".local", "share", "applications"))
+			addDir(filepath.Join(home, ".local", "share", "flatpak", "exports", "share", "applications"))
+		}
+		addDir("/usr/local/share/applications")
+		addDir("/usr/share/applications")
+		addDir("/var/lib/flatpak/exports/share/applications")
+		addDir("/var/lib/snapd/desktop/applications")
+	}
 
 	return dirs
 }
@@ -149,6 +173,15 @@ func launchBrowser(b *Browser, url string) {
 		return
 	}
 
-	cmd := exec.Command(parts[0], parts[1:]...)
+	// If running in a flatpak, use flatpak-spawn to launch on the host
+	var cmd *exec.Cmd
+	if os.Getenv("FLATPAK_ID") != "" {
+		// Use flatpak-spawn --host to launch browsers on the host system
+		args := append([]string{"--host"}, parts...)
+		cmd = exec.Command("flatpak-spawn", args...)
+	} else {
+		cmd = exec.Command(parts[0], parts[1:]...)
+	}
+
 	cmd.Start()
 }
