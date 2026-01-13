@@ -5,8 +5,11 @@ A configurable default browser for Linux. Route URLs to different browsers based
 Inspired by [Choosy](https://choosy.app/) for macOS.
 
 <p align="center">
+  <img src="docs/images/switchyard-prompt.png" alt="Switchyard Prompt" width="400">
+</p>
+
+<p align="center">
   <img src="docs/images/switchyard.png" alt="Switchyard Settings" width="400">
-  <img src="docs/images/switchyard-prompt.png" alt="Switchyard Picker" width="280">
 </p>
 
 ## Features
