@@ -64,7 +64,7 @@ Or use your desktop environment's settings to set Switchyard as the default brow
 
 ```bash
 # Open settings
-switchyard --settings
+switchyard
 
 # Open a URL (typically called automatically by the system)
 switchyard "https://example.com"

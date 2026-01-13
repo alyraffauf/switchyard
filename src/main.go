@@ -18,17 +18,7 @@ import (
 
 const appID = "io.github.alyraffauf.Switchyard"
 
-var showSettings bool
-
 func main() {
-	// Parse flags before GTK takes over
-	for _, arg := range os.Args[1:] {
-		if arg == "--settings" || arg == "-settings" {
-			showSettings = true
-			break
-		}
-	}
-
 	app := adw.NewApplication(appID, gio.ApplicationHandlesOpen)
 
 	app.ConnectActivate(func() {
@@ -36,7 +26,7 @@ func main() {
 	})
 
 	app.ConnectOpen(func(files []gio.Filer, hint string) {
-		if showSettings || len(files) == 0 {
+		if len(files) == 0 {
 			showSettingsWindow(app)
 			return
 		}
@@ -45,15 +35,7 @@ func main() {
 		handleURL(app, url)
 	})
 
-	// Filter out our custom flags before passing to GTK
-	gtkArgs := []string{os.Args[0]}
-	for _, arg := range os.Args[1:] {
-		if arg != "--settings" && arg != "-settings" {
-			gtkArgs = append(gtkArgs, arg)
-		}
-	}
-
-	if code := app.Run(gtkArgs); code > 0 {
+	if code := app.Run(os.Args); code > 0 {
 		os.Exit(code)
 	}
 }

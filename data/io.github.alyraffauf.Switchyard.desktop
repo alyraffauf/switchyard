@@ -10,7 +10,3 @@ Categories=Network;WebBrowser;
 MimeType=x-scheme-handler/http;x-scheme-handler/https;
 StartupNotify=true
 Keywords=browser;web;url;link;
-
-[Desktop Action Settings]
-Name=Settings
-Exec=switchyard --settings
