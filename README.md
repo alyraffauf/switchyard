@@ -2,8 +2,6 @@
 
 A configurable default browser for Linux. Route URLs to different browsers based on rules, or choose manually with a quick picker.
 
-Inspired by [Choosy](https://choosy.app/) for macOS.
-
 <p align="center">
   <img src="docs/images/switchyard-prompt.png" alt="Switchyard Prompt" width="600">
 </p>
@@ -134,6 +132,15 @@ browser = "brave-browser.desktop"
 |---------|-------------|
 | `prompt_on_click` | Show picker when no rule matches (default: true) |
 | `default_browser` | Browser to use when prompt is disabled and no rule matches |
+
+## Prior Art
+
+Switchyard draws inspiration from excellent browser pickers on other platforms:
+
+- **[Choosy](https://choosy.app/)** - The gold standard browser picker for macOS. Beautiful UI and great UX, but not available on Linux.
+- **[Junction](https://github.com/sonnyp/Junction)** - Slick browser picker for Linux with a snazzy interface, but without rule-based URL routing.
+
+Switchyard aims to combine the best of both: Choosy's rule-based routing with a fast, native Linux experience.
 
 ## License
 
