@@ -360,6 +360,27 @@ func showSettingsWindow(app *adw.Application) {
 		}
 	}
 
+	// Only enable default browser selection when prompt is disabled
+	defaultRow.SetSensitive(!cfg.PromptOnClick)
+
+	// Update default browser sensitivity when prompt toggle changes
+	promptRow.Connect("notify::active", func() {
+		defaultRow.SetSensitive(!promptRow.Active())
+		cfg.PromptOnClick = promptRow.Active()
+		saveConfig(cfg)
+	})
+
+	// Save config when default browser changes
+	defaultRow.Connect("notify::selected", func() {
+		idx := defaultRow.Selected()
+		if idx == 0 {
+			cfg.DefaultBrowser = ""
+		} else if int(idx)-1 < len(browsers) {
+			cfg.DefaultBrowser = browsers[idx-1].ID
+		}
+		saveConfig(cfg)
+	})
+
 	behaviorGroup.Add(defaultRow)
 	content.Append(behaviorGroup)
 
