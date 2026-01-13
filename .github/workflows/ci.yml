@@ -1,0 +1,20 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+name: CI
+jobs:
+  flatpak:
+    name: "Flatpak"
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-49
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: switchyard.flatpak
+          manifest-path: flatpak/io.github.alyraffauf.Switchyard.yml
+          cache-key: flatpak-builder-${{ github.sha }}
