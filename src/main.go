@@ -22,10 +22,15 @@ func main() {
 	app := adw.NewApplication(appID, gio.ApplicationHandlesOpen)
 
 	app.ConnectActivate(func() {
+		// Add host icon paths for Flatpak compatibility
+		setupIconPaths()
 		showSettingsWindow(app)
 	})
 
 	app.ConnectOpen(func(files []gio.Filer, hint string) {
+		// Add host icon paths for Flatpak compatibility
+		setupIconPaths()
+
 		if len(files) == 0 {
 			showSettingsWindow(app)
 			return
@@ -38,6 +43,61 @@ func main() {
 	if code := app.Run(os.Args); code > 0 {
 		os.Exit(code)
 	}
+}
+
+func setupIconPaths() {
+	// Add host system icon paths when running in Flatpak
+	if os.Getenv("FLATPAK_ID") != "" {
+		iconTheme := gtk.IconThemeGetForDisplay(gdk.DisplayGetDefault())
+		if iconTheme != nil {
+			// Add Flatpak export paths for system and user flatpaks
+			iconTheme.AddSearchPath("/var/lib/flatpak/exports/share/icons")
+			home, _ := os.UserHomeDir()
+			if home != "" {
+				iconTheme.AddSearchPath(home + "/.local/share/flatpak/exports/share/icons")
+			}
+		}
+	}
+}
+
+func loadBrowserIcon(iconName string, size int) *gtk.Image {
+	if iconName == "" {
+		iconName = "web-browser-symbolic"
+	}
+
+	// Try to load from icon theme first
+	icon := gtk.NewImageFromIconName(iconName)
+	icon.SetPixelSize(size)
+
+	// Check if we need to try loading from file (for Flatpak apps)
+	if os.Getenv("FLATPAK_ID") != "" && iconName != "web-browser-symbolic" {
+		// Try to find the icon file directly
+		iconPaths := []string{
+			"/var/lib/flatpak/exports/share/icons/hicolor/64x64/apps/" + iconName + ".png",
+			"/var/lib/flatpak/exports/share/icons/hicolor/128x128/apps/" + iconName + ".png",
+			"/var/lib/flatpak/exports/share/icons/hicolor/scalable/apps/" + iconName + ".svg",
+		}
+
+		home, _ := os.UserHomeDir()
+		if home != "" {
+			iconPaths = append(iconPaths,
+				home+"/.local/share/flatpak/exports/share/icons/hicolor/64x64/apps/"+iconName+".png",
+				home+"/.local/share/flatpak/exports/share/icons/hicolor/128x128/apps/"+iconName+".png",
+				home+"/.local/share/flatpak/exports/share/icons/hicolor/scalable/apps/"+iconName+".svg",
+			)
+		}
+
+		// Try each path
+		for _, path := range iconPaths {
+			if _, err := os.Stat(path); err == nil {
+				icon = gtk.NewImageFromFile(path)
+				icon.SetPixelSize(size)
+				break
+			}
+		}
+	}
+
+	return icon
 }
 
 func handleURL(app *adw.Application, url string) {
@@ -65,9 +125,20 @@ func handleURL(app *adw.Application, url string) {
 }
 
 func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
+	// Sort browsers alphabetically by name
+	sortedBrowsers := make([]*Browser, len(browsers))
+	copy(sortedBrowsers, browsers)
+	for i := 0; i < len(sortedBrowsers); i++ {
+		for j := i + 1; j < len(sortedBrowsers); j++ {
+			if sortedBrowsers[i].Name > sortedBrowsers[j].Name {
+				sortedBrowsers[i], sortedBrowsers[j] = sortedBrowsers[j], sortedBrowsers[i]
+			}
+		}
+	}
+
 	win := adw.NewWindow()
-	win.SetTitle(extractDomain(url))
-	win.SetDefaultSize(280, -1)
+	win.SetTitle("Switchyard")
+	win.SetDefaultSize(650, -1)
 	win.SetResizable(false)
 	win.SetApplication(&app.Application)
 
@@ -77,64 +148,79 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	header := adw.NewHeaderBar()
 	toolbarView.AddTopBar(header)
 
-	// Content - just the browser list
-	listBox := gtk.NewListBox()
-	listBox.SetSelectionMode(gtk.SelectionBrowse)
-	listBox.AddCSSClass("boxed-list")
-	listBox.SetMarginStart(12)
-	listBox.SetMarginEnd(12)
-	listBox.SetMarginTop(12)
-	listBox.SetMarginBottom(12)
+	// Content box with margins
+	contentBox := gtk.NewBox(gtk.OrientationVertical, 0)
+	contentBox.SetMarginStart(24)
+	contentBox.SetMarginEnd(24)
+	contentBox.SetMarginTop(24)
+	contentBox.SetMarginBottom(24)
 
-	// Track rows for keyboard shortcuts
-	rows := make([]*gtk.ListBoxRow, 0, len(browsers))
+	// FlowBox for browser buttons - wraps to multiple rows
+	flowBox := gtk.NewFlowBox()
+	flowBox.SetSelectionMode(gtk.SelectionNone)
+	flowBox.SetHomogeneous(true)
+	flowBox.SetColumnSpacing(16)
+	flowBox.SetRowSpacing(16)
+	flowBox.SetMaxChildrenPerLine(4)
+	flowBox.SetHAlign(gtk.AlignCenter)
+	flowBox.SetVAlign(gtk.AlignStart)
 
-	for i, browser := range browsers {
+	for i, browser := range sortedBrowsers {
 		b := browser // capture
 		idx := i
 
-		row := adw.NewActionRow()
-		row.SetTitle(b.Name)
-		row.SetActivatable(true)
+		// Button for each browser
+		btn := gtk.NewButton()
+		btn.AddCSSClass("flat")
+		btn.SetSizeRequest(140, -1)
 
-		if b.Icon != "" {
-			icon := gtk.NewImageFromIconName(b.Icon)
-			icon.SetPixelSize(24)
-			row.AddPrefix(icon)
-		}
+		// Container inside button - icon above, name and number below
+		btnBox := gtk.NewBox(gtk.OrientationVertical, 8)
+		btnBox.SetHAlign(gtk.AlignCenter)
+		btnBox.SetVAlign(gtk.AlignCenter)
 
-		// Number shortcut hint (1-9)
+		// Fixed-size container for icon to ensure uniform sizing
+		iconBox := gtk.NewBox(gtk.OrientationVertical, 0)
+		iconBox.SetSizeRequest(64, 64)
+		iconBox.SetHAlign(gtk.AlignCenter)
+		iconBox.SetVAlign(gtk.AlignCenter)
+
+		// Large browser icon - use helper to load with fallback
+		icon := loadBrowserIcon(b.Icon, 64)
+		icon.SetHAlign(gtk.AlignCenter)
+		icon.SetVAlign(gtk.AlignCenter)
+		iconBox.Append(icon)
+
+		btnBox.Append(iconBox)
+
+		// Browser name - single line with ellipsis
+		label := gtk.NewLabel(b.Name)
+		label.SetEllipsize(pango.EllipsizeEnd)
+		label.SetMaxWidthChars(18)
+		label.SetJustify(gtk.JustifyCenter)
+		label.SetLines(1)
+		btnBox.Append(label)
+
+		// Number shortcut (1-9)
 		if idx < 9 {
-			shortcut := gtk.NewLabel(fmt.Sprintf("%d", idx+1))
-			shortcut.AddCSSClass("dim-label")
-			shortcut.AddCSSClass("caption")
-			row.AddSuffix(shortcut)
+			shortcutLabel := gtk.NewLabel(fmt.Sprintf("%d", idx+1))
+			shortcutLabel.AddCSSClass("dim-label")
+			shortcutLabel.AddCSSClass("caption")
+			btnBox.Append(shortcutLabel)
 		}
 
-		row.ConnectActivated(func() {
+		btn.SetChild(btnBox)
+
+		btn.ConnectClicked(func() {
 			launchBrowser(b, url)
 			win.Close()
 		})
 
-		listBox.Append(row)
-		rows = append(rows, &row.ListBoxRow)
+		flowBox.Insert(btn, -1)
 	}
 
-	// Select first row by default
-	if len(rows) > 0 {
-		listBox.SelectRow(rows[0])
-	}
-
-	// Handle Enter key on selected row
-	listBox.ConnectRowActivated(func(row *gtk.ListBoxRow) {
-		idx := row.Index()
-		if idx >= 0 && idx < len(browsers) {
-			launchBrowser(browsers[idx], url)
-			win.Close()
-		}
-	})
-
-	toolbarView.SetContent(listBox)
+	contentBox.Append(flowBox)
+	toolbarView.SetContent(contentBox)
 	win.SetContent(toolbarView)
 
 	// Keyboard shortcuts
@@ -143,8 +229,8 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		// Number keys 1-9 for quick selection
 		if keyval >= gdk.KEY_1 && keyval <= gdk.KEY_9 {
 			idx := int(keyval - gdk.KEY_1)
-			if idx < len(browsers) {
-				launchBrowser(browsers[idx], url)
+			if idx < len(sortedBrowsers) {
+				launchBrowser(sortedBrowsers[idx], url)
 				win.Close()
 				return true
 			}
@@ -159,9 +245,6 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	win.AddController(keyController)
 
 	win.Present()
-
-	// Focus the list for immediate keyboard navigation
-	listBox.GrabFocus()
 }
 
 func showSettingsWindow(app *adw.Application) {
