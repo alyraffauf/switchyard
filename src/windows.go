@@ -173,7 +173,8 @@ func showSettingsWindow(app *adw.Application) {
 	menuBtn.SetTooltipText("Main menu")
 
 	menu := gio.NewMenu()
-	menu.Append("About Switchyard", "app.about")
+	menu.Append("Donate ❤️", "app.donate")
+	menu.Append("About", "app.about")
 
 	quitSection := gio.NewMenu()
 	quitSection.Append("Quit", "app.quit")
@@ -188,6 +189,12 @@ func showSettingsWindow(app *adw.Application) {
 		showAboutDialog(win)
 	})
 	app.AddAction(aboutAction)
+
+	donateAction := gio.NewSimpleAction("donate", nil)
+	donateAction.ConnectActivate(func(p *glib.Variant) {
+		gtk.ShowURI(&win.Window, "https://ko-fi.com/alyraffauf", 0)
+	})
+	app.AddAction(donateAction)
 
 	quitAction := gio.NewSimpleAction("quit", nil)
 	quitAction.ConnectActivate(func(p *glib.Variant) {
