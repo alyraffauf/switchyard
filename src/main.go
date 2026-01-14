@@ -508,10 +508,17 @@ func showSettingsWindow(app *adw.Application) {
 		// Show name as title if set, otherwise show pattern
 		if rule.Name != "" {
 			row.SetTitle(rule.Name)
-			row.SetSubtitle(formatRuleSubtitle(rule.PatternType, rule.Pattern, getBrowserName(rule.Browser), rule.AlwaysAsk))
+			row.SetSubtitle(formatRuleSubtitleMulti(rule, getBrowserName(rule.Browser)))
 		} else {
-			row.SetTitle(rule.Pattern)
-			row.SetSubtitle(formatRuleSubtitleNoPattern(rule.PatternType, getBrowserName(rule.Browser), rule.AlwaysAsk))
+			// For rules without names, show first pattern or condition
+			if len(rule.Conditions) > 0 && rule.Conditions[0].Pattern != "" {
+				row.SetTitle(rule.Conditions[0].Pattern)
+			} else if rule.Pattern != "" {
+				row.SetTitle(rule.Pattern)
+			} else {
+				row.SetTitle("(empty rule)")
+			}
+			row.SetSubtitle(formatRuleSubtitleMulti(rule, getBrowserName(rule.Browser)))
 		}
 		row.SetActivatable(true)
 
@@ -1154,4 +1161,49 @@ func formatRuleSubtitleNoPattern(patternType, browserName string, alwaysAsk bool
 		return fmt.Sprintf("%s · Always ask", typeLabel)
 	}
 	return fmt.Sprintf("%s · Opens in %s", typeLabel, browserName)
+}
+
+func getTypeLabel(patternType string) string {
+	switch patternType {
+	case "domain":
+		return "Exact domain"
+	case "keyword":
+		return "URL contains"
+	case "glob":
+		return "Wildcard"
+	case "regex":
+		return "Regex"
+	default:
+		return patternType
+	}
+}
+
+func formatRuleSubtitleMulti(rule *Rule, browserName string) string {
+	// Handle new multi-condition format
+	if len(rule.Conditions) > 0 {
+		condCount := len(rule.Conditions)
+		var logicText string
+		if rule.Logic == "any" {
+			logicText = "Any match"
+		} else {
+			logicText = "All match"
+		}
+		
+		if rule.AlwaysAsk {
+			if condCount == 1 {
+				return fmt.Sprintf("%s: %s · Always ask", getTypeLabel(rule.Conditions[0].Type), rule.Conditions[0].Pattern)
+			}
+			return fmt.Sprintf("%d conditions (%s) · Always ask", condCount, logicText)
+		}
+		if condCount == 1 {
+			return fmt.Sprintf("%s: %s · Opens in %s", getTypeLabel(rule.Conditions[0].Type), rule.Conditions[0].Pattern, browserName)
+		}
+		return fmt.Sprintf("%d conditions (%s) · Opens in %s", condCount, logicText, browserName)
+	}
+
+	// Handle legacy single pattern format
+	if rule.AlwaysAsk {
+		return fmt.Sprintf("%s: %s · Always ask", getTypeLabel(rule.PatternType), rule.Pattern)
+	}
+	return fmt.Sprintf("%s: %s · Opens in %s", getTypeLabel(rule.PatternType), rule.Pattern, browserName)
 }
