@@ -22,11 +22,23 @@ finish-args:
   - --filesystem=xdg-data/flatpak:ro
   - --filesystem=/var/lib/flatpak:ro
   - --filesystem=/var/lib/snapd:ro
+  - --filesystem=host:ro
 
-  # Extend XDG_DATA_DIRS to include flatpak and snap export paths
-  # This preserves the runtime defaults while adding browser icon locations
-  - --env=XDG_DATA_DIRS=/app/share:/usr/share:/usr/share/runtime/share:/run/host/user-share:/run/host/share:/var/lib/flatpak/exports/share:~/.local/share/flatpak/exports/share:/var/lib/snapd/desktop
+  # Extend XDG_DATA_DIRS to include host and flatpak paths so GIO can find all .desktop files
+  # This is critical for gio.AppInfoGetRecommendedForType to work correctly
+  - --env=XDG_DATA_DIRS=/app/share:/usr/share:/usr/share/runtime/share:/run/host/user-share:/run/host/share:/run/host/usr/share:/var/lib/flatpak/exports/share:~/.local/share/flatpak/exports/share:/var/lib/snapd/desktop
 modules:
+  - name: glib
+    buildsystem: meson
+    config-opts:
+      - -Dtests=false
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/glib/2.86/glib-2.86.3.tar.xz
+        sha256: b3211d8d34b9df5dca05787ef0ad5d7ca75dec998b970e1aab0001d229977c65
+      - type: patch
+        path: patches/glib-appinfo.patch
+
   - name: switchyard
     buildsystem: simple
     build-options:

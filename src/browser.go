@@ -3,182 +3,99 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
-	"path/filepath"
+	"os/exec"
 	"strings"
+
+	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
 type Browser struct {
-	ID   string // desktop file ID (e.g., "firefox.desktop")
-	Name string
-	Icon string
-	Exec string
+	ID      string // desktop file ID (e.g., "firefox.desktop")
+	Name    string
+	Icon    string
+	AppInfo *gio.AppInfo // Store the GIO AppInfo for launching
 }
 
 func detectBrowsers() []*Browser {
 	var browsers []*Browser
-	seen := make(map[string]bool)
 
-	dirs := getApplicationDirs()
-	for _, dir := range dirs {
-		entries, err := os.ReadDir(dir)
-		if err != nil {
+	// Use GIO to get all applications that handle HTTP URLs
+	// This automatically handles system apps, Flatpaks, Snaps, etc.
+	appInfos := gio.AppInfoGetRecommendedForType("x-scheme-handler/http")
+
+	for _, appInfo := range appInfos {
+		id := appInfo.ID()
+		if id == "" {
 			continue
 		}
 
-		for _, entry := range entries {
-			if !strings.HasSuffix(entry.Name(), ".desktop") {
-				continue
-			}
-			if seen[entry.Name()] {
-				continue
-			}
-
-			path := filepath.Join(dir, entry.Name())
-			b := parseDesktopFile(path, entry.Name())
-			if b != nil && isBrowser(b) {
-				browsers = append(browsers, b)
-				seen[entry.Name()] = true
-			}
+		// Skip ourselves
+		if id == "io.github.alyraffauf.Switchyard.desktop" {
+			continue
 		}
+
+		// Skip apps that shouldn't be shown
+		if !appInfo.ShouldShow() {
+			continue
+		}
+
+		name := appInfo.Name()
+		icon := ""
+		if gicon := appInfo.Icon(); gicon != nil {
+			icon = gicon.String()
+		}
+
+		browsers = append(browsers, &Browser{
+			ID:      id,
+			Name:    name,
+			Icon:    icon,
+			AppInfo: appInfo,
+		})
 	}
 
 	return browsers
 }
 
-func getApplicationDirs() []string {
-	var dirs []string
-	seen := make(map[string]bool)
-
-	// Helper to add unique directories
-	addDir := func(path string) {
-		if !seen[path] {
-			dirs = append(dirs, path)
-			seen[path] = true
-		}
-	}
-
-	// Helper to add common application directories
-	addCommonDirs := func() {
-		home, _ := os.UserHomeDir()
-		if home != "" {
-			addDir(filepath.Join(home, ".local", "share", "applications"))
-			addDir(filepath.Join(home, ".local", "share", "flatpak", "exports", "share", "applications"))
-		}
-		addDir("/usr/share/applications")
-		addDir("/var/lib/flatpak/exports/share/applications")
-		addDir("/var/lib/snapd/desktop/applications")
-	}
-
-	// Start with XDG_DATA_DIRS if set
-	if xdg := os.Getenv("XDG_DATA_DIRS"); xdg != "" {
-		for _, d := range strings.Split(xdg, ":") {
-			addDir(filepath.Join(d, "applications"))
-		}
-	}
-
-	// When running in a flatpak, also check host system paths
-	// The flatpak manifest grants read access to these via --filesystem
-	if os.Getenv("FLATPAK_ID") != "" {
-		addCommonDirs()
-	}
-
-	// If nothing was found, use fallback paths
-	if len(dirs) == 0 {
-		addDir("/usr/local/share/applications")
-		addCommonDirs()
-	}
-
-	return dirs
-}
-
-func parseDesktopFile(path, id string) *Browser {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil
-	}
-	defer file.Close()
-
-	b := &Browser{ID: id}
-	inDesktopEntry := false
-	hasMimeType := false
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-
-		if strings.HasPrefix(line, "[") {
-			inDesktopEntry = line == "[Desktop Entry]"
-			continue
-		}
-
-		if !inDesktopEntry {
-			continue
-		}
-
-		if strings.HasPrefix(line, "Name=") {
-			b.Name = strings.TrimPrefix(line, "Name=")
-		} else if strings.HasPrefix(line, "Icon=") {
-			b.Icon = strings.TrimPrefix(line, "Icon=")
-		} else if strings.HasPrefix(line, "Exec=") {
-			b.Exec = strings.TrimPrefix(line, "Exec=")
-		} else if strings.HasPrefix(line, "MimeType=") {
-			mimeTypes := strings.TrimPrefix(line, "MimeType=")
-			if strings.Contains(mimeTypes, "x-scheme-handler/http") {
-				hasMimeType = true
-			}
-		} else if strings.HasPrefix(line, "NoDisplay=true") {
-			return nil
-		}
-	}
-
-	if b.Name == "" || b.Exec == "" || !hasMimeType {
-		return nil
-	}
-
-	return b
-}
-
-func isBrowser(b *Browser) bool {
-	// Already filtered by MimeType in parseDesktopFile
-	// Skip ourselves
-	return b.ID != "io.github.alyraffauf.Switchyard.desktop"
-}
-
 func launchBrowser(b *Browser, url string) {
-	execLine := b.Exec
-
-	// Replace %u, %U, %f, %F with URL
-	execLine = strings.ReplaceAll(execLine, "%u", url)
-	execLine = strings.ReplaceAll(execLine, "%U", url)
-	execLine = strings.ReplaceAll(execLine, "%f", url)
-	execLine = strings.ReplaceAll(execLine, "%F", url)
-
-	// Remove other field codes
-	for _, code := range []string{"%i", "%c", "%k"} {
-		execLine = strings.ReplaceAll(execLine, code, "")
-	}
-
-	// If URL wasn't substituted, append it
-	if !strings.Contains(b.Exec, "%u") && !strings.Contains(b.Exec, "%U") {
-		execLine = execLine + " " + url
-	}
-
-	parts := strings.Fields(execLine)
-	if len(parts) == 0 {
+	// Get the command line from the AppInfo
+	cmdline := b.AppInfo.Commandline()
+	if cmdline == "" {
+		fmt.Fprintf(os.Stderr, "Error: No command line for browser %s\n", b.Name)
 		return
 	}
 
-	// Use hostCommand helper for flatpak-aware execution
-	cmd := hostCommand(parts[0], parts[1:]...)
+	// Replace %u, %U, %f, %F with URL
+	cmdline = strings.ReplaceAll(cmdline, "%u", url)
+	cmdline = strings.ReplaceAll(cmdline, "%U", url)
+	cmdline = strings.ReplaceAll(cmdline, "%f", url)
+	cmdline = strings.ReplaceAll(cmdline, "%F", url)
 
+	// Remove other field codes
+	for _, code := range []string{"%i", "%c", "%k"} {
+		cmdline = strings.ReplaceAll(cmdline, code, "")
+	}
+
+	// Parse the command line
+	parts := strings.Fields(cmdline)
+	if len(parts) == 0 {
+		fmt.Fprintf(os.Stderr, "Error: Empty command line for browser %s\n", b.Name)
+		return
+	}
+
+	// When running in Flatpak, wrap with flatpak-spawn --host
+	if os.Getenv("FLATPAK_ID") != "" && !strings.HasPrefix(parts[0], "flatpak-spawn") {
+		parts = append([]string{"flatpak-spawn", "--host"}, parts...)
+	}
+
+	// Execute the command
+	cmd := exec.Command(parts[0], parts[1:]...)
 	if err := cmd.Start(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error launching browser: %v\n", err)
 		return
 	}
 
-	// Clean up the process asynchronously to prevent zombie processes
+	// Clean up asynchronously
 	go cmd.Wait()
 }
