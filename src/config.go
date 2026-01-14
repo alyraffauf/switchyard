@@ -187,7 +187,7 @@ func sanitizeURL(url string) string {
 		return ""
 	}
 
-	// Handle file:// URIs that GIO creates from bare domains
+	// Handle file:// URIs that GIO sometimes creates from bare domains
 	// If it's a file:// URI but the path doesn't exist and looks like a domain, convert it
 	if strings.HasPrefix(url, "file://") {
 		filePath := strings.TrimPrefix(url, "file://")
@@ -199,24 +199,43 @@ func sanitizeURL(url string) string {
 			lastSlash := strings.LastIndex(filePath, "/")
 			if lastSlash != -1 {
 				possibleDomain := filePath[lastSlash+1:]
-				// If it looks like a domain (contains dots, no spaces), treat it as one
+				// Check if it looks like a domain (not a file extension)
+				// Domain should have multiple parts separated by dots, not just "file.txt"
 				if strings.Contains(possibleDomain, ".") && !strings.Contains(possibleDomain, " ") {
-					return "https://" + possibleDomain
+					// Split by dot to check if it looks like a domain vs a filename
+					parts := strings.Split(possibleDomain, ".")
+					// A domain typically has at least 2 parts and the TLD is not a file extension
+					// Common file extensions to reject: .txt, .pdf, .doc, .jpg, etc.
+					if len(parts) >= 2 {
+						lastPart := strings.ToLower(parts[len(parts)-1])
+						// List of common file extensions to reject
+						fileExtensions := []string{"txt", "pdf", "doc", "docx", "jpg", "jpeg", "png", "gif", "zip", "tar", "gz"}
+						isFileExt := false
+						for _, ext := range fileExtensions {
+							if lastPart == ext {
+								isFileExt = true
+								break
+							}
+						}
+						// If it doesn't look like a file extension, treat as domain
+						if !isFileExt && len(lastPart) > 1 {
+							return "https://" + possibleDomain
+						}
+					}
 				}
 			}
 		}
-		// Otherwise, it's a real file path, return as-is
-		return url
+		// Real file path - reject (browsers handle file:// directly)
+		return ""
 	}
 
-	// If it already has another scheme, return as-is
-	if strings.Contains(url, "://") {
-		return url
-	}
-
-	// No scheme - check if it looks like a file path (starts with / or .)
+	// Reject local file paths (browsers don't need routing for these)
 	if strings.HasPrefix(url, "/") || strings.HasPrefix(url, ".") {
-		// Looks like a file path, don't modify
+		return ""
+	}
+
+	// If it already has a scheme, return as-is
+	if strings.Contains(url, "://") {
 		return url
 	}
 
