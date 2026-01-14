@@ -17,6 +17,7 @@ type Config struct {
 	PromptOnClick       bool   `toml:"prompt_on_click"`
 	FallbackBrowser     string `toml:"fallback_browser"`
 	CheckDefaultBrowser bool   `toml:"check_default_browser"`
+	ShowAppNames        bool   `toml:"show_app_names"`
 	Rules               []Rule `toml:"rules"`
 }
 
@@ -49,6 +50,7 @@ func loadConfig() *Config {
 	cfg := &Config{
 		PromptOnClick:       true,
 		CheckDefaultBrowser: true,
+		ShowAppNames:        false, // Default: hide app names, show tooltips
 		Rules:               []Rule{},
 	}
 

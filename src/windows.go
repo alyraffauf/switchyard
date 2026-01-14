@@ -17,6 +17,8 @@ import (
 
 // showPickerWindow displays the browser picker window
 func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
+	cfg := loadConfig()
+
 	// Sort browsers alphabetically by name
 	sortedBrowsers := make([]*Browser, len(browsers))
 	copy(sortedBrowsers, browsers)
@@ -81,13 +83,19 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 
 		btnBox.Append(iconBox)
 
-		// Browser name - single line with ellipsis
-		label := gtk.NewLabel(b.Name)
-		label.SetEllipsize(pango.EllipsizeEnd)
-		label.SetMaxWidthChars(18)
-		label.SetJustify(gtk.JustifyCenter)
-		label.SetLines(1)
-		btnBox.Append(label)
+		// Show browser name based on config
+		if cfg.ShowAppNames {
+			// Show as visible label
+			label := gtk.NewLabel(b.Name)
+			label.SetEllipsize(pango.EllipsizeEnd)
+			label.SetMaxWidthChars(18)
+			label.SetJustify(gtk.JustifyCenter)
+			label.SetLines(1)
+			btnBox.Append(label)
+		} else {
+			// Show as tooltip on hover
+			btn.SetTooltipText(b.Name)
+		}
 
 		// Number shortcut (1-9)
 		if idx < 9 {
@@ -226,9 +234,27 @@ func showSettingsWindow(app *adw.Application) {
 	clamp.SetChild(content)
 	scrolled.SetChild(clamp)
 
+	// Appearance section
+	appearanceGroup := adw.NewPreferencesGroup()
+	appearanceGroup.SetTitle("Appearance")
+
+	// Show app names toggle
+	showNamesRow := adw.NewSwitchRow()
+	showNamesRow.SetTitle("Show browser names in picker")
+	showNamesRow.SetSubtitle("Display browser names below icons")
+	appearanceGroup.Add(showNamesRow)
+
+	content.Append(appearanceGroup)
+
 	// Behavior section
 	behaviorGroup := adw.NewPreferencesGroup()
 	behaviorGroup.SetTitle("Behavior")
+
+	// Check default browser toggle
+	checkDefaultRow := adw.NewSwitchRow()
+	checkDefaultRow.SetTitle("Check if Switchyard is default browser")
+	checkDefaultRow.SetSubtitle("Prompt to set Switchyard as system default browser on startup")
+	behaviorGroup.Add(checkDefaultRow)
 
 	promptRow := adw.NewSwitchRow()
 	promptRow.SetTitle("Prompt when no rule matches")
@@ -245,15 +271,9 @@ func showSettingsWindow(app *adw.Application) {
 
 	defaultRow := adw.NewComboRow()
 	defaultRow.SetTitle("Fallback browser")
-	defaultRow.SetSubtitle("Browser to open when prompt is disabled and no rule matches")
+	defaultRow.SetSubtitle("Browser to open when picker is disabled and no rule matches")
 	defaultRow.SetModel(browserList)
 	behaviorGroup.Add(defaultRow)
-
-	// Check default browser toggle
-	checkDefaultRow := adw.NewSwitchRow()
-	checkDefaultRow.SetTitle("Check if Switchyard is default browser")
-	checkDefaultRow.SetSubtitle("Prompt to set Switchyard as system default browser on startup")
-	behaviorGroup.Add(checkDefaultRow)
 
 	content.Append(behaviorGroup)
 
@@ -262,6 +282,7 @@ func showSettingsWindow(app *adw.Application) {
 		promptRow.SetActive(cfg.PromptOnClick)
 		defaultRow.SetSensitive(!cfg.PromptOnClick)
 		checkDefaultRow.SetActive(cfg.CheckDefaultBrowser)
+		showNamesRow.SetActive(cfg.ShowAppNames)
 
 		// Update fallback browser selection
 		defaultRow.SetSelected(0)
@@ -316,6 +337,11 @@ func showSettingsWindow(app *adw.Application) {
 
 	checkDefaultRow.Connect("notify::active", func() {
 		cfg.CheckDefaultBrowser = checkDefaultRow.Active()
+		saveConfigSafe(cfg)
+	})
+
+	showNamesRow.Connect("notify::active", func() {
+		cfg.ShowAppNames = showNamesRow.Active()
 		saveConfigSafe(cfg)
 	})
 
@@ -515,6 +541,7 @@ func showSettingsWindow(app *adw.Application) {
 					cfg.PromptOnClick = newCfg.PromptOnClick
 					cfg.FallbackBrowser = newCfg.FallbackBrowser
 					cfg.CheckDefaultBrowser = newCfg.CheckDefaultBrowser
+					cfg.ShowAppNames = newCfg.ShowAppNames
 					cfg.Rules = newCfg.Rules
 
 					// Update UI
