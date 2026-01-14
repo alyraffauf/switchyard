@@ -99,3 +99,45 @@ func launchBrowser(b *Browser, url string) {
 	// Clean up asynchronously
 	go cmd.Wait()
 }
+
+// launchBrowserAction launches a browser with a specific desktop file action (e.g., "new-private-window")
+func launchBrowserAction(b *Browser, action DesktopAction, url string) {
+	cmdline := action.Exec
+	if cmdline == "" {
+		fmt.Fprintf(os.Stderr, "Error: No exec line for action %s\n", action.ID)
+		return
+	}
+
+	// Replace %u, %U, %f, %F with URL
+	cmdline = strings.ReplaceAll(cmdline, "%u", url)
+	cmdline = strings.ReplaceAll(cmdline, "%U", url)
+	cmdline = strings.ReplaceAll(cmdline, "%f", url)
+	cmdline = strings.ReplaceAll(cmdline, "%F", url)
+
+	// Remove other field codes
+	for _, code := range []string{"%i", "%c", "%k"} {
+		cmdline = strings.ReplaceAll(cmdline, code, "")
+	}
+
+	// Parse the command line
+	parts := strings.Fields(cmdline)
+	if len(parts) == 0 {
+		fmt.Fprintf(os.Stderr, "Error: Empty command line for action %s\n", action.ID)
+		return
+	}
+
+	// When running in Flatpak, wrap with flatpak-spawn --host
+	if os.Getenv("FLATPAK_ID") != "" && !strings.HasPrefix(parts[0], "flatpak-spawn") {
+		parts = append([]string{"flatpak-spawn", "--host"}, parts...)
+	}
+
+	// Execute the command
+	cmd := exec.Command(parts[0], parts[1:]...)
+	if err := cmd.Start(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error launching browser action: %v\n", err)
+		return
+	}
+
+	// Clean up asynchronously
+	go cmd.Wait()
+}

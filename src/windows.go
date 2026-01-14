@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
@@ -104,6 +105,14 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 			win.Close()
 		})
 
+		// Add right-click handler for desktop file actions
+		gesture := gtk.NewGestureClick()
+		gesture.SetButton(gdk.BUTTON_SECONDARY)
+		gesture.ConnectPressed(func(nPress int, x, y float64) {
+			showBrowserActionsMenu(btn, b, url)
+		})
+		btn.AddController(gesture)
+
 		flowBox.Insert(btn, -1)
 	}
 
@@ -147,6 +156,54 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		return false
 	})
 	win.AddController(keyController)
+
+	// Set up action handlers for desktop file actions
+	actionGroup := gio.NewSimpleActionGroup()
+
+	// Action to launch browser with a specific action
+	// Parameter format: "browserID:actionID"
+	launchActionAction := gio.NewSimpleAction("launch-action", glib.NewVariantType("s"))
+	launchActionAction.ConnectActivate(func(param *glib.Variant) {
+		if param == nil {
+			return
+		}
+
+		// Parse "browserID:actionID" from the parameter
+		actionSpec := param.String()
+		parts := strings.Split(actionSpec, ":")
+		if len(parts) != 2 {
+			return
+		}
+
+		browserID := parts[0]
+		actionID := parts[1]
+
+		// Find the browser
+		var selectedBrowser *Browser
+		for _, b := range sortedBrowsers {
+			if b.ID == browserID {
+				selectedBrowser = b
+				break
+			}
+		}
+
+		if selectedBrowser == nil {
+			return
+		}
+
+		// Find the action and launch it
+		actions := ListDesktopActions(selectedBrowser.AppInfo)
+		for _, action := range actions {
+			if action.ID == actionID {
+				launchBrowserAction(selectedBrowser, action, url)
+				win.Close()
+				return
+			}
+		}
+	})
+	actionGroup.AddAction(launchActionAction)
+
+	win.InsertActionGroup("win", actionGroup)
 
 	win.Present()
 }
@@ -529,4 +586,26 @@ func showSettingsWindow(app *adw.Application) {
 	win.SetContent(toolbarView)
 
 	win.Present()
+}
+
+// showBrowserActionsMenu displays a popup menu with desktop file actions for a browser
+func showBrowserActionsMenu(btn *gtk.Button, browser *Browser, url string) {
+	actions := ListDesktopActions(browser.AppInfo)
+	if len(actions) == 0 {
+		return // No actions available
+	}
+
+	// Build menu model
+	menu := gio.NewMenu()
+
+	// Add desktop file actions
+	for _, action := range actions {
+		// Use the action ID as a unique identifier for the action
+		menu.Append(action.Name, fmt.Sprintf("win.launch-action::%s:%s", browser.ID, action.ID))
+	}
+
+	// Create and show popover
+	popover := gtk.NewPopoverMenuFromModel(menu)
+	popover.SetParent(btn)
+	popover.Popup()
 }
