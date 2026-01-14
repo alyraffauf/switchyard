@@ -3,15 +3,33 @@
 package main
 
 import (
+	"regexp"
+
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 )
 
-// validateConditions checks if all conditions have non-empty patterns
+// validateConditions checks if all conditions have non-empty patterns and valid types
 func validateConditions(conditions []Condition) bool {
+	validTypes := map[string]bool{
+		"domain":  true,
+		"keyword": true,
+		"glob":    true,
+		"regex":   true,
+	}
+
 	for _, c := range conditions {
 		if c.Pattern == "" {
 			return false
+		}
+		if !validTypes[c.Type] {
+			return false
+		}
+		// For regex type, validate the pattern compiles
+		if c.Type == "regex" {
+			if _, err := regexp.Compile(c.Pattern); err != nil {
+				return false
+			}
 		}
 	}
 	return true
