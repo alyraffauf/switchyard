@@ -13,16 +13,11 @@ finish-args:
   - --socket=wayland
   - --device=dri
 
-  # Portal access for opening URLs in browsers
-  - --talk-name=org.freedesktop.portal.Desktop
-
   # Access to Flatpak service for spawning host commands
   # Required for checking/setting default browser via xdg-settings
   - --talk-name=org.freedesktop.Flatpak
 
-  # Read host filesystem to detect installed browsers
-  # Similar to Junction (re.sonny.Junction)
-  - --filesystem=host:ro
+  # Read specific directories to detect installed browsers
   - --filesystem=xdg-data/applications:ro
   - --filesystem=xdg-data/flatpak:ro
   - --filesystem=/var/lib/flatpak:ro
