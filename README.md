@@ -10,6 +10,10 @@ A configurable default browser for Linux. Route URLs to different browsers based
   <img src="docs/images/switchyard.png" alt="Switchyard Settings" width="600">
 </p>
 
+<p align="center">
+  <img src="docs/images/switchyard-rulesedit.png" alt="Switchyard Rule Editor" width="600">
+</p>
+
 ## Features
 
 - **Rule-based routing**: Automatically open URLs in specific browsers based on patterns
