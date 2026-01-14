@@ -27,14 +27,10 @@ type Condition struct {
 
 type Rule struct {
 	Name       string      `toml:"name"`
-	Conditions []Condition `toml:"conditions,omitempty"` // NEW: Array of conditions
-	Logic      string      `toml:"logic,omitempty"`      // NEW: "all" or "any"
+	Conditions []Condition `toml:"conditions"`
+	Logic      string      `toml:"logic,omitempty"` // "all" or "any"
 	Browser    string      `toml:"browser"`
 	AlwaysAsk  bool        `toml:"always_ask"`
-
-	// Deprecated: For backward compatibility
-	Pattern     string `toml:"pattern,omitempty"`
-	PatternType string `toml:"pattern_type,omitempty"` // glob, regex, keyword
 }
 
 func configDir() string {
@@ -74,11 +70,6 @@ func loadConfig() *Config {
 }
 
 func saveConfig(cfg *Config) error {
-	// Migrate rules to new format before saving
-	for i := range cfg.Rules {
-		cfg.Rules[i].migrateToMultiCondition()
-	}
-
 	dir := configDir()
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
@@ -94,16 +85,7 @@ func saveConfig(cfg *Config) error {
 
 func (cfg *Config) matchRule(url string) (browserID string, alwaysAsk bool, matched bool) {
 	for _, rule := range cfg.Rules {
-		// Handle new multi-condition format
-		if len(rule.Conditions) > 0 {
-			if rule.matchesConditions(url) {
-				return rule.Browser, rule.AlwaysAsk, true
-			}
-			continue
-		}
-
-		// Handle legacy single pattern format
-		if rule.Pattern != "" && matchesPattern(url, rule.Pattern, rule.PatternType) {
+		if rule.matchesConditions(url) {
 			return rule.Browser, rule.AlwaysAsk, true
 		}
 	}
@@ -139,19 +121,7 @@ func (r *Rule) matchesConditions(url string) bool {
 	}
 }
 
-func (r *Rule) migrateToMultiCondition() {
-	// Convert old single-pattern format to new multi-condition format
-	if len(r.Conditions) == 0 && r.Pattern != "" {
-		r.Conditions = []Condition{{
-			Type:    r.PatternType,
-			Pattern: r.Pattern,
-		}}
-		r.Logic = "all"
-		// Clear old fields
-		r.Pattern = ""
-		r.PatternType = ""
-	}
-}
+
 
 func matchesPattern(url, pattern, patternType string) bool {
 	domain := extractDomain(url)

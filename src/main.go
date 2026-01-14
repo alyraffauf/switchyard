@@ -513,16 +513,14 @@ func showSettingsWindow(app *adw.Application) {
 		rule := &cfg.Rules[ruleIndex]
 
 		row := adw.NewActionRow()
-		// Show name as title if set, otherwise show pattern
+		// Show name as title if set, otherwise show first condition pattern
 		if rule.Name != "" {
 			row.SetTitle(rule.Name)
 			row.SetSubtitle(formatRuleSubtitle(rule, getBrowserName(rule.Browser)))
 		} else {
-			// For rules without names, show first pattern or condition
+			// For rules without names, show first condition pattern
 			if len(rule.Conditions) > 0 {
 				row.SetTitle(rule.Conditions[0].Pattern)
-			} else {
-				row.SetTitle(rule.Pattern)
 			}
 			row.SetSubtitle(formatRuleSubtitleNoPattern(rule, getBrowserName(rule.Browser)))
 		}
@@ -1160,16 +1158,7 @@ func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, row *adw.Ac
 	dialog.SetContentHeight(650)
 	dialog.SetCanClose(true)
 
-	// Auto-migrate legacy rules when opening edit dialog
-	if len(rule.Conditions) == 0 && rule.Pattern != "" {
-		rule.Conditions = []Condition{{
-			Type:    rule.PatternType,
-			Pattern: rule.Pattern,
-		}}
-		rule.Logic = "all"
-	}
-
-	// Ensure new rules have at least one condition
+	// Ensure rules have at least one condition
 	if len(rule.Conditions) == 0 {
 		rule.Conditions = []Condition{{
 			Type:    "domain",
@@ -1222,9 +1211,6 @@ func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, row *adw.Ac
 			rule.Logic = getLogicFromComboRow(logicRow)
 			rule.Browser = browsers[browserIdx].ID
 			rule.AlwaysAsk = alwaysAskRow.Active()
-			// Clear old fields
-			rule.Pattern = ""
-			rule.PatternType = ""
 
 			saveConfigWithFlag(cfg)
 			rebuildRulesList()
@@ -1266,18 +1252,8 @@ func formatRuleSubtitleInternal(rule *Rule, browserName string, includePattern b
 		return fmt.Sprintf("%d conditions (%s) · Opens in %s", condCount, logicText, browserName)
 	}
 
-	// Handle legacy single pattern format
-	typeLabel := getTypeLabel(rule.PatternType)
-	if rule.AlwaysAsk {
-		if includePattern {
-			return fmt.Sprintf("%s: %s · Always ask", typeLabel, rule.Pattern)
-		}
-		return fmt.Sprintf("%s · Always ask", typeLabel)
-	}
-	if includePattern {
-		return fmt.Sprintf("%s: %s · Opens in %s", typeLabel, rule.Pattern, browserName)
-	}
-	return fmt.Sprintf("%s · Opens in %s", typeLabel, browserName)
+	// No conditions (should not happen in normal use)
+	return "No conditions"
 }
 
 func getTypeLabel(patternType string) string {

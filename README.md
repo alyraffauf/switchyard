@@ -153,8 +153,6 @@ pattern = "amazon"
 | `browser` | Desktop file ID of the target browser |
 | `always_ask` | If true, show browser picker instead of auto-opening (default: false) |
 
-**Note:** Legacy single-pattern rules using `pattern` and `pattern_type` fields are still supported for backward compatibility, but will be automatically migrated to the multi-condition format when edited.
-
 ### Condition Options
 
 | Field | Description |
