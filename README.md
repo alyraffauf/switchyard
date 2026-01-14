@@ -22,34 +22,40 @@ A configurable default browser for Linux. Route URLs to different browsers based
 
 ## Installation
 
-### Building from Source
+### Flatpak (Recommended)
 
-Requires Go 1.21+, GTK4/libadwaita development libraries, and [just](https://github.com/casey/just).
-
-```bash
-# Fedora
-sudo dnf install gtk4-devel glib2-devel gobject-introspection-devel libadwaita-devel just
-
-# Build
-just build
-
-# Install to /usr/local (requires build first)
-sudo just install
-
-# Or install to custom prefix
-sudo PREFIX=/usr just install
-```
-
-### Building Flatpak
+Requires [just](https://github.com/casey/just) for building.
 
 ```bash
 # Build and install (automatically installs Flatpak runtimes if needed)
 just flatpak
 ```
 
+### Building from Source
+
+For non-Flatpak builds, requires Go 1.24+, GTK4/libadwaita development libraries, and [just](https://github.com/casey/just).
+
+```bash
+# Install dependencies (Fedora)
+just install-deps
+
+# Build
+just build
+
+# Install to /usr/local
+sudo just install
+
+# Or install to custom prefix
+sudo PREFIX=/usr just install
+```
+
 ### Set as Default Browser
 
 ```bash
+# Flatpak
+flatpak run io.github.alyraffauf.Switchyard --set-default
+
+# Or via system settings
 xdg-settings set default-web-browser io.github.alyraffauf.Switchyard.desktop
 ```
 
@@ -59,9 +65,13 @@ Or use your desktop environment's settings to set Switchyard as the default brow
 
 ```bash
 # Open settings
-switchyard
+flatpak run io.github.alyraffauf.Switchyard
 
 # Open a URL (typically called automatically by the system)
+flatpak run io.github.alyraffauf.Switchyard "https://example.com"
+
+# Non-Flatpak
+switchyard
 switchyard "https://example.com"
 ```
 
