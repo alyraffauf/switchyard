@@ -12,6 +12,9 @@ repo/
 # Go
 # vendor/ - committed for Flatpak reproducible builds
 
+# Test artifacts
+coverage.out
+
 # IDE
 .idea/
 .vscode/
