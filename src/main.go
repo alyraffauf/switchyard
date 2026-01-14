@@ -423,9 +423,24 @@ func showSettingsWindow(app *adw.Application) {
 		}
 	}
 
+	// Track if we're currently saving to avoid file watcher race conditions
+	var isSaving bool
+
+	// Wrap saveConfig to set the saving flag
+	saveConfigSafe := func(c *Config) error {
+		isSaving = true
+		err := saveConfig(c)
+		// Add small delay to ensure file is flushed before file watcher reads it
+		glib.TimeoutAdd(100, func() bool {
+			isSaving = false
+			return false
+		})
+		return err
+	}
+
 	// Function to save config and update UI
 	saveAndUpdate := func() {
-		saveConfig(cfg)
+		saveConfigSafe(cfg)
 		updateUI()
 	}
 
@@ -442,15 +457,15 @@ func showSettingsWindow(app *adw.Application) {
 		idx := defaultRow.Selected()
 		if idx == 0 {
 			cfg.FallbackBrowser = ""
-		} else if int(idx)-1 < len(browsers) {
+		} else if idx > 0 && int(idx) <= len(browsers) {
 			cfg.FallbackBrowser = browsers[idx-1].ID
 		}
-		saveConfig(cfg)
+		saveConfigSafe(cfg)
 	})
 
 	checkDefaultRow.Connect("notify::active", func() {
 		cfg.CheckDefaultBrowser = checkDefaultRow.Active()
-		saveConfig(cfg)
+		saveConfigSafe(cfg)
 	})
 
 	// Check if we should prompt to set as default browser (after UI is created)
@@ -633,6 +648,11 @@ func showSettingsWindow(app *adw.Application) {
 		if monitor != nil {
 			monitor.ConnectChanged(func(file, otherFile gio.Filer, eventType gio.FileMonitorEvent) {
 				if eventType == gio.FileMonitorEventChanged || eventType == gio.FileMonitorEventCreated {
+					// Ignore file changes while we're saving to avoid race conditions
+					if isSaving {
+						return
+					}
+
 					// Reload config from disk
 					newCfg := loadConfig()
 					cfg.PromptOnClick = newCfg.PromptOnClick
