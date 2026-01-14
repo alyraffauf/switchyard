@@ -13,8 +13,8 @@ finish-args:
   - --socket=wayland
   - --device=dri
 
-  # Flatpak spawn to launch browsers on the host
-  - --talk-name=org.freedesktop.Flatpak
+  # Portal access for opening URLs in browsers
+  - --talk-name=org.freedesktop.portal.Desktop
 
   # Read host filesystem to detect installed browsers
   # Similar to Junction (re.sonny.Junction)
@@ -27,10 +27,6 @@ finish-args:
   # Extend XDG_DATA_DIRS to include flatpak and snap export paths
   # This preserves the runtime defaults while adding browser icon locations
   - --env=XDG_DATA_DIRS=/app/share:/usr/share:/usr/share/runtime/share:/run/host/user-share:/run/host/share:/var/lib/flatpak/exports/share:~/.local/share/flatpak/exports/share:/var/lib/snapd/desktop
-
-  # Config storage
-  - --filesystem=xdg-config/switchyard:create
-
 modules:
   - name: switchyard
     buildsystem: simple
