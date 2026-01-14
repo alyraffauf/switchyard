@@ -21,7 +21,7 @@ type Config struct {
 }
 
 type Condition struct {
-	Type    string `toml:"type"`    // "domain", "keyword", "glob", "regex"
+	Type    string `toml:"type"` // "domain", "keyword", "glob", "regex"
 	Pattern string `toml:"pattern"`
 }
 
@@ -47,9 +47,9 @@ func configPath() string {
 
 func loadConfig() *Config {
 	cfg := &Config{
-		PromptOnClick:      true,
+		PromptOnClick:       true,
 		CheckDefaultBrowser: true,
-		Rules:              []Rule{},
+		Rules:               []Rule{},
 	}
 
 	data, err := os.ReadFile(configPath())
@@ -120,8 +120,6 @@ func (r *Rule) matchesConditions(url string) bool {
 		return false
 	}
 }
-
-
 
 func matchesPattern(url, pattern, patternType string) bool {
 	domain := extractDomain(url)
