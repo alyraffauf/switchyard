@@ -20,12 +20,21 @@ type Config struct {
 	Rules               []Rule `toml:"rules"`
 }
 
+type Condition struct {
+	Type    string `toml:"type"`    // "domain", "keyword", "glob", "regex"
+	Pattern string `toml:"pattern"`
+}
+
 type Rule struct {
-	Name        string `toml:"name"`
-	Pattern     string `toml:"pattern"`
-	PatternType string `toml:"pattern_type"` // glob, regex, keyword
-	Browser     string `toml:"browser"`
-	AlwaysAsk   bool   `toml:"always_ask"`
+	Name       string      `toml:"name"`
+	Conditions []Condition `toml:"conditions,omitempty"` // NEW: Array of conditions
+	Logic      string      `toml:"logic,omitempty"`      // NEW: "all" or "any"
+	Browser    string      `toml:"browser"`
+	AlwaysAsk  bool        `toml:"always_ask"`
+
+	// Deprecated: For backward compatibility
+	Pattern     string `toml:"pattern,omitempty"`
+	PatternType string `toml:"pattern_type,omitempty"` // glob, regex, keyword
 }
 
 func configDir() string {
@@ -65,6 +74,11 @@ func loadConfig() *Config {
 }
 
 func saveConfig(cfg *Config) error {
+	// Migrate rules to new format before saving
+	for i := range cfg.Rules {
+		cfg.Rules[i].migrateToMultiCondition()
+	}
+
 	dir := configDir()
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
@@ -80,11 +94,63 @@ func saveConfig(cfg *Config) error {
 
 func (cfg *Config) matchRule(url string) (browserID string, alwaysAsk bool, matched bool) {
 	for _, rule := range cfg.Rules {
-		if matchesPattern(url, rule.Pattern, rule.PatternType) {
+		// Handle new multi-condition format
+		if len(rule.Conditions) > 0 {
+			if rule.matchesConditions(url) {
+				return rule.Browser, rule.AlwaysAsk, true
+			}
+			continue
+		}
+
+		// Handle legacy single pattern format
+		if rule.Pattern != "" && matchesPattern(url, rule.Pattern, rule.PatternType) {
 			return rule.Browser, rule.AlwaysAsk, true
 		}
 	}
 	return "", false, false
+}
+
+func (r *Rule) matchesConditions(url string) bool {
+	if len(r.Conditions) == 0 {
+		return false
+	}
+
+	logic := r.Logic
+	if logic == "" {
+		logic = "all" // Default to AND logic
+	}
+
+	if logic == "all" {
+		// AND: All conditions must match
+		for _, cond := range r.Conditions {
+			if !matchesPattern(url, cond.Pattern, cond.Type) {
+				return false
+			}
+		}
+		return true
+	} else {
+		// OR: Any condition must match
+		for _, cond := range r.Conditions {
+			if matchesPattern(url, cond.Pattern, cond.Type) {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+func (r *Rule) migrateToMultiCondition() {
+	// Convert old single-pattern format to new multi-condition format
+	if len(r.Conditions) == 0 && r.Pattern != "" {
+		r.Conditions = []Condition{{
+			Type:    r.PatternType,
+			Pattern: r.Pattern,
+		}}
+		r.Logic = "all"
+		// Clear old fields
+		r.Pattern = ""
+		r.PatternType = ""
+	}
 }
 
 func matchesPattern(url, pattern, patternType string) bool {
