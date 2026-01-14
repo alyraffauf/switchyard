@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
@@ -17,6 +18,15 @@ import (
 )
 
 const appID = "io.github.alyraffauf.Switchyard"
+
+func findBrowserByID(browsers []*Browser, id string) *Browser {
+	for _, b := range browsers {
+		if b.ID == id {
+			return b
+		}
+	}
+	return nil
+}
 
 func main() {
 	app := adw.NewApplication(appID, gio.ApplicationHandlesOpen)
@@ -102,38 +112,30 @@ func loadBrowserIcon(iconName string, size int) *gtk.Image {
 }
 
 func handleURL(app *adw.Application, url string) {
-	continueHandlingURL(app, url)
-}
-
-func continueHandlingURL(app *adw.Application, url string) {
 	cfg := loadConfig()
 	browsers := detectBrowsers()
 
 	// Try to match a rule
-	matchedBrowserID := cfg.matchRuleID(url)
-	if matchedBrowserID != "" {
+	browserID, alwaysAsk, matched := cfg.matchRule(url)
+	if matched {
 		// Check if rule has AlwaysAsk enabled
-		if cfg.matchRuleShouldAsk(url) {
+		if alwaysAsk {
 			showPickerWindow(app, url, browsers)
 			return
 		}
 
 		// Find the browser and launch it
-		for _, b := range browsers {
-			if b.ID == matchedBrowserID {
-				launchBrowser(b, url)
-				return
-			}
+		if browser := findBrowserByID(browsers, browserID); browser != nil {
+			launchBrowser(browser, url)
+			return
 		}
 	}
 
 	// No rule matched
 	if !cfg.PromptOnClick && cfg.FallbackBrowser != "" {
-		for _, b := range browsers {
-			if b.ID == cfg.FallbackBrowser {
-				launchBrowser(b, url)
-				return
-			}
+		if browser := findBrowserByID(browsers, cfg.FallbackBrowser); browser != nil {
+			launchBrowser(browser, url)
+			return
 		}
 	}
 
@@ -175,13 +177,9 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	// Sort browsers alphabetically by name
 	sortedBrowsers := make([]*Browser, len(browsers))
 	copy(sortedBrowsers, browsers)
-	for i := 0; i < len(sortedBrowsers); i++ {
-		for j := i + 1; j < len(sortedBrowsers); j++ {
-			if sortedBrowsers[i].Name > sortedBrowsers[j].Name {
-				sortedBrowsers[i], sortedBrowsers[j] = sortedBrowsers[j], sortedBrowsers[i]
-			}
-		}
-	}
+	sort.Slice(sortedBrowsers, func(i, j int) bool {
+		return sortedBrowsers[i].Name < sortedBrowsers[j].Name
+	})
 
 	win := adw.NewWindow()
 	win.SetTitle("Switchyard")
@@ -475,20 +473,16 @@ func showSettingsWindow(app *adw.Application) {
 
 	// Helper to get browser name from ID
 	getBrowserName := func(id string) string {
-		for _, b := range browsers {
-			if b.ID == id {
-				return b.Name
-			}
+		if browser := findBrowserByID(browsers, id); browser != nil {
+			return browser.Name
 		}
 		return id
 	}
 
 	// Helper to get browser icon from ID
 	getBrowserIcon := func(id string) string {
-		for _, b := range browsers {
-			if b.ID == id {
-				return b.Icon
-			}
+		if browser := findBrowserByID(browsers, id); browser != nil {
+			return browser.Icon
 		}
 		return "web-browser-symbolic"
 	}
@@ -1160,29 +1154,4 @@ func formatRuleSubtitleNoPattern(patternType, browserName string, alwaysAsk bool
 		return fmt.Sprintf("%s · Always ask", typeLabel)
 	}
 	return fmt.Sprintf("%s · Opens in %s", typeLabel, browserName)
-}
-
-func createBrowserButton(b *Browser) *gtk.Box {
-	box := gtk.NewBox(gtk.OrientationVertical, 6)
-	box.SetHAlign(gtk.AlignCenter)
-
-	if b.Icon != "" {
-		icon := gtk.NewImageFromIconName(b.Icon)
-		icon.SetPixelSize(48)
-		box.Append(icon)
-	}
-
-	label := gtk.NewLabel(b.Name)
-	label.SetEllipsize(pango.EllipsizeEnd)
-	label.SetMaxWidthChars(12)
-	box.Append(label)
-
-	return box
-}
-
-func truncateURL(url string, maxLen int) string {
-	if len(url) <= maxLen {
-		return url
-	}
-	return url[:maxLen-3] + "..."
 }

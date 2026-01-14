@@ -4,6 +4,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -183,5 +184,11 @@ func launchBrowser(b *Browser, url string) {
 		cmd = exec.Command(parts[0], parts[1:]...)
 	}
 
-	cmd.Start()
+	if err := cmd.Start(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error launching browser: %v\n", err)
+		return
+	}
+
+	// Clean up the process asynchronously to prevent zombie processes
+	go cmd.Wait()
 }

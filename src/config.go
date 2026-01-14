@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -51,7 +52,15 @@ func loadConfig() *Config {
 		return cfg
 	}
 
-	toml.Unmarshal(data, cfg)
+	if err := toml.Unmarshal(data, cfg); err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: Failed to parse config file: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Using default configuration\n")
+		return &Config{
+			PromptOnClick:       true,
+			CheckDefaultBrowser: true,
+			Rules:               []Rule{},
+		}
+	}
 	return cfg
 }
 
@@ -69,37 +78,13 @@ func saveConfig(cfg *Config) error {
 	return os.WriteFile(configPath(), data, 0644)
 }
 
-func (cfg *Config) matchRule(url string) *Browser {
-	browsers := detectBrowsers()
-
+func (cfg *Config) matchRule(url string) (browserID string, alwaysAsk bool, matched bool) {
 	for _, rule := range cfg.Rules {
 		if matchesPattern(url, rule.Pattern, rule.PatternType) {
-			for _, b := range browsers {
-				if b.ID == rule.Browser {
-					return b
-				}
-			}
+			return rule.Browser, rule.AlwaysAsk, true
 		}
 	}
-	return nil
-}
-
-func (cfg *Config) matchRuleID(url string) string {
-	for _, rule := range cfg.Rules {
-		if matchesPattern(url, rule.Pattern, rule.PatternType) {
-			return rule.Browser
-		}
-	}
-	return ""
-}
-
-func (cfg *Config) matchRuleShouldAsk(url string) bool {
-	for _, rule := range cfg.Rules {
-		if matchesPattern(url, rule.Pattern, rule.PatternType) {
-			return rule.AlwaysAsk
-		}
-	}
-	return false
+	return "", false, false
 }
 
 func matchesPattern(url, pattern, patternType string) bool {
