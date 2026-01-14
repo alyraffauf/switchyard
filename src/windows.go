@@ -20,6 +20,11 @@ import (
 func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	cfg := loadConfig()
 
+	if cfg.ForceDarkMode {
+		// Optionally dark mode for picker window
+		adw.StyleManagerGetDefault().SetColorScheme(adw.ColorSchemeForceDark)
+	}
+
 	// Sort browsers alphabetically by name
 	sortedBrowsers := make([]*Browser, len(browsers))
 	copy(sortedBrowsers, browsers)
@@ -296,6 +301,12 @@ func showSettingsWindow(app *adw.Application) {
 	appearanceGroup.SetTitle("Appearance")
 
 	// Show app names toggle
+	forceDarkRow := adw.NewSwitchRow()
+	forceDarkRow.SetTitle("Force dark mode in browser picker")
+	forceDarkRow.SetSubtitle("Always use dark mode for the picker window")
+	appearanceGroup.Add(forceDarkRow)
+
+	// Show app names toggle
 	showNamesRow := adw.NewSwitchRow()
 	showNamesRow.SetTitle("Show browser names in picker")
 	showNamesRow.SetSubtitle("Display browser names below icons")
@@ -340,6 +351,7 @@ func showSettingsWindow(app *adw.Application) {
 		defaultRow.SetSensitive(!cfg.PromptOnClick)
 		checkDefaultRow.SetActive(cfg.CheckDefaultBrowser)
 		showNamesRow.SetActive(cfg.ShowAppNames)
+		forceDarkRow.SetActive(cfg.ForceDarkMode)
 
 		// Update fallback browser selection
 		defaultRow.SetSelected(0)
@@ -399,6 +411,11 @@ func showSettingsWindow(app *adw.Application) {
 
 	showNamesRow.Connect("notify::active", func() {
 		cfg.ShowAppNames = showNamesRow.Active()
+		saveConfigSafe(cfg)
+	})
+
+	forceDarkRow.Connect("notify::active", func() {
+		cfg.ForceDarkMode = forceDarkRow.Active()
 		saveConfigSafe(cfg)
 	})
 
