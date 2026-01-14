@@ -5,6 +5,26 @@ on:
     branches: [master]
 name: CI
 jobs:
+  test:
+    name: "Unit Tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - name: Run tests
+        run: make test
+      - name: Generate coverage report
+        run: |
+          go test -coverprofile=coverage.out ./src/config_test.go ./src/config.go
+          go tool cover -func=coverage.out
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.out
+
   flatpak:
     name: "Flatpak"
     runs-on: ubuntu-latest

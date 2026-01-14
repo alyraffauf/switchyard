@@ -184,6 +184,25 @@ Use `all` for precise targeting (e.g., "docs.google.com AND contains 'edit'") an
 | `fallback_browser` | Fallback browser to use when prompt is disabled and no rule matches |
 | `check_default_browser` | Prompt to set Switchyard as system default browser on startup (default: true) |
 
+## Development
+
+### Running Tests
+
+The project includes unit tests for the core rule matching logic. Tests can run without GTK dependencies.
+
+```bash
+# Run tests
+make test
+
+# Run tests with coverage report
+make test-coverage
+
+# View HTML coverage report
+go tool cover -html=coverage.out
+```
+
+Tests are automatically run in CI on every push and pull request.
+
 ## Prior Art
 
 Switchyard draws inspiration from excellent browser pickers on other platforms:

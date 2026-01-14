@@ -1,4 +1,4 @@
-.PHONY: build install uninstall clean set-default vendor
+.PHONY: build install uninstall clean set-default vendor test test-coverage
 
 PREFIX ?= /usr/local
 BINDIR = $(PREFIX)/bin
@@ -31,3 +31,14 @@ set-default:
 vendor:
 	go mod tidy
 	go mod vendor
+
+test:
+	@echo "Running unit tests..."
+	go test -v ./src/config_test.go ./src/config.go
+
+test-coverage:
+	@echo "Running tests with coverage..."
+	go test -coverprofile=coverage.out ./src/config_test.go ./src/config.go
+	go tool cover -func=coverage.out
+	@echo ""
+	@echo "To view HTML coverage report, run: go tool cover -html=coverage.out"
