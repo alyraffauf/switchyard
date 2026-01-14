@@ -24,20 +24,20 @@ A configurable default browser for Linux. Route URLs to different browsers based
 
 ### Building from Source
 
-Requires Go 1.21+ and GTK4/libadwaita development libraries.
+Requires Go 1.21+, GTK4/libadwaita development libraries, and [just](https://github.com/casey/just).
 
 ```bash
 # Fedora
-sudo dnf install gtk4-devel glib2-devel gobject-introspection-devel libadwaita-devel
+sudo dnf install gtk4-devel glib2-devel gobject-introspection-devel libadwaita-devel just
 
 # Build
-make build
+just build
 
 # Install to /usr/local (requires build first)
-sudo make install
+sudo just install
 
 # Or install to custom prefix
-sudo make install PREFIX=/usr
+sudo PREFIX=/usr just install
 ```
 
 ### Building Flatpak
@@ -192,10 +192,10 @@ The project includes unit tests for the core rule matching logic. Tests can run 
 
 ```bash
 # Run tests
-make test
+just test
 
 # Run tests with coverage report
-make test-coverage
+just test-coverage
 
 # View HTML coverage report
 go tool cover -html=coverage.out
