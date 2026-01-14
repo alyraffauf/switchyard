@@ -1,6 +1,6 @@
 # Switchyard
 
-A configurable default browser for Linux. Route URLs to different browsers based on rules, or choose manually with a quick picker.
+**A rules-based URL router for Linux that replaces your default web browser.** When you click a link, Switchyard makes sure it gets sent to the right browser based on your rules, or lets you choose with a quick prompt.
 
 <p align="center">
   <img src="docs/images/switchyard-prompt.png" alt="Switchyard Prompt" width="600">
@@ -14,15 +14,19 @@ A configurable default browser for Linux. Route URLs to different browsers based
   <img src="docs/images/switchyard-rulesedit.png" alt="Switchyard Rule Editor" width="600">
 </p>
 
+## Why Switchyard?
+
+Switchyards are the backbone of modern commerce. Instead of all trains (URLs) going to the same destination (one browser), switchyards direct each one to the right track (browser) based on your rules. Work links go to your work browser, social sites to another, and you can manually switch tracks when needed.
+
 ## Features
 
-- **Rule-based routing**: Automatically open URLs in specific browsers based on patterns
-- **Multi-condition rules**: Combine multiple conditions with AND/OR logic for complex routing
-- **Multiple pattern types**: Exact domain, URL contains, wildcard (glob), and regex
-- **Quick picker**: When no rule matches, choose from detected browsers with keyboard or mouse
-- **Keyboard-first**: Press 1-9 to instantly select a browser, arrow keys to navigate
-- **Live config reload**: Edit the config file externally and changes apply immediately
-- **GTK4 + libadwaita**: Native GNOME look and feel
+- **Rule-based routing**: Automatically send URLs to specific browsers based on powerful text patterns.
+- **Multi-condition rules**: Stack multiple conditions with AND/OR logic for precise routing.
+- **Multiple pattern types**: Exact domain, URL contains, wildcard (glob), and regex.
+- **Quick picker**: When no rule matches, choose from your installed browsers with keyboard or mouse.
+- **Keyboard-first**: Press 1-9 to instantly select a browser, arrow keys to navigate.
+- **Daemonless**: Runs only when needed, no background processes.
+- **GTK4 + libadwaita**: Native GNOME look and feel.
 
 ## Installation
 
@@ -55,15 +59,13 @@ sudo PREFIX=/usr just install
 
 ### Set as Default Browser
 
-```bash
-# Flatpak
-flatpak run io.github.alyraffauf.Switchyard --set-default
+After installation, set Switchyard as your default browser so it can route all clicked links:
 
-# Or via system settings
+```bash
 xdg-settings set default-web-browser io.github.alyraffauf.Switchyard.desktop
 ```
 
-Or use your desktop environment's settings to set Switchyard as the default browser.
+Or use your desktop environment's graphical settings to set Switchyard as the default browser.
 
 ## Usage
 
@@ -212,9 +214,9 @@ Tests are automatically run in CI on every push and pull request.
 
 ## Prior Art
 
-Switchyard draws inspiration from excellent browser pickers on other platforms:
+Switchyard draws inspiration from other excellent URL routers and browser pickers:
 
-- **[Choosy](https://choosy.app/)** - The gold standard browser picker for macOS. Beautiful UI and great UX, but not available on Linux.
+- **[Choosy](https://choosy.app/)** - The gold standard URL router for macOS. Beautiful UI and powerful rule-based routing, but not available on Linux.
 - **[Junction](https://github.com/sonnyp/Junction)** - Slick browser picker for Linux with a snazzy interface, but without rule-based URL routing.
 
 Switchyard aims to combine the best of both: Choosy's rule-based routing with a fast, native Linux experience.

@@ -2,7 +2,7 @@
 Type=Application
 Name=Switchyard
 GenericName=Web Browser
-Comment=Choose which browser opens each link
+Comment=Rules-based URL router
 Exec=switchyard %U
 Icon=io.github.alyraffauf.Switchyard
 Terminal=false

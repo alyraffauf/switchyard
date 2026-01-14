@@ -2,24 +2,29 @@
 <component type="desktop-application">
   <id>io.github.alyraffauf.Switchyard</id>
   <name>Switchyard</name>
-  <summary>Choose which browser opens each link</summary>
+  <summary
+    >Rules-based URL router that replaces your default web browser</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
 
   <description>
     <p>
-      Switchyard is a configurable default browser for Linux, inspired by Choosy for macOS.
-      When you click a link, it lets you choose which browser to open it with, or automatically
-      routes URLs to specific browsers based on rules you define.
+      Switchyard is a URL router for Linux that makes sure clicked links get sent to the right browser
+      based on your rules. Like a railroad switchyard directing trains to different tracks, it routes
+      URLs to the appropriate browser, or lets you choose with a quick prompt when no rule matches.
     </p>
     <p>Features:</p>
     <ul>
-      <li>Set rules to open specific domains in specific browsers</li>
-      <li>Multi-condition rules with AND/OR logic for complex routing</li>
-      <li>Support for exact domain, wildcard, keyword, and regex matching</li>
-      <li>Quick browser picker with keyboard shortcuts (1-9)</li>
+      <li
+            >Rule-based routing: Automatically send URLs to specific browsers based on powerful text patterns</li>
+      <li
+            >Multi-condition rules: Stack multiple conditions with AND/OR logic for precise routing</li>
+      <li
+            >Multiple pattern types: Exact domain, URL contains, wildcard (glob), and regex</li>
+      <li
+            >Quick prompt with keyboard shortcuts (press 1-9 to instantly select a browser)</li>
+      <li>Daemonless: Runs only when needed, no background processes</li>
       <li>Simple TOML configuration file for power users</li>
-      <li>Live config reload when editing externally</li>
     </ul>
   </description>
 
@@ -63,10 +68,12 @@
       <description>
         <p>Initial release</p>
         <ul>
-          <li>Browser picker with libadwaita UI</li>
-          <li>Rule-based URL routing with multiple pattern types</li>
+          <li
+                    >Rules-based URL routing with multiple pattern types (domain, keyword, glob, regex)</li>
+          <li>Multi-condition rules with AND/OR logic</li>
+          <li>Quick browser prompt with libadwaita UI</li>
           <li>Settings window for managing rules</li>
-          <li>Keyboard-first picker (1-9 shortcuts)</li>
+          <li>Keyboard-first (press 1-9 for instant selection)</li>
         </ul>
       </description>
     </release>
