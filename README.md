@@ -13,6 +13,7 @@ A configurable default browser for Linux. Route URLs to different browsers based
 ## Features
 
 - **Rule-based routing**: Automatically open URLs in specific browsers based on patterns
+- **Multi-condition rules**: Combine multiple conditions with AND/OR logic for complex routing
 - **Multiple pattern types**: Exact domain, URL contains, wildcard (glob), and regex
 - **Quick picker**: When no rule matches, choose from detected browsers with keyboard or mouse
 - **Keyboard-first**: Press 1-9 to instantly select a browser, arrow keys to navigate
@@ -91,22 +92,55 @@ prompt_on_click = true
 fallback_browser = ""
 check_default_browser = true
 
+# Simple rule with a single condition
 [[rules]]
 name = "Work GitHub"
-pattern = "github.com"
-pattern_type = "domain"
 browser = "firefox.desktop"
 
+[[rules.conditions]]
+type = "domain"
+pattern = "github.com"
+
+# Multi-condition rule with AND logic
 [[rules]]
-name = "Google Apps"
-pattern = "*.google.com"
-pattern_type = "glob"
+name = "Google Docs"
+logic = "all"  # all conditions must match
 browser = "google-chrome.desktop"
 
+[[rules.conditions]]
+type = "domain"
+pattern = "docs.google.com"
+
+[[rules.conditions]]
+type = "keyword"
+pattern = "edit"
+
+# Multi-condition rule with OR logic
 [[rules]]
-pattern = "youtube.com/watch"
-pattern_type = "keyword"
+name = "Video Sites"
+logic = "any"  # any condition can match
 browser = "brave-browser.desktop"
+
+[[rules.conditions]]
+type = "domain"
+pattern = "youtube.com"
+
+[[rules.conditions]]
+type = "domain"
+pattern = "vimeo.com"
+
+[[rules.conditions]]
+type = "domain"
+pattern = "twitch.tv"
+
+# Rule with always ask
+[[rules]]
+name = "Shopping Sites"
+always_ask = true
+
+[[rules.conditions]]
+type = "keyword"
+pattern = "amazon"
 ```
 
 ### Rule Options
@@ -114,11 +148,21 @@ browser = "brave-browser.desktop"
 | Field | Description |
 |-------|-------------|
 | `name` | Optional friendly name displayed in the UI |
-| `pattern` | The pattern to match against |
-| `pattern_type` | One of: `domain`, `keyword`, `glob`, `regex` |
+| `conditions` | Array of conditions to match (see below) |
+| `logic` | How to combine conditions: `all` (AND) or `any` (OR). Default: `all` |
 | `browser` | Desktop file ID of the target browser |
+| `always_ask` | If true, show browser picker instead of auto-opening (default: false) |
 
-### Pattern Types
+**Note:** Legacy single-pattern rules using `pattern` and `pattern_type` fields are still supported for backward compatibility, but will be automatically migrated to the multi-condition format when edited.
+
+### Condition Options
+
+| Field | Description |
+|-------|-------------|
+| `type` | One of: `domain`, `keyword`, `glob`, `regex` |
+| `pattern` | The pattern to match against |
+
+### Condition Types
 
 | Type | Description | Example |
 |------|-------------|---------|
@@ -126,6 +170,13 @@ browser = "brave-browser.desktop"
 | `keyword` | URL contains text | `youtube.com/watch` |
 | `glob` | Wildcard pattern | `*.github.com` |
 | `regex` | Regular expression | `^https://.*\.example\.(com\|org)` |
+
+### Logic Modes
+
+- **`all`** (AND logic): All conditions in the rule must match for the rule to apply
+- **`any`** (OR logic): Any single condition matching will trigger the rule
+
+Use `all` for precise targeting (e.g., "docs.google.com AND contains 'edit'") and `any` for broad matching (e.g., "youtube.com OR vimeo.com OR twitch.tv").
 
 ### Settings
 
