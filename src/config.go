@@ -18,6 +18,7 @@ type Config struct {
 	FallbackBrowser     string `toml:"fallback_browser"`
 	CheckDefaultBrowser bool   `toml:"check_default_browser"`
 	ShowAppNames        bool   `toml:"show_app_names"`
+	ForceDarkMode       bool   `toml:"force_dark_mode"`
 	Rules               []Rule `toml:"rules"`
 }
 
@@ -51,6 +52,7 @@ func loadConfig() *Config {
 		PromptOnClick:       true,
 		CheckDefaultBrowser: true,
 		ShowAppNames:        false, // Default: hide app names, show tooltips
+		ForceDarkMode:       true,  // Default: force dark mode
 		Rules:               []Rule{},
 	}
 
