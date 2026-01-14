@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"regexp"
 
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
@@ -325,10 +326,57 @@ func showEditConditionDialog(parent *adw.Window, cond *Condition, onSave func())
 	patternRow.SetText(cond.Pattern)
 	group.Add(patternRow)
 
+	// Error label for regex validation
+	errorLabel := gtk.NewLabel("")
+	errorLabel.SetWrap(true)
+	errorLabel.AddCSSClass("error")
+	errorLabel.SetVisible(false)
+
+	// Function to validate and update error display
+	updateValidation := func() {
+		var condType string
+		switch typeRow.Selected() {
+		case 0:
+			condType = "domain"
+		case 1:
+			condType = "keyword"
+		case 2:
+			condType = "glob"
+		case 3:
+			condType = "regex"
+		}
+
+		pattern := patternRow.Text()
+		err := validateConditionPattern(condType, pattern)
+
+		if err != nil {
+			errorLabel.SetLabel(err.Error())
+			errorLabel.SetVisible(true)
+			patternRow.AddCSSClass("error")
+			saveBtn.SetSensitive(false)
+		} else {
+			errorLabel.SetVisible(false)
+			patternRow.RemoveCSSClass("error")
+			saveBtn.SetSensitive(pattern != "")
+		}
+	}
+
+	patternRow.Connect("changed", func() {
+		updateValidation()
+	})
+
+	typeRow.Connect("notify::selected", func() {
+		updateValidation()
+	})
+
 	content.Append(group)
+	content.Append(errorLabel)
 
 	toolbarView.SetContent(content)
 	dialog.SetChild(toolbarView)
+
+	// Initial validation check
+	updateValidation()
 
 	saveBtn.ConnectClicked(func() {
 		pattern := patternRow.Text()
@@ -336,8 +384,16 @@ func showEditConditionDialog(parent *adw.Window, cond *Condition, onSave func())
 			return
 		}
 
+		// Final validation
+		selectedType := typeRow.Selected()
+		if selectedType == 3 { // Regex
+			if _, err := regexp.Compile(pattern); err != nil {
+				return
+			}
+		}
+
 		// Update condition
-		switch typeRow.Selected() {
+		switch selectedType {
 		case 0:
 			cond.Type = "domain"
 		case 1:
@@ -490,18 +546,33 @@ func buildRuleDialogContent(
 			patternRow := adw.NewEntryRow()
 			patternRow.SetTitle("Pattern")
 			patternRow.SetText((*conditions)[condIdx].Pattern)
+
+			// Function to validate pattern (especially for regex)
+			validatePattern := func() {
+				pattern := patternRow.Text()
+				condType := (*conditions)[condIdx].Type
+
+				err := validateConditionPattern(condType, pattern)
+
+				if err != nil {
+					patternRow.AddCSSClass("error")
+				} else {
+					patternRow.RemoveCSSClass("error")
+				}
+
+				// Enable/disable action button based on all conditions validity
+				actionBtn.SetSensitive(areAllConditionsValid(*conditions))
+			}
+
 			patternRow.Connect("changed", func() {
 				(*conditions)[condIdx].Pattern = patternRow.Text()
-				// Enable/disable action button based on whether all conditions have patterns
-				allValid := true
-				for _, c := range *conditions {
-					if c.Pattern == "" {
-						allValid = false
-						break
-					}
-				}
-				actionBtn.SetSensitive(allValid)
+				validatePattern()
 			})
+
+			typeRow.Connect("notify::selected", func() {
+				validatePattern()
+			})
+
 			innerListBox.Append(patternRow)
 
 			conditionContainer.Append(innerListBox)
