@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
@@ -30,6 +31,39 @@ func validateConditions(conditions []Condition) bool {
 			if _, err := regexp.Compile(c.Pattern); err != nil {
 				return false
 			}
+		}
+	}
+	return true
+}
+
+// validateConditionPattern checks if a condition's pattern is valid for its type.
+// Returns an error with a descriptive message if invalid, nil if valid.
+func validateConditionPattern(condType, pattern string) error {
+	if pattern == "" {
+		return fmt.Errorf("pattern cannot be empty")
+	}
+
+	if condType == "regex" {
+		if _, err := regexp.Compile(pattern); err != nil {
+			return fmt.Errorf("invalid regex: %w", err)
+		}
+	}
+	return nil
+}
+
+// isConditionValid checks if a single condition is valid.
+func isConditionValid(c Condition) bool {
+	return validateConditionPattern(c.Type, c.Pattern) == nil
+}
+
+// areAllConditionsValid checks if all conditions in a slice are valid.
+func areAllConditionsValid(conditions []Condition) bool {
+	if len(conditions) == 0 {
+		return false
+	}
+	for _, c := range conditions {
+		if !isConditionValid(c) {
+			return false
 		}
 	}
 	return true
