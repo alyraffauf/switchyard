@@ -92,7 +92,7 @@ switchyard "https://example.com"
 
 ## Configuration
 
-Config file location: `~/.config/switchyard/config.toml`
+Config file location: `~/.config/switchyard/config.toml` or `~/.var/app/io.github.alyraffauf.Switchyard/config/switchyard/config.toml` for Flatpak.
 
 ```toml
 prompt_on_click = true
