@@ -101,6 +101,10 @@ func loadBrowserIcon(iconName string, size int) *gtk.Image {
 }
 
 func handleURL(app *adw.Application, url string) {
+	continueHandlingURL(app, url)
+}
+
+func continueHandlingURL(app *adw.Application, url string) {
 	cfg := loadConfig()
 	browsers := detectBrowsers()
 
@@ -111,9 +115,9 @@ func handleURL(app *adw.Application, url string) {
 	}
 
 	// No rule matched
-	if !cfg.PromptOnClick && cfg.DefaultBrowser != "" {
+	if !cfg.PromptOnClick && cfg.FallbackBrowser != "" {
 		for _, b := range browsers {
-			if b.ID == cfg.DefaultBrowser {
+			if b.ID == cfg.FallbackBrowser {
 				launchBrowser(b, url)
 				return
 			}
@@ -122,6 +126,36 @@ func handleURL(app *adw.Application, url string) {
 
 	// Show picker
 	showPickerWindow(app, url, browsers)
+}
+
+func showDefaultBrowserPrompt(parent gtk.Widgetter, checkDefaultRow *adw.SwitchRow) {
+	dialog := adw.NewAlertDialog(
+		"Set as Default Browser?",
+		"Switchyard is not your default browser. Would you like to set it as the default browser now?",
+	)
+
+	dialog.AddResponse("no", "Don't Ask Again")
+	dialog.AddResponse("later", "Not Now")
+	dialog.AddResponse("yes", "Set as Default")
+
+	dialog.SetResponseAppearance("yes", adw.ResponseSuggested)
+	dialog.SetDefaultResponse("yes")
+	dialog.SetCloseResponse("later")
+
+	dialog.ConnectResponse(func(response string) {
+		if response == "yes" {
+			setAsDefaultBrowser()
+		} else if response == "no" {
+			cfg := loadConfig()
+			cfg.CheckDefaultBrowser = false
+			saveConfig(cfg)
+			if checkDefaultRow != nil {
+				checkDefaultRow.SetActive(false)
+			}
+		}
+	})
+
+	dialog.Present(parent)
 }
 
 func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
@@ -348,13 +382,13 @@ func showSettingsWindow(app *adw.Application) {
 	browserList := gtk.NewStringList(browserNames)
 
 	defaultRow := adw.NewComboRow()
-	defaultRow.SetTitle("Default browser")
-	defaultRow.SetSubtitle("Used when prompt is disabled and no rule matches")
+	defaultRow.SetTitle("Fallback browser")
+	defaultRow.SetSubtitle("Browser to open when prompt is disabled and no rule matches")
 	defaultRow.SetModel(browserList)
 
 	// Set current selection
 	for i, b := range browsers {
-		if b.ID == cfg.DefaultBrowser {
+		if b.ID == cfg.FallbackBrowser {
 			defaultRow.SetSelected(uint(i + 1))
 			break
 		}
@@ -374,15 +408,32 @@ func showSettingsWindow(app *adw.Application) {
 	defaultRow.Connect("notify::selected", func() {
 		idx := defaultRow.Selected()
 		if idx == 0 {
-			cfg.DefaultBrowser = ""
+			cfg.FallbackBrowser = ""
 		} else if int(idx)-1 < len(browsers) {
-			cfg.DefaultBrowser = browsers[idx-1].ID
+			cfg.FallbackBrowser = browsers[idx-1].ID
 		}
 		saveConfig(cfg)
 	})
 
 	behaviorGroup.Add(defaultRow)
+
+	// Check default browser toggle
+	checkDefaultRow := adw.NewSwitchRow()
+	checkDefaultRow.SetTitle("Check if Switchyard is default browser")
+	checkDefaultRow.SetSubtitle("Prompt to set Switchyard as system default browser on startup")
+	checkDefaultRow.SetActive(cfg.CheckDefaultBrowser)
+	checkDefaultRow.Connect("notify::active", func() {
+		cfg.CheckDefaultBrowser = checkDefaultRow.Active()
+		saveConfig(cfg)
+	})
+	behaviorGroup.Add(checkDefaultRow)
+
 	content.Append(behaviorGroup)
+
+	// Check if we should prompt to set as default browser (after UI is created)
+	if cfg.CheckDefaultBrowser && !isDefaultBrowser() {
+		showDefaultBrowserPrompt(win, checkDefaultRow)
+	}
 
 	// Helper to get browser name from ID
 	getBrowserName := func(id string) string {
@@ -556,18 +607,19 @@ func showSettingsWindow(app *adw.Application) {
 					// Reload config from disk
 					newCfg := loadConfig()
 					cfg.PromptOnClick = newCfg.PromptOnClick
-					cfg.DefaultBrowser = newCfg.DefaultBrowser
+					cfg.FallbackBrowser = newCfg.FallbackBrowser
+					cfg.CheckDefaultBrowser = newCfg.CheckDefaultBrowser
 					cfg.Rules = newCfg.Rules
 
 					// Update UI
 					promptRow.SetActive(cfg.PromptOnClick)
 					for i, b := range browsers {
-						if b.ID == cfg.DefaultBrowser {
+						if b.ID == cfg.FallbackBrowser {
 							defaultRow.SetSelected(uint(i + 1))
 							break
 						}
 					}
-					if cfg.DefaultBrowser == "" {
+					if cfg.FallbackBrowser == "" {
 						defaultRow.SetSelected(0)
 					}
 					rebuildRulesList()
@@ -584,9 +636,9 @@ func showSettingsWindow(app *adw.Application) {
 		cfg.PromptOnClick = promptRow.Active()
 		idx := defaultRow.Selected()
 		if idx == 0 {
-			cfg.DefaultBrowser = ""
+			cfg.FallbackBrowser = ""
 		} else if int(idx)-1 < len(browsers) {
-			cfg.DefaultBrowser = browsers[idx-1].ID
+			cfg.FallbackBrowser = browsers[idx-1].ID
 		}
 		saveConfig(cfg)
 		return false

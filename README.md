@@ -88,7 +88,8 @@ Config file location: `~/.config/switchyard/config.toml`
 
 ```toml
 prompt_on_click = true
-default_browser = ""
+fallback_browser = ""
+check_default_browser = true
 
 [[rules]]
 name = "Work GitHub"
@@ -131,7 +132,8 @@ browser = "brave-browser.desktop"
 | Setting | Description |
 |---------|-------------|
 | `prompt_on_click` | Show picker when no rule matches (default: true) |
-| `default_browser` | Browser to use when prompt is disabled and no rule matches |
+| `fallback_browser` | Fallback browser to use when prompt is disabled and no rule matches |
+| `check_default_browser` | Prompt to set Switchyard as system default browser on startup (default: true) |
 
 ## Prior Art
 

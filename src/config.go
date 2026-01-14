@@ -4,6 +4,7 @@ package main
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -12,9 +13,10 @@ import (
 )
 
 type Config struct {
-	PromptOnClick  bool   `toml:"prompt_on_click"`
-	DefaultBrowser string `toml:"default_browser"`
-	Rules          []Rule `toml:"rules"`
+	PromptOnClick       bool   `toml:"prompt_on_click"`
+	FallbackBrowser     string `toml:"fallback_browser"`
+	CheckDefaultBrowser bool   `toml:"check_default_browser"`
+	Rules               []Rule `toml:"rules"`
 }
 
 type Rule struct {
@@ -38,8 +40,9 @@ func configPath() string {
 
 func loadConfig() *Config {
 	cfg := &Config{
-		PromptOnClick: true,
-		Rules:         []Rule{},
+		PromptOnClick:      true,
+		CheckDefaultBrowser: true,
+		Rules:              []Rule{},
 	}
 
 	data, err := os.ReadFile(configPath())
@@ -136,4 +139,36 @@ func extractDomain(url string) string {
 		u = u[:idx]
 	}
 	return u
+}
+
+func isDefaultBrowser() bool {
+	// Check if Switchyard is the default browser using xdg-settings
+	// Use flatpak-spawn to run on host system when in flatpak
+	var cmd *exec.Cmd
+	if os.Getenv("FLATPAK_ID") != "" {
+		cmd = exec.Command("flatpak-spawn", "--host", "xdg-settings", "get", "default-web-browser")
+	} else {
+		cmd = exec.Command("xdg-settings", "get", "default-web-browser")
+	}
+
+	output, err := cmd.Output()
+	if err != nil {
+		return false
+	}
+
+	defaultBrowser := strings.TrimSpace(string(output))
+	return defaultBrowser == "io.github.alyraffauf.Switchyard.desktop"
+}
+
+func setAsDefaultBrowser() error {
+	// Set Switchyard as the default browser using xdg-settings
+	// Use flatpak-spawn to run on host system when in flatpak
+	var cmd *exec.Cmd
+	if os.Getenv("FLATPAK_ID") != "" {
+		cmd = exec.Command("flatpak-spawn", "--host", "xdg-settings", "set", "default-web-browser", "io.github.alyraffauf.Switchyard.desktop")
+	} else {
+		cmd = exec.Command("xdg-settings", "set", "default-web-browser", "io.github.alyraffauf.Switchyard.desktop")
+	}
+
+	return cmd.Run()
 }
