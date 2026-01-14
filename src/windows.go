@@ -484,9 +484,12 @@ func showSettingsWindow(app *adw.Application) {
 	infoRow.ConnectActivated(func() {
 		// Ensure config file exists
 		saveConfig(cfg)
-		// Open with default text editor
-		launcher := gtk.NewURILauncher("file://" + configPath())
-		launcher.Launch(context.Background(), &win.Window, nil)
+		// Open with xdg-open via flatpak-spawn when in Flatpak
+		cmd := hostCommand("xdg-open", configPath())
+		if err := cmd.Start(); err != nil {
+			fmt.Printf("Failed to open config file: %v\n", err)
+		}
+		go cmd.Wait()
 	})
 	infoGroup.Add(infoRow)
 	content.Append(infoGroup)
