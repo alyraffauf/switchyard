@@ -8,6 +8,14 @@ APPID := 'io.github.alyraffauf.Switchyard'
 default:
     @just --list
 
+# Install development dependencies
+install-deps:
+    sudo dnf install gtk4-devel glib2-devel gobject-introspection-devel libadwaita-devel just
+
+# Install Flatpak dependencies
+install-flatpak-deps:
+    flatpak install flathub org.gnome.Platform//49 org.gnome.Sdk//49 org.freedesktop.Sdk.Extension.golang//25.08
+
 # Build the application
 build:
     go build -o switchyard ./src
@@ -53,3 +61,7 @@ test-coverage:
     go tool cover -func=coverage.out
     @echo ""
     @echo "To view HTML coverage report, run: go tool cover -html=coverage.out"
+
+# Build and install Flatpak
+flatpak: install-flatpak-deps
+    flatpak-builder --user --install --force-clean build-dir flatpak/{{APPID}}.yml
