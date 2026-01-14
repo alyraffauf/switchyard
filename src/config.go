@@ -24,6 +24,7 @@ type Rule struct {
 	Pattern     string `toml:"pattern"`
 	PatternType string `toml:"pattern_type"` // glob, regex, keyword
 	Browser     string `toml:"browser"`
+	AlwaysAsk   bool   `toml:"always_ask"`
 }
 
 func configDir() string {
@@ -81,6 +82,24 @@ func (cfg *Config) matchRule(url string) *Browser {
 		}
 	}
 	return nil
+}
+
+func (cfg *Config) matchRuleID(url string) string {
+	for _, rule := range cfg.Rules {
+		if matchesPattern(url, rule.Pattern, rule.PatternType) {
+			return rule.Browser
+		}
+	}
+	return ""
+}
+
+func (cfg *Config) matchRuleShouldAsk(url string) bool {
+	for _, rule := range cfg.Rules {
+		if matchesPattern(url, rule.Pattern, rule.PatternType) {
+			return rule.AlwaysAsk
+		}
+	}
+	return false
 }
 
 func matchesPattern(url, pattern, patternType string) bool {

@@ -110,9 +110,21 @@ func continueHandlingURL(app *adw.Application, url string) {
 	browsers := detectBrowsers()
 
 	// Try to match a rule
-	if browser := cfg.matchRule(url); browser != nil {
-		launchBrowser(browser, url)
-		return
+	matchedBrowserID := cfg.matchRuleID(url)
+	if matchedBrowserID != "" {
+		// Check if rule has AlwaysAsk enabled
+		if cfg.matchRuleShouldAsk(url) {
+			showPickerWindow(app, url, browsers)
+			return
+		}
+
+		// Find the browser and launch it
+		for _, b := range browsers {
+			if b.ID == matchedBrowserID {
+				launchBrowser(b, url)
+				return
+			}
+		}
 	}
 
 	// No rule matched
@@ -487,15 +499,21 @@ func showSettingsWindow(app *adw.Application) {
 		// Show name as title if set, otherwise show pattern
 		if rule.Name != "" {
 			row.SetTitle(rule.Name)
-			row.SetSubtitle(formatRuleSubtitle(rule.PatternType, rule.Pattern, getBrowserName(rule.Browser)))
+			row.SetSubtitle(formatRuleSubtitle(rule.PatternType, rule.Pattern, getBrowserName(rule.Browser), rule.AlwaysAsk))
 		} else {
 			row.SetTitle(rule.Pattern)
-			row.SetSubtitle(formatRuleSubtitleNoPattern(rule.PatternType, getBrowserName(rule.Browser)))
+			row.SetSubtitle(formatRuleSubtitleNoPattern(rule.PatternType, getBrowserName(rule.Browser), rule.AlwaysAsk))
 		}
 		row.SetActivatable(true)
 
-		// Browser icon
-		icon := gtk.NewImageFromIconName(getBrowserIcon(rule.Browser))
+		// Browser icon - use Switchyard icon if AlwaysAsk is enabled
+		var iconName string
+		if rule.AlwaysAsk {
+			iconName = appID
+		} else {
+			iconName = getBrowserIcon(rule.Browser)
+		}
+		icon := gtk.NewImageFromIconName(iconName)
 		icon.SetPixelSize(24)
 		row.AddPrefix(icon)
 
@@ -834,6 +852,13 @@ func showAddRuleDialog(parent *adw.Window, cfg *Config, browsers []*Browser, get
 	actionGroup := adw.NewPreferencesGroup()
 	actionGroup.SetTitle("Open With")
 
+	// Always Ask toggle
+	alwaysAskRow := adw.NewSwitchRow()
+	alwaysAskRow.SetTitle("Always ask")
+	alwaysAskRow.SetSubtitle("Show browser picker for this rule")
+	actionGroup.Add(alwaysAskRow)
+
+	// Browser dropdown
 	browserNames := make([]string, len(browsers))
 	for i, b := range browsers {
 		browserNames[i] = b.Name
@@ -843,6 +868,11 @@ func showAddRuleDialog(parent *adw.Window, cfg *Config, browsers []*Browser, get
 	browserRow.SetTitle("Browser")
 	browserRow.SetModel(gtk.NewStringList(browserNames))
 	actionGroup.Add(browserRow)
+
+	// Make browser row sensitive based on always ask toggle
+	alwaysAskRow.Connect("notify::active", func() {
+		browserRow.SetSensitive(!alwaysAskRow.Active())
+	})
 
 	content.Append(actionGroup)
 
@@ -873,6 +903,7 @@ func showAddRuleDialog(parent *adw.Window, cfg *Config, browsers []*Browser, get
 				Pattern:     pattern,
 				PatternType: patternType,
 				Browser:     browsers[browserIdx].ID,
+				AlwaysAsk:   alwaysAskRow.Active(),
 			}
 			cfg.Rules = append(cfg.Rules, rule)
 			saveConfig(cfg)
@@ -1003,8 +1034,17 @@ func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, row *adw.Ac
 	actionGroup := adw.NewPreferencesGroup()
 	actionGroup.SetTitle("Open With")
 
+	// Always Ask toggle
+	alwaysAskRow := adw.NewSwitchRow()
+	alwaysAskRow.SetTitle("Always ask")
+	alwaysAskRow.SetSubtitle("Show browser picker for this rule")
+	alwaysAskRow.SetActive(rule.AlwaysAsk)
+	actionGroup.Add(alwaysAskRow)
+
+	// Browser dropdown
 	browserNames := make([]string, len(browsers))
 	selectedIdx := uint(0)
+
 	for i, b := range browsers {
 		browserNames[i] = b.Name
 		if b.ID == rule.Browser {
@@ -1016,7 +1056,13 @@ func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, row *adw.Ac
 	browserRow.SetTitle("Browser")
 	browserRow.SetModel(gtk.NewStringList(browserNames))
 	browserRow.SetSelected(selectedIdx)
+	browserRow.SetSensitive(!rule.AlwaysAsk) // Grey out if AlwaysAsk is enabled
 	actionGroup.Add(browserRow)
+
+	// Make browser row sensitive based on always ask toggle
+	alwaysAskRow.Connect("notify::active", func() {
+		browserRow.SetSensitive(!alwaysAskRow.Active())
+	})
 
 	content.Append(actionGroup)
 
@@ -1032,6 +1078,7 @@ func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, row *adw.Ac
 			rule.Name = nameEntry.Text()
 			rule.Pattern = pattern
 			rule.Browser = browsers[browserIdx].ID
+			rule.AlwaysAsk = alwaysAskRow.Active()
 
 			switch matchType {
 			case 0:
@@ -1053,7 +1100,7 @@ func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, row *adw.Ac
 	dialog.Present(parent)
 }
 
-func formatRuleSubtitle(patternType, pattern, browserName string) string {
+func formatRuleSubtitle(patternType, pattern, browserName string, alwaysAsk bool) string {
 	var typeLabel string
 	switch patternType {
 	case "domain":
@@ -1067,10 +1114,14 @@ func formatRuleSubtitle(patternType, pattern, browserName string) string {
 	default:
 		typeLabel = patternType
 	}
+
+	if alwaysAsk {
+		return fmt.Sprintf("%s: %s · Always ask", typeLabel, pattern)
+	}
 	return fmt.Sprintf("%s: %s · Opens in %s", typeLabel, pattern, browserName)
 }
 
-func formatRuleSubtitleNoPattern(patternType, browserName string) string {
+func formatRuleSubtitleNoPattern(patternType, browserName string, alwaysAsk bool) string {
 	var typeLabel string
 	switch patternType {
 	case "domain":
@@ -1083,6 +1134,10 @@ func formatRuleSubtitleNoPattern(patternType, browserName string) string {
 		typeLabel = "Regex"
 	default:
 		typeLabel = patternType
+	}
+
+	if alwaysAsk {
+		return fmt.Sprintf("%s · Always ask", typeLabel)
 	}
 	return fmt.Sprintf("%s · Opens in %s", typeLabel, browserName)
 }
