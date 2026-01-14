@@ -20,6 +20,11 @@ import (
 func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	cfg := loadConfig()
 
+	if cfg.ForceDarkMode {
+		// Optionally dark mode for picker window
+		adw.StyleManagerGetDefault().SetColorScheme(adw.ColorSchemeForceDark)
+	}
+
 	// Sort browsers alphabetically by name
 	sortedBrowsers := make([]*Browser, len(browsers))
 	copy(sortedBrowsers, browsers)
