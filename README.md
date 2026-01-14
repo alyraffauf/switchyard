@@ -43,15 +43,8 @@ sudo PREFIX=/usr just install
 ### Building Flatpak
 
 ```bash
-# Ensure dependencies are vendored
-go mod tidy
-go mod vendor
-
-# Install GNOME runtime
-flatpak install flathub org.gnome.Platform//49 org.gnome.Sdk//49 org.freedesktop.Sdk.Extension.golang
-
-# Build and install
-flatpak-builder --user --install --force-clean build-dir flatpak/io.github.alyraffauf.Switchyard.yml
+# Build and install (automatically installs Flatpak runtimes if needed)
+just flatpak
 ```
 
 ### Set as Default Browser
