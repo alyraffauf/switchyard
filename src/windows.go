@@ -192,7 +192,8 @@ func showSettingsWindow(app *adw.Application) {
 
 	donateAction := gio.NewSimpleAction("donate", nil)
 	donateAction.ConnectActivate(func(p *glib.Variant) {
-		gtk.ShowURI(&win.Window, "https://ko-fi.com/alyraffauf", 0)
+		launcher := gtk.NewURILauncher("https://ko-fi.com/alyraffauf")
+		launcher.Launch(context.Background(), &win.Window, nil)
 	})
 	app.AddAction(donateAction)
 
@@ -484,7 +485,8 @@ func showSettingsWindow(app *adw.Application) {
 		// Ensure config file exists
 		saveConfig(cfg)
 		// Open with default text editor
-		gtk.ShowURI(&win.Window, "file://"+configPath(), 0)
+		launcher := gtk.NewURILauncher("file://" + configPath())
+		launcher.Launch(context.Background(), &win.Window, nil)
 	})
 	infoGroup.Add(infoRow)
 	content.Append(infoGroup)
