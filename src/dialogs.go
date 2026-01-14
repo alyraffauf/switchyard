@@ -3,6 +3,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
@@ -18,7 +20,6 @@ func showDefaultBrowserPrompt(parent gtk.Widgetter, cfg *Config, updateUI func()
 	dialog.AddResponse("later", "Not Now")
 	dialog.AddResponse("yes", "Set as Default")
 
-	dialog.SetResponseAppearance("yes", adw.ResponseSuggested)
 	dialog.SetDefaultResponse("yes")
 	dialog.SetCloseResponse("later")
 
@@ -98,7 +99,8 @@ func showAboutDialog(parent *adw.Window) {
 	websiteRow.SetActivatable(true)
 	websiteRow.AddSuffix(gtk.NewImageFromIconName("external-link-symbolic"))
 	websiteRow.ConnectActivated(func() {
-		gtk.ShowURI(&parent.Window, "https://github.com/alyraffauf/switchyard", 0)
+		launcher := gtk.NewURILauncher("https://github.com/alyraffauf/switchyard")
+		launcher.Launch(context.Background(), &parent.Window, nil)
 	})
 	linksGroup.Add(websiteRow)
 
@@ -107,7 +109,8 @@ func showAboutDialog(parent *adw.Window) {
 	issueRow.SetActivatable(true)
 	issueRow.AddSuffix(gtk.NewImageFromIconName("external-link-symbolic"))
 	issueRow.ConnectActivated(func() {
-		gtk.ShowURI(&parent.Window, "https://github.com/alyraffauf/switchyard/issues", 0)
+		launcher := gtk.NewURILauncher("https://github.com/alyraffauf/switchyard/issues")
+		launcher.Launch(context.Background(), &parent.Window, nil)
 	})
 	linksGroup.Add(issueRow)
 
