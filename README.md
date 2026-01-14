@@ -16,7 +16,7 @@
 
 ## Why Switchyard?
 
-Switchyards are the backbone of modern commerce. Instead of all trains (URLs) going to the same destination (one browser), switchyards direct each one to the right track (browser) based on your rules. Work links go to your work browser, social sites to another, and you can manually switch tracks when needed.
+Switchyards are the backbone of modern commerce. Instead of all trains (URLs) going to the same destination (one browser), switchyards direct each one to the right track (browser) based on pre-existing rules. Work links go to your work browser, social sites to another, and you can manually switch tracks when needed.
 
 ## Features
 
