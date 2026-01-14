@@ -145,6 +145,9 @@ func showDefaultBrowserPrompt(parent gtk.Widgetter, cfg *Config, updateUI func()
 	dialog.ConnectResponse(func(response string) {
 		if response == "yes" {
 			setAsDefaultBrowser()
+			cfg.CheckDefaultBrowser = false
+			saveConfig(cfg)
+			updateUI()
 		} else if response == "no" {
 			cfg.CheckDefaultBrowser = false
 			saveConfig(cfg)

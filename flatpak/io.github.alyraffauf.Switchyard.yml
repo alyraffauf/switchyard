@@ -16,6 +16,10 @@ finish-args:
   # Portal access for opening URLs in browsers
   - --talk-name=org.freedesktop.portal.Desktop
 
+  # Access to Flatpak service for spawning host commands
+  # Required for checking/setting default browser via xdg-settings
+  - --talk-name=org.freedesktop.Flatpak
+
   # Read host filesystem to detect installed browsers
   # Similar to Junction (re.sonny.Junction)
   - --filesystem=host:ro
