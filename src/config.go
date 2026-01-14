@@ -256,15 +256,19 @@ func sanitizeURL(url string) string {
 	return "https://" + url
 }
 
+// hostCommand creates a command that runs on the host system when in flatpak,
+// or directly otherwise
+func hostCommand(name string, args ...string) *exec.Cmd {
+	if os.Getenv("FLATPAK_ID") != "" {
+		hostArgs := append([]string{"--host", name}, args...)
+		return exec.Command("flatpak-spawn", hostArgs...)
+	}
+	return exec.Command(name, args...)
+}
+
 func isDefaultBrowser() bool {
 	// Check if Switchyard is the default browser using xdg-settings
-	// Use flatpak-spawn to run on host system when in flatpak
-	var cmd *exec.Cmd
-	if os.Getenv("FLATPAK_ID") != "" {
-		cmd = exec.Command("flatpak-spawn", "--host", "xdg-settings", "get", "default-web-browser")
-	} else {
-		cmd = exec.Command("xdg-settings", "get", "default-web-browser")
-	}
+	cmd := hostCommand("xdg-settings", "get", "default-web-browser")
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -277,13 +281,6 @@ func isDefaultBrowser() bool {
 
 func setAsDefaultBrowser() error {
 	// Set Switchyard as the default browser using xdg-settings
-	// Use flatpak-spawn to run on host system when in flatpak
-	var cmd *exec.Cmd
-	if os.Getenv("FLATPAK_ID") != "" {
-		cmd = exec.Command("flatpak-spawn", "--host", "xdg-settings", "set", "default-web-browser", "io.github.alyraffauf.Switchyard.desktop")
-	} else {
-		cmd = exec.Command("xdg-settings", "set", "default-web-browser", "io.github.alyraffauf.Switchyard.desktop")
-	}
-
+	cmd := hostCommand("xdg-settings", "set", "default-web-browser", "io.github.alyraffauf.Switchyard.desktop")
 	return cmd.Run()
 }

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"sync"
 
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
@@ -18,6 +19,12 @@ import (
 )
 
 const appID = "io.github.alyraffauf.Switchyard"
+
+// Global flag to track if we're currently saving config to avoid file watcher race conditions
+var (
+	isSaving  bool
+	savingMux sync.Mutex
+)
 
 func findBrowserByID(browsers []*Browser, id string) *Browser {
 	for _, b := range browsers {
@@ -421,16 +428,17 @@ func showSettingsWindow(app *adw.Application) {
 		}
 	}
 
-	// Track if we're currently saving to avoid file watcher race conditions
-	var isSaving bool
-
-	// Wrap saveConfig to set the saving flag
+	// Wrap saveConfig to set the global saving flag
 	saveConfigSafe := func(c *Config) error {
+		savingMux.Lock()
 		isSaving = true
+		savingMux.Unlock()
 		err := saveConfig(c)
 		// Add small delay to ensure file is flushed before file watcher reads it
 		glib.TimeoutAdd(100, func() bool {
+			savingMux.Lock()
 			isSaving = false
+			savingMux.Unlock()
 			return false
 		})
 		return err
@@ -508,17 +516,15 @@ func showSettingsWindow(app *adw.Application) {
 		// Show name as title if set, otherwise show pattern
 		if rule.Name != "" {
 			row.SetTitle(rule.Name)
-			row.SetSubtitle(formatRuleSubtitleMulti(rule, getBrowserName(rule.Browser)))
+			row.SetSubtitle(formatRuleSubtitle(rule, getBrowserName(rule.Browser)))
 		} else {
 			// For rules without names, show first pattern or condition
-			if len(rule.Conditions) > 0 && rule.Conditions[0].Pattern != "" {
+			if len(rule.Conditions) > 0 {
 				row.SetTitle(rule.Conditions[0].Pattern)
-			} else if rule.Pattern != "" {
-				row.SetTitle(rule.Pattern)
 			} else {
-				row.SetTitle("(empty rule)")
+				row.SetTitle(rule.Pattern)
 			}
-			row.SetSubtitle(formatRuleSubtitleMulti(rule, getBrowserName(rule.Browser)))
+			row.SetSubtitle(formatRuleSubtitleNoPattern(rule, getBrowserName(rule.Browser)))
 		}
 		row.SetActivatable(true)
 
@@ -650,7 +656,10 @@ func showSettingsWindow(app *adw.Application) {
 			monitor.ConnectChanged(func(file, otherFile gio.Filer, eventType gio.FileMonitorEvent) {
 				if eventType == gio.FileMonitorEventChanged || eventType == gio.FileMonitorEventCreated {
 					// Ignore file changes while we're saving to avoid race conditions
-					if isSaving {
+					savingMux.Lock()
+					saving := isSaving
+					savingMux.Unlock()
+					if saving {
 						return
 					}
 
@@ -768,11 +777,324 @@ func showAboutDialog(parent *adw.Window) {
 	dialog.Present(parent)
 }
 
+// validateConditions checks if all conditions have non-empty patterns
+func validateConditions(conditions []Condition) bool {
+	for _, c := range conditions {
+		if c.Pattern == "" {
+			return false
+		}
+	}
+	return true
+}
+
+// getLogicFromComboRow extracts the logic string from a combo row selection
+func getLogicFromComboRow(logicRow *adw.ComboRow) string {
+	if logicRow.Selected() == 1 {
+		return "any"
+	}
+	return "all"
+}
+
+// saveConfigWithFlag saves config while setting the global saving flag to prevent file watcher loops
+func saveConfigWithFlag(cfg *Config) {
+	savingMux.Lock()
+	isSaving = true
+	savingMux.Unlock()
+	saveConfig(cfg)
+	glib.TimeoutAdd(100, func() bool {
+		savingMux.Lock()
+		isSaving = false
+		savingMux.Unlock()
+		return false
+	})
+}
+
+// buildRuleDialogContent creates the common UI content for add/edit rule dialogs
+func buildRuleDialogContent(
+	initialRule *Rule,
+	browsers []*Browser,
+	actionBtn *gtk.Button,
+) (
+	nameEntry *adw.EntryRow,
+	conditions *[]Condition,
+	logicRow *adw.ComboRow,
+	alwaysAskRow *adw.SwitchRow,
+	browserRow *adw.ComboRow,
+	content *gtk.Box,
+) {
+	content = gtk.NewBox(gtk.OrientationVertical, 18)
+	content.SetMarginStart(18)
+	content.SetMarginEnd(18)
+	content.SetMarginTop(18)
+	content.SetMarginBottom(18)
+
+	// Name section
+	nameGroup := adw.NewPreferencesGroup()
+	nameGroup.SetTitle("Rule Name")
+	nameGroup.SetDescription("Optional friendly name for this rule")
+
+	nameEntry = adw.NewEntryRow()
+	nameEntry.SetTitle("Name")
+	if initialRule != nil {
+		nameEntry.SetText(initialRule.Name)
+	}
+	nameGroup.Add(nameEntry)
+
+	content.Append(nameGroup)
+
+	// Conditions section
+	conditionsGroup := adw.NewPreferencesGroup()
+	conditionsGroup.SetTitle("Conditions")
+	conditionsGroup.SetDescription("Define one or more conditions to match URLs")
+
+	// Store conditions in a slice
+	var conditionsSlice []Condition
+	if initialRule != nil && len(initialRule.Conditions) > 0 {
+		conditionsSlice = make([]Condition, len(initialRule.Conditions))
+		copy(conditionsSlice, initialRule.Conditions)
+	} else {
+		conditionsSlice = []Condition{{Type: "domain", Pattern: ""}}
+	}
+	conditions = &conditionsSlice
+
+	// Create a single ListBox to hold Match selector and all conditions
+	conditionsListBox := gtk.NewListBox()
+	conditionsListBox.SetSelectionMode(gtk.SelectionNone)
+	conditionsListBox.AddCSSClass("boxed-list")
+
+	// Logic selector row (All/Any) as a ComboRow
+	logicRow = adw.NewComboRow()
+	logicRow.SetTitle("Match")
+	logicRow.SetModel(gtk.NewStringList([]string{"All conditions", "Any condition"}))
+	if initialRule != nil && initialRule.Logic == "any" {
+		logicRow.SetSelected(1)
+	} else {
+		logicRow.SetSelected(0)
+	}
+
+	conditionsListBox.Append(logicRow)
+
+	// Track condition rows separately so we can rebuild them
+	var conditionRows []*gtk.ListBoxRow
+
+	// Declare function variable first to allow recursive calls
+	var rebuildConditions func()
+
+	// Function to rebuild the conditions list UI
+	rebuildConditions = func() {
+		// Clear all condition rows
+		for _, row := range conditionRows {
+			conditionsListBox.Remove(row)
+		}
+		conditionRows = nil
+
+		// Add each condition as a grouped unit
+		for i := range *conditions {
+			condIdx := i // Capture for closure
+
+			// Create a ListBoxRow to properly handle spacing
+			conditionRow := gtk.NewListBoxRow()
+			conditionRow.SetActivatable(false)
+			conditionRow.SetSelectable(false)
+
+			// Create a box to group this condition's fields + buttons
+			conditionContainer := gtk.NewBox(gtk.OrientationHorizontal, 6)
+			conditionContainer.SetMarginTop(12)
+			conditionContainer.SetMarginBottom(12)
+			conditionContainer.SetMarginStart(12)
+			conditionContainer.SetMarginEnd(12)
+
+			// Inner listbox for type and pattern fields
+			innerListBox := gtk.NewListBox()
+			innerListBox.SetSelectionMode(gtk.SelectionNone)
+			innerListBox.AddCSSClass("boxed-list")
+			innerListBox.SetHExpand(true)
+
+			// Type row
+			typeRow := adw.NewComboRow()
+			typeRow.SetTitle("Match type")
+			typeRow.SetModel(gtk.NewStringList([]string{"Domain", "Contains", "Wildcard", "Regex"}))
+			// Set current value
+			switch (*conditions)[condIdx].Type {
+			case "domain":
+				typeRow.SetSelected(0)
+			case "keyword":
+				typeRow.SetSelected(1)
+			case "glob":
+				typeRow.SetSelected(2)
+			case "regex":
+				typeRow.SetSelected(3)
+			}
+			typeRow.Connect("notify::selected", func() {
+				switch typeRow.Selected() {
+				case 0:
+					(*conditions)[condIdx].Type = "domain"
+				case 1:
+					(*conditions)[condIdx].Type = "keyword"
+				case 2:
+					(*conditions)[condIdx].Type = "glob"
+				case 3:
+					(*conditions)[condIdx].Type = "regex"
+				}
+			})
+			innerListBox.Append(typeRow)
+
+			// Pattern row
+			patternRow := adw.NewEntryRow()
+			patternRow.SetTitle("Pattern")
+			patternRow.SetText((*conditions)[condIdx].Pattern)
+			patternRow.Connect("changed", func() {
+				(*conditions)[condIdx].Pattern = patternRow.Text()
+				// Enable/disable action button based on whether all conditions have patterns
+				allValid := true
+				for _, c := range *conditions {
+					if c.Pattern == "" {
+						allValid = false
+						break
+					}
+				}
+				actionBtn.SetSensitive(allValid)
+			})
+			innerListBox.Append(patternRow)
+
+			conditionContainer.Append(innerListBox)
+
+			// Buttons box on the right
+			btnBox := gtk.NewBox(gtk.OrientationVertical, 3)
+			btnBox.SetVAlign(gtk.AlignCenter)
+
+			// Move up button
+			upBtn := gtk.NewButton()
+			upBtn.SetIconName("go-up-symbolic")
+			upBtn.SetTooltipText("Move condition up")
+			upBtn.AddCSSClass("flat")
+			upBtn.AddCSSClass("circular")
+			upBtn.SetSensitive(condIdx > 0)
+			upBtn.ConnectClicked(func() {
+				if condIdx > 0 && condIdx < len(*conditions) {
+					// Swap with previous
+					(*conditions)[condIdx], (*conditions)[condIdx-1] = (*conditions)[condIdx-1], (*conditions)[condIdx]
+					rebuildConditions()
+				}
+			})
+			btnBox.Append(upBtn)
+
+			// Delete button
+			deleteBtn := gtk.NewButton()
+			deleteBtn.SetIconName("edit-delete-symbolic")
+			deleteBtn.SetTooltipText("Delete this condition")
+			deleteBtn.AddCSSClass("flat")
+			deleteBtn.AddCSSClass("circular")
+			deleteBtn.AddCSSClass("destructive-action")
+			deleteBtn.SetSensitive(len(*conditions) > 1)
+			deleteBtn.ConnectClicked(func() {
+				if len(*conditions) > 1 && condIdx < len(*conditions) {
+					*conditions = append((*conditions)[:condIdx], (*conditions)[condIdx+1:]...)
+					rebuildConditions()
+				}
+			})
+			btnBox.Append(deleteBtn)
+
+			// Move down button
+			downBtn := gtk.NewButton()
+			downBtn.SetIconName("go-down-symbolic")
+			downBtn.SetTooltipText("Move condition down")
+			downBtn.AddCSSClass("flat")
+			downBtn.AddCSSClass("circular")
+			downBtn.SetSensitive(condIdx < len(*conditions)-1)
+			downBtn.ConnectClicked(func() {
+				if condIdx >= 0 && condIdx < len(*conditions)-1 {
+					// Swap with next
+					(*conditions)[condIdx], (*conditions)[condIdx+1] = (*conditions)[condIdx+1], (*conditions)[condIdx]
+					rebuildConditions()
+				}
+			})
+			btnBox.Append(downBtn)
+
+			conditionContainer.Append(btnBox)
+			conditionRow.SetChild(conditionContainer)
+			conditionsListBox.Append(conditionRow)
+			conditionRows = append(conditionRows, conditionRow)
+		}
+
+		// Update action button sensitivity
+		allValid := len(*conditions) > 0
+		for _, c := range *conditions {
+			if c.Pattern == "" {
+				allValid = false
+				break
+			}
+		}
+		actionBtn.SetSensitive(allValid)
+	}
+
+	// Initialize conditions UI
+	rebuildConditions()
+
+	conditionsGroup.Add(conditionsListBox)
+	content.Append(conditionsGroup)
+
+	// Add condition button
+	addConditionGroup := adw.NewPreferencesGroup()
+	addConditionRow := adw.NewButtonRow()
+	addConditionRow.SetTitle("Add Condition")
+	addConditionRow.SetStartIconName("list-add-symbolic")
+	addConditionRow.ConnectActivated(func() {
+		*conditions = append(*conditions, Condition{Type: "domain", Pattern: ""})
+		rebuildConditions()
+	})
+	addConditionGroup.Add(addConditionRow)
+	content.Append(addConditionGroup)
+
+	// Action section
+	actionGroup := adw.NewPreferencesGroup()
+	actionGroup.SetTitle("Actions")
+	actionGroup.SetDescription("Choose which browser to use")
+
+	// Always Ask toggle
+	alwaysAskRow = adw.NewSwitchRow()
+	alwaysAskRow.SetTitle("Always ask")
+	alwaysAskRow.SetSubtitle("Show browser picker for this rule")
+	if initialRule != nil {
+		alwaysAskRow.SetActive(initialRule.AlwaysAsk)
+	}
+	actionGroup.Add(alwaysAskRow)
+
+	// Browser dropdown
+	browserNames := make([]string, len(browsers))
+	selectedIdx := uint(0)
+
+	for i, b := range browsers {
+		browserNames[i] = b.Name
+		if initialRule != nil && b.ID == initialRule.Browser {
+			selectedIdx = uint(i)
+		}
+	}
+
+	browserRow = adw.NewComboRow()
+	browserRow.SetTitle("Browser")
+	browserRow.SetModel(gtk.NewStringList(browserNames))
+	browserRow.SetSelected(selectedIdx)
+	if initialRule != nil {
+		browserRow.SetSensitive(!initialRule.AlwaysAsk)
+	}
+	actionGroup.Add(browserRow)
+
+	// Make browser row sensitive based on always ask toggle
+	alwaysAskRow.Connect("notify::active", func() {
+		browserRow.SetSensitive(!alwaysAskRow.Active())
+	})
+
+	content.Append(actionGroup)
+
+	return
+}
+
 func showAddRuleDialog(parent *adw.Window, cfg *Config, browsers []*Browser, getBrowserName func(string) string, getBrowserIcon func(string) string, rebuildRulesList func()) {
 	dialog := adw.NewDialog()
 	dialog.SetTitle("Add Rule")
-	dialog.SetContentWidth(500)
-	dialog.SetContentHeight(450)
+	dialog.SetContentWidth(600)
+	dialog.SetContentHeight(650)
 	dialog.SetCanClose(true)
 
 	toolbarView := adw.NewToolbarView()
@@ -790,144 +1112,39 @@ func showAddRuleDialog(parent *adw.Window, cfg *Config, browsers []*Browser, get
 	addBtn := gtk.NewButton()
 	addBtn.SetLabel("Add")
 	addBtn.AddCSSClass("suggested-action")
-	addBtn.SetSensitive(false) // Insensitive until pattern is filled
+	addBtn.SetSensitive(false) // Insensitive until at least one condition is added
 	addBtn.SetTooltipText("Add this rule")
 	header.PackEnd(addBtn)
 
 	toolbarView.AddTopBar(header)
 
-	content := gtk.NewBox(gtk.OrientationVertical, 18)
-	content.SetMarginStart(18)
-	content.SetMarginEnd(18)
-	content.SetMarginTop(18)
-	content.SetMarginBottom(18)
+	scrolledWindow := gtk.NewScrolledWindow()
+	scrolledWindow.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
+	scrolledWindow.SetVExpand(true)
 
-	// Name section
-	nameGroup := adw.NewPreferencesGroup()
-	nameGroup.SetTitle("Rule Name")
-	nameGroup.SetDescription("Optional friendly name for this rule")
+	nameEntry, conditions, logicRow, alwaysAskRow, browserRow, content := buildRuleDialogContent(nil, browsers, addBtn)
 
-	nameEntry := adw.NewEntryRow()
-	nameEntry.SetTitle("Name")
-	nameGroup.Add(nameEntry)
-
-	content.Append(nameGroup)
-
-	// Rule types with descriptions
-	ruleTypes := []string{
-		"Exact domain",
-		"URL contains",
-		"Wildcard pattern",
-		"Regular expression",
-	}
-
-	ruleTypeDescriptions := []string{
-		"Matches only this exact domain",
-		"Matches if the URL contains this text",
-		"Matches using wildcards (* = anything)",
-		"Matches using a regular expression",
-	}
-
-	ruleTypeExamples := []string{
-		"github.com",
-		"youtube.com/watch",
-		"*.github.com",
-		"^https://.*\\.example\\.(com|org)",
-	}
-
-	// Match condition section
-	matchGroup := adw.NewPreferencesGroup()
-	matchGroup.SetTitle("Match Condition")
-
-	matchTypeRow := adw.NewComboRow()
-	matchTypeRow.SetTitle("Rule type")
-	matchTypeRow.SetModel(gtk.NewStringList(ruleTypes))
-	matchGroup.Add(matchTypeRow)
-
-	patternEntry := adw.NewEntryRow()
-	patternEntry.SetTitle("Pattern")
-	patternEntry.Connect("changed", func() {
-		addBtn.SetSensitive(patternEntry.Text() != "")
-	})
-	matchGroup.Add(patternEntry)
-
-	// Help row showing description and example
-	helpRow := adw.NewActionRow()
-	helpRow.SetTitle(ruleTypeDescriptions[0])
-	helpRow.SetSubtitle("Example: " + ruleTypeExamples[0])
-	helpRow.AddCSSClass("dim-label")
-	matchGroup.Add(helpRow)
-
-	// Update help when match type changes
-	matchTypeRow.Connect("notify::selected", func() {
-		idx := matchTypeRow.Selected()
-		if int(idx) < len(ruleTypeDescriptions) {
-			helpRow.SetTitle(ruleTypeDescriptions[idx])
-			helpRow.SetSubtitle("Example: " + ruleTypeExamples[idx])
-		}
-	})
-
-	content.Append(matchGroup)
-
-	// Action section
-	actionGroup := adw.NewPreferencesGroup()
-	actionGroup.SetTitle("Open With")
-
-	// Always Ask toggle
-	alwaysAskRow := adw.NewSwitchRow()
-	alwaysAskRow.SetTitle("Always ask")
-	alwaysAskRow.SetSubtitle("Show browser picker for this rule")
-	actionGroup.Add(alwaysAskRow)
-
-	// Browser dropdown
-	browserNames := make([]string, len(browsers))
-	for i, b := range browsers {
-		browserNames[i] = b.Name
-	}
-
-	browserRow := adw.NewComboRow()
-	browserRow.SetTitle("Browser")
-	browserRow.SetModel(gtk.NewStringList(browserNames))
-	actionGroup.Add(browserRow)
-
-	// Make browser row sensitive based on always ask toggle
-	alwaysAskRow.Connect("notify::active", func() {
-		browserRow.SetSensitive(!alwaysAskRow.Active())
-	})
-
-	content.Append(actionGroup)
-
-	toolbarView.SetContent(content)
+	scrolledWindow.SetChild(content)
+	toolbarView.SetContent(scrolledWindow)
 	dialog.SetChild(toolbarView)
 
 	addBtn.ConnectClicked(func() {
-		pattern := patternEntry.Text()
 		browserIdx := browserRow.Selected()
-		matchType := matchTypeRow.Selected()
 
-		if pattern != "" && int(browserIdx) < len(browsers) {
-			var patternType string
-
-			switch matchType {
-			case 0: // Exact domain
-				patternType = "domain"
-			case 1: // Domain contains
-				patternType = "keyword"
-			case 2: // Wildcard pattern
-				patternType = "glob"
-			case 3: // Regular expression
-				patternType = "regex"
+		if len(*conditions) > 0 && int(browserIdx) < len(browsers) {
+			if !validateConditions(*conditions) {
+				return
 			}
 
 			rule := Rule{
-				Name:        nameEntry.Text(),
-				Pattern:     pattern,
-				PatternType: patternType,
-				Browser:     browsers[browserIdx].ID,
-				AlwaysAsk:   alwaysAskRow.Active(),
+				Name:       nameEntry.Text(),
+				Conditions: *conditions,
+				Logic:      getLogicFromComboRow(logicRow),
+				Browser:    browsers[browserIdx].ID,
+				AlwaysAsk:  alwaysAskRow.Active(),
 			}
 			cfg.Rules = append(cfg.Rules, rule)
-			saveConfig(cfg)
+			saveConfigWithFlag(cfg)
 			rebuildRulesList()
 			dialog.Close()
 		}
@@ -939,9 +1156,27 @@ func showAddRuleDialog(parent *adw.Window, cfg *Config, browsers []*Browser, get
 func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, row *adw.ActionRow, browsers []*Browser, getBrowserName func(string) string, getBrowserIcon func(string) string, rebuildRulesList func()) {
 	dialog := adw.NewDialog()
 	dialog.SetTitle("Edit Rule")
-	dialog.SetContentWidth(500)
-	dialog.SetContentHeight(450)
+	dialog.SetContentWidth(600)
+	dialog.SetContentHeight(650)
 	dialog.SetCanClose(true)
+
+	// Auto-migrate legacy rules when opening edit dialog
+	if len(rule.Conditions) == 0 && rule.Pattern != "" {
+		rule.Conditions = []Condition{{
+			Type:    rule.PatternType,
+			Pattern: rule.Pattern,
+		}}
+		rule.Logic = "all"
+	}
+
+	// Ensure new rules have at least one condition
+	if len(rule.Conditions) == 0 {
+		rule.Conditions = []Condition{{
+			Type:    "domain",
+			Pattern: "",
+		}}
+		rule.Logic = "all"
+	}
 
 	toolbarView := adw.NewToolbarView()
 
@@ -963,156 +1198,35 @@ func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, row *adw.Ac
 
 	toolbarView.AddTopBar(header)
 
-	content := gtk.NewBox(gtk.OrientationVertical, 18)
-	content.SetMarginStart(18)
-	content.SetMarginEnd(18)
-	content.SetMarginTop(18)
-	content.SetMarginBottom(18)
+	scrolledWindow := gtk.NewScrolledWindow()
+	scrolledWindow.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
+	scrolledWindow.SetVExpand(true)
 
-	// Name section
-	nameGroup := adw.NewPreferencesGroup()
-	nameGroup.SetTitle("Rule Name")
-	nameGroup.SetDescription("Optional friendly name for this rule")
+	nameEntry, conditions, logicRow, alwaysAskRow, browserRow, content := buildRuleDialogContent(rule, browsers, saveBtn)
 
-	nameEntry := adw.NewEntryRow()
-	nameEntry.SetTitle("Name")
-	nameEntry.SetText(rule.Name)
-	nameGroup.Add(nameEntry)
-
-	content.Append(nameGroup)
-
-	// Rule types with descriptions
-	ruleTypes := []string{
-		"Exact domain",
-		"URL contains",
-		"Wildcard pattern",
-		"Regular expression",
-	}
-
-	ruleTypeDescriptions := []string{
-		"Matches only this exact domain",
-		"Matches if the URL contains this text",
-		"Matches using wildcards (* = anything)",
-		"Matches using a regular expression",
-	}
-
-	ruleTypeExamples := []string{
-		"github.com",
-		"youtube.com/watch",
-		"*.github.com",
-		"^https://.*\\.example\\.(com|org)",
-	}
-
-	// Determine current match type index
-	var currentMatchType uint
-	switch rule.PatternType {
-	case "domain":
-		currentMatchType = 0
-	case "keyword":
-		currentMatchType = 1
-	case "glob":
-		currentMatchType = 2
-	case "regex":
-		currentMatchType = 3
-	default:
-		currentMatchType = 1
-	}
-
-	// Match condition section
-	matchGroup := adw.NewPreferencesGroup()
-	matchGroup.SetTitle("Match Condition")
-
-	matchTypeRow := adw.NewComboRow()
-	matchTypeRow.SetTitle("Rule type")
-	matchTypeRow.SetModel(gtk.NewStringList(ruleTypes))
-	matchTypeRow.SetSelected(currentMatchType)
-	matchGroup.Add(matchTypeRow)
-
-	patternEntry := adw.NewEntryRow()
-	patternEntry.SetTitle("Pattern")
-	patternEntry.SetText(rule.Pattern)
-	matchGroup.Add(patternEntry)
-
-	// Help row showing description and example
-	helpRow := adw.NewActionRow()
-	helpRow.SetTitle(ruleTypeDescriptions[currentMatchType])
-	helpRow.SetSubtitle("Example: " + ruleTypeExamples[currentMatchType])
-	helpRow.AddCSSClass("dim-label")
-	matchGroup.Add(helpRow)
-
-	// Update help when match type changes
-	matchTypeRow.Connect("notify::selected", func() {
-		idx := matchTypeRow.Selected()
-		if int(idx) < len(ruleTypeDescriptions) {
-			helpRow.SetTitle(ruleTypeDescriptions[idx])
-			helpRow.SetSubtitle("Example: " + ruleTypeExamples[idx])
-		}
-	})
-
-	content.Append(matchGroup)
-
-	// Action section
-	actionGroup := adw.NewPreferencesGroup()
-	actionGroup.SetTitle("Open With")
-
-	// Always Ask toggle
-	alwaysAskRow := adw.NewSwitchRow()
-	alwaysAskRow.SetTitle("Always ask")
-	alwaysAskRow.SetSubtitle("Show browser picker for this rule")
-	alwaysAskRow.SetActive(rule.AlwaysAsk)
-	actionGroup.Add(alwaysAskRow)
-
-	// Browser dropdown
-	browserNames := make([]string, len(browsers))
-	selectedIdx := uint(0)
-
-	for i, b := range browsers {
-		browserNames[i] = b.Name
-		if b.ID == rule.Browser {
-			selectedIdx = uint(i)
-		}
-	}
-
-	browserRow := adw.NewComboRow()
-	browserRow.SetTitle("Browser")
-	browserRow.SetModel(gtk.NewStringList(browserNames))
-	browserRow.SetSelected(selectedIdx)
-	browserRow.SetSensitive(!rule.AlwaysAsk) // Grey out if AlwaysAsk is enabled
-	actionGroup.Add(browserRow)
-
-	// Make browser row sensitive based on always ask toggle
-	alwaysAskRow.Connect("notify::active", func() {
-		browserRow.SetSensitive(!alwaysAskRow.Active())
-	})
-
-	content.Append(actionGroup)
-
-	toolbarView.SetContent(content)
+	scrolledWindow.SetChild(content)
+	toolbarView.SetContent(scrolledWindow)
 	dialog.SetChild(toolbarView)
 
 	saveBtn.ConnectClicked(func() {
-		pattern := patternEntry.Text()
 		browserIdx := browserRow.Selected()
-		matchType := matchTypeRow.Selected()
 
-		if pattern != "" && int(browserIdx) < len(browsers) {
-			rule.Name = nameEntry.Text()
-			rule.Pattern = pattern
-			rule.Browser = browsers[browserIdx].ID
-			rule.AlwaysAsk = alwaysAskRow.Active()
-
-			switch matchType {
-			case 0:
-				rule.PatternType = "domain"
-			case 1:
-				rule.PatternType = "keyword"
-			case 2:
-				rule.PatternType = "glob"
-			case 3:
-				rule.PatternType = "regex"
+		if len(*conditions) > 0 && int(browserIdx) < len(browsers) {
+			if !validateConditions(*conditions) {
+				return
 			}
 
-			saveConfig(cfg)
+			// Update rule
+			rule.Name = nameEntry.Text()
+			rule.Conditions = *conditions
+			rule.Logic = getLogicFromComboRow(logicRow)
+			rule.Browser = browsers[browserIdx].ID
+			rule.AlwaysAsk = alwaysAskRow.Active()
+			// Clear old fields
+			rule.Pattern = ""
+			rule.PatternType = ""
+
+			saveConfigWithFlag(cfg)
 			rebuildRulesList()
 			dialog.Close()
 		}
@@ -1121,44 +1235,47 @@ func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, row *adw.Ac
 	dialog.Present(parent)
 }
 
-func formatRuleSubtitle(patternType, pattern, browserName string, alwaysAsk bool) string {
-	var typeLabel string
-	switch patternType {
-	case "domain":
-		typeLabel = "Exact domain"
-	case "keyword":
-		typeLabel = "URL contains"
-	case "glob":
-		typeLabel = "Wildcard"
-	case "regex":
-		typeLabel = "Regex"
-	default:
-		typeLabel = patternType
-	}
-
-	if alwaysAsk {
-		return fmt.Sprintf("%s: %s · Always ask", typeLabel, pattern)
-	}
-	return fmt.Sprintf("%s: %s · Opens in %s", typeLabel, pattern, browserName)
+func formatRuleSubtitle(rule *Rule, browserName string) string {
+	return formatRuleSubtitleInternal(rule, browserName, true)
 }
 
-func formatRuleSubtitleNoPattern(patternType, browserName string, alwaysAsk bool) string {
-	var typeLabel string
-	switch patternType {
-	case "domain":
-		typeLabel = "Exact domain"
-	case "keyword":
-		typeLabel = "URL contains"
-	case "glob":
-		typeLabel = "Wildcard"
-	case "regex":
-		typeLabel = "Regex"
-	default:
-		typeLabel = patternType
+func formatRuleSubtitleNoPattern(rule *Rule, browserName string) string {
+	return formatRuleSubtitleInternal(rule, browserName, false)
+}
+
+func formatRuleSubtitleInternal(rule *Rule, browserName string, includePattern bool) string {
+	// Handle new multi-condition format
+	if len(rule.Conditions) > 0 {
+		condCount := len(rule.Conditions)
+		var logicText string
+		if rule.Logic == "any" {
+			logicText = "Any match"
+		} else {
+			logicText = "All match"
+		}
+
+		if rule.AlwaysAsk {
+			if condCount == 1 && includePattern {
+				return fmt.Sprintf("%s: %s · Always ask", getTypeLabel(rule.Conditions[0].Type), rule.Conditions[0].Pattern)
+			}
+			return fmt.Sprintf("%d conditions (%s) · Always ask", condCount, logicText)
+		}
+		if condCount == 1 && includePattern {
+			return fmt.Sprintf("%s: %s · Opens in %s", getTypeLabel(rule.Conditions[0].Type), rule.Conditions[0].Pattern, browserName)
+		}
+		return fmt.Sprintf("%d conditions (%s) · Opens in %s", condCount, logicText, browserName)
 	}
 
-	if alwaysAsk {
+	// Handle legacy single pattern format
+	typeLabel := getTypeLabel(rule.PatternType)
+	if rule.AlwaysAsk {
+		if includePattern {
+			return fmt.Sprintf("%s: %s · Always ask", typeLabel, rule.Pattern)
+		}
 		return fmt.Sprintf("%s · Always ask", typeLabel)
+	}
+	if includePattern {
+		return fmt.Sprintf("%s: %s · Opens in %s", typeLabel, rule.Pattern, browserName)
 	}
 	return fmt.Sprintf("%s · Opens in %s", typeLabel, browserName)
 }
@@ -1178,32 +1295,85 @@ func getTypeLabel(patternType string) string {
 	}
 }
 
-func formatRuleSubtitleMulti(rule *Rule, browserName string) string {
-	// Handle new multi-condition format
-	if len(rule.Conditions) > 0 {
-		condCount := len(rule.Conditions)
-		var logicText string
-		if rule.Logic == "any" {
-			logicText = "Any match"
-		} else {
-			logicText = "All match"
-		}
-		
-		if rule.AlwaysAsk {
-			if condCount == 1 {
-				return fmt.Sprintf("%s: %s · Always ask", getTypeLabel(rule.Conditions[0].Type), rule.Conditions[0].Pattern)
-			}
-			return fmt.Sprintf("%d conditions (%s) · Always ask", condCount, logicText)
-		}
-		if condCount == 1 {
-			return fmt.Sprintf("%s: %s · Opens in %s", getTypeLabel(rule.Conditions[0].Type), rule.Conditions[0].Pattern, browserName)
-		}
-		return fmt.Sprintf("%d conditions (%s) · Opens in %s", condCount, logicText, browserName)
-	}
+func showEditConditionDialog(parent *adw.Window, cond *Condition, onSave func()) {
+	dialog := adw.NewDialog()
+	dialog.SetTitle("Edit Condition")
+	dialog.SetContentWidth(400)
+	dialog.SetContentHeight(300)
+	dialog.SetCanClose(true)
 
-	// Handle legacy single pattern format
-	if rule.AlwaysAsk {
-		return fmt.Sprintf("%s: %s · Always ask", getTypeLabel(rule.PatternType), rule.Pattern)
+	toolbarView := adw.NewToolbarView()
+
+	header := adw.NewHeaderBar()
+	header.SetShowStartTitleButtons(false)
+	header.SetShowEndTitleButtons(false)
+
+	cancelBtn := gtk.NewButton()
+	cancelBtn.SetLabel("Cancel")
+	cancelBtn.ConnectClicked(func() { dialog.Close() })
+	header.PackStart(cancelBtn)
+
+	saveBtn := gtk.NewButton()
+	saveBtn.SetLabel("Save")
+	saveBtn.AddCSSClass("suggested-action")
+	header.PackEnd(saveBtn)
+
+	toolbarView.AddTopBar(header)
+
+	content := gtk.NewBox(gtk.OrientationVertical, 0)
+
+	// Preferences group
+	group := adw.NewPreferencesGroup()
+
+	// Type row
+	typeRow := adw.NewComboRow()
+	typeRow.SetTitle("Type")
+	typeRow.SetModel(gtk.NewStringList([]string{"Domain", "Contains", "Wildcard", "Regex"}))
+	switch cond.Type {
+	case "domain":
+		typeRow.SetSelected(0)
+	case "keyword":
+		typeRow.SetSelected(1)
+	case "glob":
+		typeRow.SetSelected(2)
+	case "regex":
+		typeRow.SetSelected(3)
 	}
-	return fmt.Sprintf("%s: %s · Opens in %s", getTypeLabel(rule.PatternType), rule.Pattern, browserName)
+	group.Add(typeRow)
+
+	// Pattern row
+	patternRow := adw.NewEntryRow()
+	patternRow.SetTitle("Pattern")
+	patternRow.SetText(cond.Pattern)
+	group.Add(patternRow)
+
+	content.Append(group)
+
+	toolbarView.SetContent(content)
+	dialog.SetChild(toolbarView)
+
+	saveBtn.ConnectClicked(func() {
+		pattern := patternRow.Text()
+		if pattern == "" {
+			return
+		}
+
+		// Update condition
+		switch typeRow.Selected() {
+		case 0:
+			cond.Type = "domain"
+		case 1:
+			cond.Type = "keyword"
+		case 2:
+			cond.Type = "glob"
+		case 3:
+			cond.Type = "regex"
+		}
+		cond.Pattern = pattern
+
+		onSave()
+		dialog.Close()
+	})
+
+	dialog.Present(parent)
 }
