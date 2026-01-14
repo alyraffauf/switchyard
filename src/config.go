@@ -141,6 +141,51 @@ func extractDomain(url string) string {
 	return u
 }
 
+func sanitizeURL(url string) string {
+	// Trim whitespace
+	url = strings.TrimSpace(url)
+
+	if url == "" {
+		return ""
+	}
+
+	// Handle file:// URIs that GIO creates from bare domains
+	// If it's a file:// URI but the path doesn't exist and looks like a domain, convert it
+	if strings.HasPrefix(url, "file://") {
+		filePath := strings.TrimPrefix(url, "file://")
+
+		// Check if file actually exists
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			// File doesn't exist - might be a bare domain that GIO converted
+			// Extract just the filename (last component)
+			lastSlash := strings.LastIndex(filePath, "/")
+			if lastSlash != -1 {
+				possibleDomain := filePath[lastSlash+1:]
+				// If it looks like a domain (contains dots, no spaces), treat it as one
+				if strings.Contains(possibleDomain, ".") && !strings.Contains(possibleDomain, " ") {
+					return "https://" + possibleDomain
+				}
+			}
+		}
+		// Otherwise, it's a real file path, return as-is
+		return url
+	}
+
+	// If it already has another scheme, return as-is
+	if strings.Contains(url, "://") {
+		return url
+	}
+
+	// No scheme - check if it looks like a file path (starts with / or .)
+	if strings.HasPrefix(url, "/") || strings.HasPrefix(url, ".") {
+		// Looks like a file path, don't modify
+		return url
+	}
+
+	// Add https:// prefix for bare domains/URLs
+	return "https://" + url
+}
+
 func isDefaultBrowser() bool {
 	// Check if Switchyard is the default browser using xdg-settings
 	// Use flatpak-spawn to run on host system when in flatpak

@@ -37,6 +37,7 @@ func main() {
 		}
 
 		url := files[0].URI()
+		url = sanitizeURL(url)
 		handleURL(app, url)
 	})
 
