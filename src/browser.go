@@ -6,7 +6,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -61,6 +60,18 @@ func getApplicationDirs() []string {
 		}
 	}
 
+	// Helper to add common application directories
+	addCommonDirs := func() {
+		home, _ := os.UserHomeDir()
+		if home != "" {
+			addDir(filepath.Join(home, ".local", "share", "applications"))
+			addDir(filepath.Join(home, ".local", "share", "flatpak", "exports", "share", "applications"))
+		}
+		addDir("/usr/share/applications")
+		addDir("/var/lib/flatpak/exports/share/applications")
+		addDir("/var/lib/snapd/desktop/applications")
+	}
+
 	// Start with XDG_DATA_DIRS if set
 	if xdg := os.Getenv("XDG_DATA_DIRS"); xdg != "" {
 		for _, d := range strings.Split(xdg, ":") {
@@ -71,27 +82,13 @@ func getApplicationDirs() []string {
 	// When running in a flatpak, also check host system paths
 	// The flatpak manifest grants read access to these via --filesystem
 	if os.Getenv("FLATPAK_ID") != "" {
-		home, _ := os.UserHomeDir()
-		if home != "" {
-			addDir(filepath.Join(home, ".local", "share", "applications"))
-			addDir(filepath.Join(home, ".local", "share", "flatpak", "exports", "share", "applications"))
-		}
-		addDir("/usr/share/applications")
-		addDir("/var/lib/flatpak/exports/share/applications")
-		addDir("/var/lib/snapd/desktop/applications")
+		addCommonDirs()
 	}
 
 	// If nothing was found, use fallback paths
 	if len(dirs) == 0 {
-		home, _ := os.UserHomeDir()
-		if home != "" {
-			addDir(filepath.Join(home, ".local", "share", "applications"))
-			addDir(filepath.Join(home, ".local", "share", "flatpak", "exports", "share", "applications"))
-		}
 		addDir("/usr/local/share/applications")
-		addDir("/usr/share/applications")
-		addDir("/var/lib/flatpak/exports/share/applications")
-		addDir("/var/lib/snapd/desktop/applications")
+		addCommonDirs()
 	}
 
 	return dirs
@@ -174,15 +171,8 @@ func launchBrowser(b *Browser, url string) {
 		return
 	}
 
-	// If running in a flatpak, use flatpak-spawn to launch on the host
-	var cmd *exec.Cmd
-	if os.Getenv("FLATPAK_ID") != "" {
-		// Use flatpak-spawn --host to launch browsers on the host system
-		args := append([]string{"--host"}, parts...)
-		cmd = exec.Command("flatpak-spawn", args...)
-	} else {
-		cmd = exec.Command(parts[0], parts[1:]...)
-	}
+	// Use hostCommand helper for flatpak-aware execution
+	cmd := hostCommand(parts[0], parts[1:]...)
 
 	if err := cmd.Start(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error launching browser: %v\n", err)
