@@ -1,29 +1,177 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#8ff0a4"/>
-      <stop offset="100%" style="stop-color:#26a269"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="128"
+   height="128"
+   viewBox="0 0 128 128"
+   version="1.1"
+   id="svg7"
+   sodipodi:docname="io.github.alyraffauf.Switchyard.svg"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="3"
+     inkscape:cx="50.833333"
+     inkscape:cy="64.5"
+     inkscape:window-width="1600"
+     inkscape:window-height="928"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg7" />
+  <defs
+     id="defs2">
+    <linearGradient
+       id="bg"
+       x1="0%"
+       y1="0%"
+       x2="0%"
+       y2="100%">
+      <stop
+         offset="0%"
+         style="stop-color:#8ff0a4"
+         id="stop1" />
+      <stop
+         offset="100%"
+         style="stop-color:#26a269"
+         id="stop2" />
     </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#bg"
+       id="linearGradient7"
+       x1="21.466253"
+       y1="60.373835"
+       x2="21.466253"
+       y2="69.318107"
+       gradientTransform="scale(1.118034,0.89442719)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#bg"
+       id="linearGradient8"
+       x1="33.988233"
+       y1="60.373835"
+       x2="33.988233"
+       y2="69.318107"
+       gradientTransform="scale(1.118034,0.89442719)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#bg"
+       id="linearGradient9"
+       x1="66.187612"
+       y1="60.373835"
+       x2="66.187612"
+       y2="69.318107"
+       gradientTransform="scale(1.118034,0.89442719)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#bg"
+       id="linearGradient10"
+       x1="78.709593"
+       y1="60.373835"
+       x2="78.709593"
+       y2="69.318107"
+       gradientTransform="scale(1.118034,0.89442719)"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <!-- Background circle -->
-  <circle cx="64" cy="64" r="60" fill="url(#bg)"/>
-
+  <circle
+     cx="64"
+     cy="64"
+     r="60"
+     fill="url(#bg)"
+     id="circle2" />
+  <line
+     x1="19.565887"
+     y1="68.360672"
+     x2="108.43411"
+     y2="68.360672"
+     stroke="#ffffff"
+     stroke-width="2.72134"
+     stroke-linecap="round"
+     id="line7-5" />
   <!-- Two-car subway train -->
-  <g fill="#ffffff">
+  <g
+     fill="#ffffff"
+     id="g7"
+     transform="matrix(0.93834693,0,0,1,3.9457967,0)">
     <!-- Left car -->
-    <rect x="18" y="50" width="42" height="24" rx="4"/>
+    <rect
+       x="18"
+       y="50"
+       width="42"
+       height="24"
+       rx="4"
+       id="rect2" />
     <!-- Left car windows -->
-    <rect x="24" y="54" width="10" height="8" rx="2" fill="url(#bg)"/>
-    <rect x="38" y="54" width="10" height="8" rx="2" fill="url(#bg)"/>
-
+    <rect
+       x="24"
+       y="54"
+       width="10"
+       height="8"
+       rx="2"
+       fill="url(#bg)"
+       id="rect3"
+       style="fill:url(#linearGradient7)" />
+    <rect
+       x="38"
+       y="54"
+       width="10"
+       height="8"
+       rx="2"
+       fill="url(#bg)"
+       id="rect4"
+       style="fill:url(#linearGradient8)" />
     <!-- Right car -->
-    <rect x="68" y="50" width="42" height="24" rx="4"/>
+    <rect
+       x="68"
+       y="50"
+       width="42"
+       height="24"
+       rx="4"
+       id="rect5" />
     <!-- Right car windows -->
-    <rect x="74" y="54" width="10" height="8" rx="2" fill="url(#bg)"/>
-    <rect x="88" y="54" width="10" height="8" rx="2" fill="url(#bg)"/>
+    <rect
+       x="74"
+       y="54"
+       width="10"
+       height="8"
+       rx="2"
+       fill="url(#bg)"
+       id="rect6"
+       style="fill:url(#linearGradient9)" />
+    <rect
+       x="88"
+       y="54"
+       width="10"
+       height="8"
+       rx="2"
+       fill="url(#bg)"
+       id="rect7"
+       style="fill:url(#linearGradient10)" />
   </g>
-
   <!-- Track -->
-  <line x1="10" y1="78" x2="118" y2="78" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  <line
+     x1="19.565891"
+     y1="78"
+     x2="108.43411"
+     y2="78"
+     stroke="#ffffff"
+     stroke-width="2.72134"
+     stroke-linecap="round"
+     id="line7" />
 </svg>
