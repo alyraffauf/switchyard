@@ -16,35 +16,54 @@ func showSettingsWindow(app *adw.Application) {
 	win := adw.NewWindow()
 	win.SetTitle("Switchyard")
 	win.SetApplication(&app.Application)
-	win.SetDefaultSize(700, 800)
+	win.SetDefaultSize(900, 600)
 	win.SetResizable(true)
+
+	// Set minimum size to prevent too-small window
+	win.SetSizeRequest(700, 500)
 
 	cfg := loadConfig()
 	browsers := detectBrowsers()
 
-	// Main layout with toolbar
-	toolbarView := adw.NewToolbarView()
+	// Setup app-level actions
+	setupAppActions(app, win)
 
-	// Header bar with hamburger menu
-	header := adw.NewHeaderBar()
+	// Navigation split view (sidebar + content)
+	splitView := adw.NewNavigationSplitView()
+	splitView.SetShowContent(true)
+	splitView.SetMinSidebarWidth(200)
+	splitView.SetMaxSidebarWidth(200)
 
-	// Hamburger menu
-	menuBtn := gtk.NewMenuButton()
-	menuBtn.SetIconName("open-menu-symbolic")
-	menuBtn.SetTooltipText("Main menu")
+	// Sidebar
+	sidebarPage := adw.NewNavigationPage(createSidebar(win, cfg, browsers, splitView), "Switchyard")
+	splitView.SetSidebar(sidebarPage)
 
-	menu := gio.NewMenu()
-	menu.Append("Donate ❤️", "app.donate")
-	menu.Append("About", "app.about")
+	// Initial content - show Appearance page by default
+	contentPage := adw.NewNavigationPage(createAppearancePage(win, cfg), "Appearance")
+	splitView.SetContent(contentPage)
 
-	quitSection := gio.NewMenu()
-	quitSection.Append("Quit", "app.quit")
-	menu.AppendSection("", quitSection)
+	win.SetContent(splitView)
 
-	menuBtn.SetMenuModel(menu)
-	header.PackEnd(menuBtn)
+	// Check if we should prompt to set as default browser
+	if cfg.CheckDefaultBrowser && !isDefaultBrowser() {
+		showDefaultBrowserPrompt(win, cfg, func() {
+			// Reload the behavior page after setting as default
+			newPage := adw.NewNavigationPage(createBehaviorPage(win, cfg, browsers), "Behavior")
+			splitView.SetContent(newPage)
+		})
+	}
 
-	// Actions
+	// Watch config file for external changes
+	watchConfigFile(cfg, func() {
+		// Refresh current view
+		// For now, we'll just note that external changes happened
+		// A full implementation would reload the current page
+	})
+
+	win.Present()
+}
+
+func setupAppActions(app *adw.Application, win *adw.Window) {
 	aboutAction := gio.NewSimpleAction("about", nil)
 	aboutAction.ConnectActivate(func(p *glib.Variant) {
 		showAboutDialog(win)
@@ -53,7 +72,7 @@ func showSettingsWindow(app *adw.Application) {
 
 	donateAction := gio.NewSimpleAction("donate", nil)
 	donateAction.ConnectActivate(func(p *glib.Variant) {
-		launcher := gtk.NewURILauncher("https://ko-fi.com/alyraffauf")
+		launcher := gtk.NewURILauncher(DonateURL)
 		launcher.Launch(context.Background(), &win.Window, nil)
 	})
 	app.AddAction(donateAction)
@@ -64,57 +83,275 @@ func showSettingsWindow(app *adw.Application) {
 	})
 	app.AddAction(quitAction)
 
-	// Keyboard shortcut for Quit
+	// Keyboard shortcuts
 	app.SetAccelsForAction("app.quit", []string{"<Ctrl>q"})
+}
 
+func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView *adw.NavigationSplitView) gtk.Widgetter {
+	// Use AdwToolbarView for proper sidebar architecture
+	toolbarView := adw.NewToolbarView()
+
+	// Sidebar header with menu
+	sidebarHeader := adw.NewHeaderBar()
+	sidebarHeader.SetShowEndTitleButtons(false)
+
+	titleLabel := gtk.NewLabel("Switchyard")
+	titleLabel.AddCSSClass("title")
+	sidebarHeader.SetTitleWidget(titleLabel)
+
+	// Hamburger menu
+	menuBtn := gtk.NewMenuButton()
+	menuBtn.SetIconName("open-menu-symbolic")
+	menuBtn.SetTooltipText("Main Menu")
+
+	menu := gio.NewMenu()
+	menu.Append("Donate ❤️", "app.donate")
+	menu.Append("About", "app.about")
+
+	quitSection := gio.NewMenu()
+	quitSection.Append("Quit", "app.quit")
+	menu.AppendSection("", quitSection)
+
+	menuBtn.SetMenuModel(menu)
+	sidebarHeader.PackEnd(menuBtn)
+
+	toolbarView.AddTopBar(sidebarHeader)
+
+	// Scrolled window for sidebar content
+	scrolled := gtk.NewScrolledWindow()
+	scrolled.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
+	scrolled.SetVExpand(true)
+
+	// List box for navigation items
+	listBox := gtk.NewListBox()
+	listBox.SetSelectionMode(gtk.SelectionSingle)
+	listBox.AddCSSClass("navigation-sidebar")
+
+	// Appearance row
+	appearanceRow := gtk.NewListBoxRow()
+	appearanceBox := gtk.NewBox(gtk.OrientationHorizontal, 12)
+	appearanceBox.SetMarginStart(12)
+	appearanceBox.SetMarginEnd(12)
+	appearanceBox.SetMarginTop(8)
+	appearanceBox.SetMarginBottom(8)
+	appearanceIcon := gtk.NewImageFromIconName("window-symbolic")
+	appearanceIcon.SetPixelSize(16)
+	appearanceLabel := gtk.NewLabel("Appearance")
+	appearanceLabel.SetXAlign(0)
+	appearanceBox.Append(appearanceIcon)
+	appearanceBox.Append(appearanceLabel)
+	appearanceRow.SetChild(appearanceBox)
+	listBox.Append(appearanceRow)
+
+	// Behavior row
+	behaviorRow := gtk.NewListBoxRow()
+	behaviorBox := gtk.NewBox(gtk.OrientationHorizontal, 12)
+	behaviorBox.SetMarginStart(12)
+	behaviorBox.SetMarginEnd(12)
+	behaviorBox.SetMarginTop(8)
+	behaviorBox.SetMarginBottom(8)
+	behaviorIcon := gtk.NewImageFromIconName("preferences-system-symbolic")
+	behaviorIcon.SetPixelSize(16)
+	behaviorLabel := gtk.NewLabel("Behavior")
+	behaviorLabel.SetXAlign(0)
+	behaviorBox.Append(behaviorIcon)
+	behaviorBox.Append(behaviorLabel)
+	behaviorRow.SetChild(behaviorBox)
+	listBox.Append(behaviorRow)
+
+	// Rules row
+	rulesRow := gtk.NewListBoxRow()
+	rulesBox := gtk.NewBox(gtk.OrientationHorizontal, 12)
+	rulesBox.SetMarginStart(12)
+	rulesBox.SetMarginEnd(12)
+	rulesBox.SetMarginTop(8)
+	rulesBox.SetMarginBottom(8)
+	rulesIcon := gtk.NewImageFromIconName("emblem-system-symbolic")
+	rulesIcon.SetPixelSize(16)
+	rulesLabel := gtk.NewLabel("Rules")
+	rulesLabel.SetXAlign(0)
+	rulesBox.Append(rulesIcon)
+	rulesBox.Append(rulesLabel)
+	rulesRow.SetChild(rulesBox)
+	listBox.Append(rulesRow)
+
+	// Advanced row
+	advancedRow := gtk.NewListBoxRow()
+	advancedBox := gtk.NewBox(gtk.OrientationHorizontal, 12)
+	advancedBox.SetMarginStart(12)
+	advancedBox.SetMarginEnd(12)
+	advancedBox.SetMarginTop(8)
+	advancedBox.SetMarginBottom(8)
+	advancedIcon := gtk.NewImageFromIconName("applications-system-symbolic")
+	advancedIcon.SetPixelSize(16)
+	advancedLabel := gtk.NewLabel("Advanced")
+	advancedLabel.SetXAlign(0)
+	advancedBox.Append(advancedIcon)
+	advancedBox.Append(advancedLabel)
+	advancedRow.SetChild(advancedBox)
+	listBox.Append(advancedRow)
+
+	scrolled.SetChild(listBox)
+	toolbarView.SetContent(scrolled)
+
+	// Select first item by default
+	listBox.SelectRow(appearanceRow)
+
+	// Handle navigation - need to connect to both activated and selected
+	navigateToPage := func(index int) {
+		var page gtk.Widgetter
+		var title string
+
+		switch index {
+		case 0: // Appearance
+			page = createAppearancePage(win, cfg)
+			title = "Appearance"
+		case 1: // Behavior
+			page = createBehaviorPage(win, cfg, browsers)
+			title = "Behavior"
+		case 2: // Rules
+			page = createRulesPage(win, cfg, browsers)
+			title = "Rules"
+		case 3: // Advanced
+			page = createAdvancedPage(cfg)
+			title = "Advanced"
+		}
+
+		if page != nil {
+			contentPage := adw.NewNavigationPage(page, title)
+			splitView.SetContent(contentPage)
+		}
+	}
+
+	listBox.ConnectRowActivated(func(row *gtk.ListBoxRow) {
+		navigateToPage(row.Index())
+	})
+
+	listBox.ConnectRowSelected(func(row *gtk.ListBoxRow) {
+		if row != nil {
+			navigateToPage(row.Index())
+		}
+	})
+
+	return toolbarView
+}
+
+func createAppearancePage(win *adw.Window, cfg *Config) gtk.Widgetter {
+	// Use AdwToolbarView for proper page architecture
+	toolbarView := adw.NewToolbarView()
+
+	// Header for this page
+	header := adw.NewHeaderBar()
+	header.SetShowEndTitleButtons(true)
+	titleLabel := gtk.NewLabel("Appearance")
+	titleLabel.AddCSSClass("title")
+	header.SetTitleWidget(titleLabel)
 	toolbarView.AddTopBar(header)
 
-	// Scrolled window for content
 	scrolled := gtk.NewScrolledWindow()
 	scrolled.SetVExpand(true)
 	scrolled.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
 
-	// Content box
 	content := gtk.NewBox(gtk.OrientationVertical, 24)
 	content.SetMarginStart(24)
 	content.SetMarginEnd(24)
 	content.SetMarginTop(24)
 	content.SetMarginBottom(24)
 
-	// Clamp for max width
 	clamp := adw.NewClamp()
 	clamp.SetMaximumSize(600)
 	clamp.SetChild(content)
 	scrolled.SetChild(clamp)
 
-	// Appearance section
-	appearanceGroup := adw.NewPreferencesGroup()
-	appearanceGroup.SetTitle("Appearance")
+	// Browser Picker section
+	pickerGroup := adw.NewPreferencesGroup()
+	pickerGroup.SetTitle("Picker Window")
 
 	forceDarkRow := adw.NewSwitchRow()
-	forceDarkRow.SetTitle("Force dark mode in browser picker")
+	forceDarkRow.SetTitle("Force dark mode")
 	forceDarkRow.SetSubtitle("Always use dark mode for the picker window")
-	appearanceGroup.Add(forceDarkRow)
+	forceDarkRow.SetActive(cfg.ForceDarkMode)
+	pickerGroup.Add(forceDarkRow)
 
 	showNamesRow := adw.NewSwitchRow()
-	showNamesRow.SetTitle("Show browser names in picker")
+	showNamesRow.SetTitle("Show browser names")
 	showNamesRow.SetSubtitle("Show browser names below icons")
-	appearanceGroup.Add(showNamesRow)
+	showNamesRow.SetActive(cfg.ShowAppNames)
+	pickerGroup.Add(showNamesRow)
 
-	content.Append(appearanceGroup)
+	content.Append(pickerGroup)
 
-	// Behavior section
+	// Wrap saveConfig to set the global saving flag
+	saveConfigSafe := func(c *Config) error {
+		savingMux.Lock()
+		isSaving = true
+		savingMux.Unlock()
+		err := saveConfig(c)
+		glib.TimeoutAdd(100, func() bool {
+			savingMux.Lock()
+			isSaving = false
+			savingMux.Unlock()
+			return false
+		})
+		return err
+	}
+
+	// Connect change handlers
+	forceDarkRow.Connect("notify::active", func() {
+		cfg.ForceDarkMode = forceDarkRow.Active()
+		saveConfigSafe(cfg)
+	})
+
+	showNamesRow.Connect("notify::active", func() {
+		cfg.ShowAppNames = showNamesRow.Active()
+		saveConfigSafe(cfg)
+	})
+
+	toolbarView.SetContent(scrolled)
+	return toolbarView
+}
+
+func createBehaviorPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.Widgetter {
+	// Use AdwToolbarView for proper page architecture
+	toolbarView := adw.NewToolbarView()
+
+	// Header for this page
+	header := adw.NewHeaderBar()
+	header.SetShowEndTitleButtons(true)
+	titleLabel := gtk.NewLabel("Behavior")
+	titleLabel.AddCSSClass("title")
+	header.SetTitleWidget(titleLabel)
+	toolbarView.AddTopBar(header)
+
+	scrolled := gtk.NewScrolledWindow()
+	scrolled.SetVExpand(true)
+	scrolled.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
+
+	content := gtk.NewBox(gtk.OrientationVertical, 24)
+	content.SetMarginStart(24)
+	content.SetMarginEnd(24)
+	content.SetMarginTop(24)
+	content.SetMarginBottom(24)
+
+	clamp := adw.NewClamp()
+	clamp.SetMaximumSize(600)
+	clamp.SetChild(content)
+	scrolled.SetChild(clamp)
+
+	// General Behavior section
 	behaviorGroup := adw.NewPreferencesGroup()
-	behaviorGroup.SetTitle("Behavior")
+	behaviorGroup.SetTitle("General")
 
 	checkDefaultRow := adw.NewSwitchRow()
-	checkDefaultRow.SetTitle("Check if Switchyard is default browser")
-	checkDefaultRow.SetSubtitle("Ask to set Switchyard as default browser on startup")
+	checkDefaultRow.SetTitle("Prompt to set as default browser")
+	checkDefaultRow.SetSubtitle("Show prompt on startup if Switchyard is not the default browser")
+	checkDefaultRow.SetActive(cfg.CheckDefaultBrowser)
 	behaviorGroup.Add(checkDefaultRow)
 
 	promptRow := adw.NewSwitchRow()
 	promptRow.SetTitle("Show picker when no rule matches")
 	promptRow.SetSubtitle("Let you choose a browser for unmatched URLs")
+	promptRow.SetActive(cfg.PromptOnClick)
 	behaviorGroup.Add(promptRow)
 
 	// Favorite browser dropdown
@@ -129,29 +366,19 @@ func showSettingsWindow(app *adw.Application) {
 	defaultRow.SetTitle("Favorite browser")
 	defaultRow.SetSubtitle("Appears first in picker and opens when picker is disabled")
 	defaultRow.SetModel(browserList)
-	behaviorGroup.Add(defaultRow)
 
-	content.Append(behaviorGroup)
-
-	// Function to update UI from config
-	updateUI := func() {
-		promptRow.SetActive(cfg.PromptOnClick)
-		checkDefaultRow.SetActive(cfg.CheckDefaultBrowser)
-		showNamesRow.SetActive(cfg.ShowAppNames)
-		forceDarkRow.SetActive(cfg.ForceDarkMode)
-
-		// Update favorite browser selection only if it differs from current
-		var targetSelection uint = 0
-		for i, b := range browsers {
-			if b.ID == cfg.FavoriteBrowser {
-				targetSelection = uint(i + 1)
-				break
-			}
-		}
-		if defaultRow.Selected() != targetSelection {
-			defaultRow.SetSelected(targetSelection)
+	// Set initial selection
+	selectedIndex := uint(0)
+	for i, b := range browsers {
+		if b.ID == cfg.FavoriteBrowser {
+			selectedIndex = uint(i + 1)
+			break
 		}
 	}
+	defaultRow.SetSelected(selectedIndex)
+
+	behaviorGroup.Add(defaultRow)
+	content.Append(behaviorGroup)
 
 	// Wrap saveConfig to set the global saving flag
 	saveConfigSafe := func(c *Config) error {
@@ -159,7 +386,6 @@ func showSettingsWindow(app *adw.Application) {
 		isSaving = true
 		savingMux.Unlock()
 		err := saveConfig(c)
-		// Add small delay to ensure file is flushed before file watcher reads it
 		glib.TimeoutAdd(100, func() bool {
 			savingMux.Lock()
 			isSaving = false
@@ -169,19 +395,15 @@ func showSettingsWindow(app *adw.Application) {
 		return err
 	}
 
-	// Function to save config and update UI
-	saveAndUpdate := func() {
-		saveConfigSafe(cfg)
-		updateUI()
-	}
-
-	// Initial UI update
-	updateUI()
-
 	// Connect change handlers
+	checkDefaultRow.Connect("notify::active", func() {
+		cfg.CheckDefaultBrowser = checkDefaultRow.Active()
+		saveConfigSafe(cfg)
+	})
+
 	promptRow.Connect("notify::active", func() {
 		cfg.PromptOnClick = promptRow.Active()
-		saveAndUpdate()
+		saveConfigSafe(cfg)
 	})
 
 	defaultRow.Connect("notify::selected", func() {
@@ -194,25 +416,55 @@ func showSettingsWindow(app *adw.Application) {
 		saveConfigSafe(cfg)
 	})
 
-	checkDefaultRow.Connect("notify::active", func() {
-		cfg.CheckDefaultBrowser = checkDefaultRow.Active()
-		saveConfigSafe(cfg)
-	})
+	toolbarView.SetContent(scrolled)
+	return toolbarView
+}
 
-	showNamesRow.Connect("notify::active", func() {
-		cfg.ShowAppNames = showNamesRow.Active()
-		saveConfigSafe(cfg)
-	})
+func createRulesPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.Widgetter {
+	// Use AdwToolbarView for proper page architecture
+	toolbarView := adw.NewToolbarView()
 
-	forceDarkRow.Connect("notify::active", func() {
-		cfg.ForceDarkMode = forceDarkRow.Active()
-		saveConfigSafe(cfg)
-	})
+	// Header for this page
+	header := adw.NewHeaderBar()
+	header.SetShowEndTitleButtons(true)
+	titleLabel := gtk.NewLabel("Rules")
+	titleLabel.AddCSSClass("title")
+	header.SetTitleWidget(titleLabel)
 
-	// Check if we should prompt to set as default browser (after UI is created)
-	if cfg.CheckDefaultBrowser && !isDefaultBrowser() {
-		showDefaultBrowserPrompt(win, cfg, updateUI)
-	}
+	// Add Rule button in header
+	addButton := gtk.NewButton()
+	addButton.SetIconName("list-add-symbolic")
+	addButton.SetTooltipText("Add New Rule")
+	addButton.SetHasFrame(false)
+	header.PackEnd(addButton)
+
+	toolbarView.AddTopBar(header)
+
+	// Scrolled window for rules list
+	scrolled := gtk.NewScrolledWindow()
+	scrolled.SetVExpand(true)
+	scrolled.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
+
+	content := gtk.NewBox(gtk.OrientationVertical, 12)
+	content.SetMarginStart(12)
+	content.SetMarginEnd(12)
+	content.SetMarginTop(12)
+	content.SetMarginBottom(12)
+
+	// Info banner
+	infoLabel := gtk.NewLabel("Rules are evaluated in order. First match wins.")
+	infoLabel.SetWrap(true)
+	infoLabel.SetXAlign(0)
+	infoLabel.AddCSSClass("dim-label")
+	infoLabel.SetMarginStart(12)
+	infoLabel.SetMarginEnd(12)
+	infoLabel.SetMarginBottom(6)
+	content.Append(infoLabel)
+
+	// Rules list with drag-and-drop support
+	rulesListBox := gtk.NewListBox()
+	rulesListBox.SetSelectionMode(gtk.SelectionNone)
+	rulesListBox.AddCSSClass("boxed-list")
 
 	// Helper to get browser name from ID
 	getBrowserName := func(id string) string {
@@ -221,16 +473,6 @@ func showSettingsWindow(app *adw.Application) {
 		}
 		return id
 	}
-
-	// Rules section
-	rulesGroup := adw.NewPreferencesGroup()
-	rulesGroup.SetTitle("Rules")
-	rulesGroup.SetDescription("Rules are evaluated in order. First match wins.")
-
-	// Use a ListBox for proper ordering control
-	rulesListBox := gtk.NewListBox()
-	rulesListBox.SetSelectionMode(gtk.SelectionNone)
-	rulesListBox.AddCSSClass("boxed-list")
 
 	// Function to rebuild the rules list UI
 	var rebuildRulesList func()
@@ -256,7 +498,6 @@ func showSettingsWindow(app *adw.Application) {
 		// Browser icon - use Switchyard icon if AlwaysAsk is enabled
 		var icon *gtk.Image
 		if rule.AlwaysAsk {
-			// Find app's own browser entry to load its icon
 			appBrowser := &Browser{
 				ID:      getAppID(),
 				Icon:    getAppID(),
@@ -268,7 +509,6 @@ func showSettingsWindow(app *adw.Application) {
 			if browser != nil {
 				icon = loadBrowserIcon(browser, 24)
 			} else {
-				// Fallback icon if browser not found
 				icon = gtk.NewImageFromIconName("web-browser-symbolic")
 				icon.SetPixelSize(24)
 			}
@@ -315,6 +555,7 @@ func showSettingsWindow(app *adw.Application) {
 		deleteBtn := gtk.NewButton()
 		deleteBtn.SetIconName("user-trash-symbolic")
 		deleteBtn.AddCSSClass("flat")
+		deleteBtn.AddCSSClass("destructive-action")
 		deleteBtn.SetTooltipText("Delete rule")
 		deleteBtn.ConnectClicked(func() {
 			cfg.Rules = append(cfg.Rules[:ruleIndex], cfg.Rules[ruleIndex+1:]...)
@@ -351,29 +592,55 @@ func showSettingsWindow(app *adw.Application) {
 	// Initial build
 	rebuildRulesList()
 
-	rulesGroup.Add(rulesListBox)
-	content.Append(rulesGroup)
+	content.Append(rulesListBox)
+	scrolled.SetChild(content)
+	toolbarView.SetContent(scrolled)
 
-	// Add rule button
-	addGroup := adw.NewPreferencesGroup()
-	addRow := adw.NewButtonRow()
-	addRow.SetTitle("Add Rule")
-	addRow.SetStartIconName("list-add-symbolic")
-	addRow.ConnectActivated(func() {
+	// Connect Add Rule button handler
+	addButton.ConnectClicked(func() {
 		showAddRuleDialog(win, cfg, browsers, rebuildRulesList)
 	})
-	addGroup.Add(addRow)
-	content.Append(addGroup)
+
+	return toolbarView
+}
+
+func createAdvancedPage(cfg *Config) gtk.Widgetter {
+	// Use AdwToolbarView for proper page architecture
+	toolbarView := adw.NewToolbarView()
+
+	// Header for this page
+	header := adw.NewHeaderBar()
+	header.SetShowEndTitleButtons(true)
+	titleLabel := gtk.NewLabel("Advanced")
+	titleLabel.AddCSSClass("title")
+	header.SetTitleWidget(titleLabel)
+	toolbarView.AddTopBar(header)
+
+	scrolled := gtk.NewScrolledWindow()
+	scrolled.SetVExpand(true)
+	scrolled.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
+
+	content := gtk.NewBox(gtk.OrientationVertical, 24)
+	content.SetMarginStart(24)
+	content.SetMarginEnd(24)
+	content.SetMarginTop(24)
+	content.SetMarginBottom(24)
+
+	clamp := adw.NewClamp()
+	clamp.SetMaximumSize(600)
+	clamp.SetChild(content)
+	scrolled.SetChild(clamp)
 
 	// Config file info
-	infoGroup := adw.NewPreferencesGroup()
-	infoGroup.SetTitle("Advanced")
-	infoRow := adw.NewActionRow()
-	infoRow.SetTitle("Config file")
-	infoRow.SetSubtitle(configPath())
-	infoRow.SetActivatable(true)
-	infoRow.AddSuffix(gtk.NewImageFromIconName("document-edit-symbolic"))
-	infoRow.ConnectActivated(func() {
+	configGroup := adw.NewPreferencesGroup()
+	configGroup.SetTitle("Configuration")
+
+	configRow := adw.NewActionRow()
+	configRow.SetTitle("Configuration File")
+	configRow.SetSubtitle(configPath())
+	configRow.SetActivatable(true)
+	configRow.AddSuffix(gtk.NewImageFromIconName("document-edit-symbolic"))
+	configRow.ConnectActivated(func() {
 		// Ensure config file exists
 		saveConfig(cfg)
 		// Open with xdg-open via flatpak-spawn when in Flatpak
@@ -383,10 +650,15 @@ func showSettingsWindow(app *adw.Application) {
 		}
 		go cmd.Wait()
 	})
-	infoGroup.Add(infoRow)
-	content.Append(infoGroup)
+	configGroup.Add(configRow)
 
-	// Watch config file for external changes
+	content.Append(configGroup)
+
+	toolbarView.SetContent(scrolled)
+	return toolbarView
+}
+
+func watchConfigFile(cfg *Config, onChange func()) {
 	configFile := gio.NewFileForPath(configPath())
 	monitorIface, err := configFile.Monitor(context.Background(), gio.FileMonitorNone)
 	if err == nil && monitorIface != nil {
@@ -408,18 +680,14 @@ func showSettingsWindow(app *adw.Application) {
 					cfg.FavoriteBrowser = newCfg.FavoriteBrowser
 					cfg.CheckDefaultBrowser = newCfg.CheckDefaultBrowser
 					cfg.ShowAppNames = newCfg.ShowAppNames
+					cfg.ForceDarkMode = newCfg.ForceDarkMode
 					cfg.Rules = newCfg.Rules
 
-					// Update UI
-					updateUI()
-					rebuildRulesList()
+					if onChange != nil {
+						onChange()
+					}
 				}
 			})
 		}
 	}
-
-	toolbarView.SetContent(scrolled)
-	win.SetContent(toolbarView)
-
-	win.Present()
 }
