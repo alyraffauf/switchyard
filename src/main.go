@@ -13,8 +13,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-const appID = "io.github.alyraffauf.Switchyard"
-
 // Global flag to track if we're currently saving config to avoid file watcher race conditions
 var (
 	isSaving  bool
@@ -22,7 +20,7 @@ var (
 )
 
 func main() {
-	app := adw.NewApplication(appID, gio.ApplicationHandlesOpen)
+	app := adw.NewApplication(getAppID(), gio.ApplicationHandlesOpen)
 
 	app.ConnectActivate(func() {
 		// Add host icon paths for Flatpak compatibility

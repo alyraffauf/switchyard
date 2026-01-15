@@ -267,11 +267,13 @@ func isDefaultBrowser() bool {
 	}
 
 	defaultBrowser := strings.TrimSpace(string(output))
-	return defaultBrowser == "io.github.alyraffauf.Switchyard.desktop"
+	desktopFile := getAppID() + ".desktop"
+	return defaultBrowser == desktopFile
 }
 
 func setAsDefaultBrowser() error {
 	// Set Switchyard as the default browser using xdg-settings
-	cmd := hostCommand("xdg-settings", "set", "default-web-browser", "io.github.alyraffauf.Switchyard.desktop")
+	desktopFile := getAppID() + ".desktop"
+	cmd := hostCommand("xdg-settings", "set", "default-web-browser", desktopFile)
 	return cmd.Run()
 }
