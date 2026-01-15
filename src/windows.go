@@ -61,9 +61,8 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	flowBox.SetHAlign(gtk.AlignCenter)
 	flowBox.SetVAlign(gtk.AlignStart)
 
-	for i, browser := range sortedBrowsers {
+	for _, browser := range sortedBrowsers {
 		b := browser // capture
-		idx := i
 
 		// Button for each browser
 		btn := gtk.NewButton()
@@ -101,14 +100,6 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		} else {
 			// Show as tooltip on hover
 			btn.SetTooltipText(b.Name)
-		}
-
-		// Number shortcut (1-9)
-		if idx < 9 {
-			shortcutLabel := gtk.NewLabel(fmt.Sprintf("%d", idx+1))
-			shortcutLabel.AddCSSClass("dim-label")
-			shortcutLabel.AddCSSClass("caption")
-			btnBox.Append(shortcutLabel)
 		}
 
 		btn.SetChild(btnBox)
