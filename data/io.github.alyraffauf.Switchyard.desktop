@@ -1,12 +1,12 @@
 [Desktop Entry]
 Type=Application
 Name=Switchyard
-GenericName=Web Browser
-Comment=Rules-based URL router
+GenericName=Browser Chooser
+Comment=Choose which browser opens each link
 Exec=switchyard %U
 Icon=io.github.alyraffauf.Switchyard
 Terminal=false
 Categories=Network;WebBrowser;
 MimeType=x-scheme-handler/http;x-scheme-handler/https;
 StartupNotify=true
-Keywords=browser;web;url;link;
+Keywords=browser;web;url;link;chooser;picker;router;switch;

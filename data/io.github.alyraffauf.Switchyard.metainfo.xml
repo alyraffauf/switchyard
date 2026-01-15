@@ -3,28 +3,28 @@
   <id>io.github.alyraffauf.Switchyard</id>
   <name>Switchyard</name>
   <summary
-    >Rules-based URL router that replaces your default web browser</summary>
+    >Choose which browser opens each link with powerful routing rules</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
 
   <description>
     <p>
-      Switchyard is a URL router for Linux that makes sure clicked links get sent to the right browser
-      based on your rules. Like a railroad switchyard directing trains to different tracks, it routes
-      URLs to the appropriate browser, or lets you choose with a quick prompt when no rule matches.
+      Switchyard routes clicked links to the right browser based on your rules. Like a railroad
+      switchyard directing trains to different tracks, it automatically opens URLs in the appropriate
+      browser, or shows a quick picker when no rule matches.
     </p>
     <p>Features:</p>
     <ul>
       <li
-            >Rule-based routing: Automatically send URLs to specific browsers based on powerful text patterns</li>
+            >Rule-based routing: Automatically open URLs in specific browsers based on powerful patterns</li>
       <li
-            >Multi-condition rules: Stack multiple conditions with AND/OR logic for precise routing</li>
+            >Multi-condition rules: Combine multiple conditions with AND/OR logic for precise control</li>
       <li
-            >Multiple pattern types: Exact domain, URL contains, wildcard (glob), and regex</li>
+            >Multiple pattern types: Exact Domain, URL Contains, Wildcard, and Regex matching</li>
       <li
-            >Quick prompt with keyboard shortcuts (press 1-9 to instantly select a browser)</li>
-      <li>Daemonless: Runs only when needed, no background processes</li>
-      <li>Simple TOML configuration file for power users</li>
+            >Quick browser picker with keyboard shortcuts (press Ctrl+1-9 to instantly select)</li>
+      <li>Lightweight: Runs only when needed, no background processes</li>
+      <li>Simple TOML configuration file for advanced customization</li>
     </ul>
   </description>
 
@@ -69,11 +69,11 @@
         <p>Initial release</p>
         <ul>
           <li
-                    >Rules-based URL routing with multiple pattern types (domain, keyword, glob, regex)</li>
+                    >Rules-based URL routing with multiple pattern types (Exact Domain, URL Contains, Wildcard, Regex)</li>
           <li>Multi-condition rules with AND/OR logic</li>
-          <li>Quick browser prompt with libadwaita UI</li>
-          <li>Settings window for managing rules</li>
-          <li>Keyboard-first (press 1-9 for instant selection)</li>
+          <li>Quick browser picker with modern libadwaita UI</li>
+          <li>Settings window for managing rules and preferences</li>
+          <li>Keyboard shortcuts (press Ctrl+1-9 for instant selection)</li>
         </ul>
       </description>
     </release>

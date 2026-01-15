@@ -1,6 +1,6 @@
 # Switchyard
 
-**A rules-based URL router for Linux that replaces your default web browser.** When you click a link, Switchyard makes sure it gets sent to the right browser based on your rules, or lets you choose with a quick prompt.
+**A rules-based URL router for Linux.** When you click a link, Switchyard automatically opens it in the right browser based on your rules, or shows a quick picker to let you choose.
 
 <p align="center">
   <img src="docs/images/switchyard-prompt.png" alt="Switchyard Prompt" width="600">
@@ -16,16 +16,16 @@
 
 ## Why Switchyard?
 
-Switchyards are the backbone of modern commerce. Instead of all trains (URLs) going to the same destination (one browser), switchyards direct each one to the right track (browser) based on pre-existing rules. Work links go to your work browser, social sites to another, and you can manually switch tracks when needed.
+Like a railroad switchyard directing trains to different tracks, Switchyard routes URLs to the appropriate browser based on your rules. Work links go to your work browser, personal sites to another, and you can manually choose when needed.
 
 ## Features
 
-- **Rule-based routing**: Automatically send URLs to specific browsers based on powerful text patterns.
-- **Multi-condition rules**: Stack multiple conditions with AND/OR logic for precise routing.
-- **Multiple pattern types**: Exact domain, URL contains, wildcard (glob), and regex.
-- **Quick picker**: When no rule matches, choose from your installed browsers with keyboard or mouse.
-- **Keyboard-first**: Press 1-9 to instantly select a browser, arrow keys to navigate.
-- **Daemonless**: Runs only when needed, no background processes.
+- **Rule-based routing**: Automatically open URLs in specific browsers based on powerful patterns.
+- **Multi-condition rules**: Combine multiple conditions with AND/OR logic for precise control.
+- **Multiple pattern types**: Exact Domain, URL Contains, Wildcard, and Regex matching.
+- **Quick browser picker**: When no rule matches, choose from your installed browsers with keyboard or mouse.
+- **Keyboard shortcuts**: Press Ctrl+1-9 to instantly select a browser.
+- **Lightweight**: Runs only when needed, no background processes.
 - **GTK4 + libadwaita**: Native GNOME look and feel.
 
 ## Installation
@@ -84,10 +84,8 @@ switchyard "https://example.com"
 ### Keyboard Shortcuts
 
 **In the picker:**
-- `1-9` - Select browser by number
-- `↑/↓` - Navigate list
-- `Enter` - Open in selected browser
-- `Escape` - Cancel
+- `Ctrl+1-9` - Select browser by number
+- `Escape` - Close picker
 
 **In settings:**
 - `Ctrl+Q` - Quit
@@ -166,17 +164,17 @@ pattern = "amazon"
 
 | Field | Description |
 |-------|-------------|
-| `type` | One of: `domain`, `keyword`, `glob`, `regex` |
+| `type` | Match type: `domain`, `keyword`, `glob`, or `regex` |
 | `pattern` | The pattern to match against |
 
 ### Condition Types
 
 | Type | Description | Example |
 |------|-------------|---------|
-| `domain` | Exact domain match | `github.com` |
-| `keyword` | URL contains text | `youtube.com/watch` |
-| `glob` | Wildcard pattern | `*.github.com` |
-| `regex` | Regular expression | `^https://.*\.example\.(com\|org)` |
+| `domain` | Exact Domain - matches specific hostname | `github.com` |
+| `keyword` | URL Contains - matches if URL contains text | `youtube.com/watch` |
+| `glob` | Wildcard - pattern with * wildcards | `*.github.com` |
+| `regex` | Regex - regular expression matching | `^https://.*\.example\.(com\|org)` |
 
 ### Logic Modes
 
@@ -190,7 +188,7 @@ Use `all` for precise targeting (e.g., "docs.google.com AND contains 'edit'") an
 | Setting | Description |
 |---------|-------------|
 | `prompt_on_click` | Show picker when no rule matches (default: true) |
-| `fallback_browser` | Fallback browser to use when prompt is disabled and no rule matches |
+| `fallback_browser` | Default browser to use when picker is disabled and no rule matches |
 | `check_default_browser` | Prompt to set Switchyard as system default browser on startup (default: true) |
 
 ## Development
@@ -216,10 +214,10 @@ Tests are automatically run in CI on every push and pull request.
 
 Switchyard draws inspiration from other excellent URL routers and browser pickers:
 
-- **[Choosy](https://choosy.app/)** - The gold standard URL router for macOS. Beautiful UI and powerful rule-based routing, but not available on Linux.
-- **[Junction](https://github.com/sonnyp/Junction)** - Slick browser picker for Linux with a snazzy interface, but without rule-based URL routing.
+- **[Choosy](https://choosy.app/)** - The gold standard URL router for macOS with beautiful UI and powerful rule-based routing.
+- **[Junction](https://github.com/sonnyp/Junction)** - Elegant browser picker for Linux with a modern interface.
 
-Switchyard aims to combine the best of both: Choosy's rule-based routing with a fast, native Linux experience.
+Switchyard combines the best of both: powerful rule-based routing with a fast, native Linux experience built on GTK4 and libadwaita.
 
 ## License
 

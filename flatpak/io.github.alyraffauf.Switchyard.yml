@@ -14,18 +14,18 @@ finish-args:
   - --device=dri
 
   # Access to Flatpak service for spawning host commands
-  # Required for checking/setting default browser via xdg-settings
+  # Required for checking and setting Switchyard as the default browser via xdg-settings
   - --talk-name=org.freedesktop.Flatpak
 
-  # Read specific directories to detect installed browsers
+  # Read directories to detect all installed browsers (native, Flatpak, and Snap)
   - --filesystem=xdg-data/applications:ro
   - --filesystem=xdg-data/flatpak:ro
   - --filesystem=/var/lib/flatpak:ro
   - --filesystem=/var/lib/snapd:ro
   - --filesystem=host:ro
 
-  # Extend XDG_DATA_DIRS to include host and flatpak paths so GIO can find all .desktop files
-  # This is critical for gio.AppInfoGetRecommendedForType to work correctly
+  # Extend XDG_DATA_DIRS to find all .desktop files from host, Flatpak, and Snap apps
+  # Required for discovering and launching all installed browsers
   - --env=XDG_DATA_DIRS=/app/share:/usr/share:/usr/share/runtime/share:/run/host/user-share:/run/host/share:/run/host/usr/share:/var/lib/flatpak/exports/share:~/.local/share/flatpak/exports/share:/var/lib/snapd/desktop
 modules:
   - name: glib
@@ -51,9 +51,9 @@ modules:
     build-commands:
       - |
         . /usr/lib/sdk/golang/enable.sh
-        # Ensure cache directory exists
+        # Ensure Go cache directory exists
         mkdir -p "$GOCACHE"
-        # Build with vendor mode for reproducibility
+        # Build with vendored dependencies for reproducibility and smaller binary size
         go build -mod=vendor -trimpath -ldflags="-s -w" -o switchyard ./src
       - install -Dm755 switchyard /app/bin/switchyard
       - install -Dm644 data/io.github.alyraffauf.Switchyard.desktop /app/share/applications/io.github.alyraffauf.Switchyard.desktop
