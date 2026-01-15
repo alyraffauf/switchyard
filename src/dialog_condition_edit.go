@@ -46,8 +46,8 @@ func showEditConditionDialog(parent *adw.Window, cond *Condition, onSave func())
 
 	// Type row
 	typeRow := adw.NewComboRow()
-	typeRow.SetTitle("Type")
-	typeRow.SetModel(gtk.NewStringList([]string{"Domain", "Contains", "Wildcard", "Regex"}))
+	typeRow.SetTitle("Match Type")
+	typeRow.SetModel(gtk.NewStringList([]string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}))
 	typeRow.SetSelected(conditionTypeToIndex(cond.Type))
 	group.Add(typeRow)
 

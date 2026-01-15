@@ -29,7 +29,7 @@ func buildRuleDialogContent(
 	// Name section
 	nameGroup := adw.NewPreferencesGroup()
 	nameGroup.SetTitle("Rule Name")
-	nameGroup.SetDescription("Optional friendly name for this rule")
+	nameGroup.SetDescription("Give this rule a descriptive name (optional)")
 
 	nameEntry = adw.NewEntryRow()
 	nameEntry.SetTitle("Name")
@@ -52,7 +52,7 @@ func buildRuleDialogContent(
 	// Conditions section
 	conditionsGroup := adw.NewPreferencesGroup()
 	conditionsGroup.SetTitle("Conditions")
-	conditionsGroup.SetDescription("Define one or more conditions to match URLs")
+	conditionsGroup.SetDescription("Define conditions to match URLs")
 
 	conditionsListBox := gtk.NewListBox()
 	conditionsListBox.SetSelectionMode(gtk.SelectionNone)
@@ -60,7 +60,7 @@ func buildRuleDialogContent(
 
 	// Logic selector row
 	logicRow = adw.NewComboRow()
-	logicRow.SetTitle("Match")
+	logicRow.SetTitle("Match Logic")
 	logicRow.SetModel(gtk.NewStringList([]string{"All conditions", "Any condition"}))
 	if initialRule != nil && initialRule.Logic == "any" {
 		logicRow.SetSelected(1)
@@ -114,12 +114,12 @@ func buildRuleDialogContent(
 
 	// Action section
 	actionGroup := adw.NewPreferencesGroup()
-	actionGroup.SetTitle("Actions")
-	actionGroup.SetDescription("Choose which browser to use")
+	actionGroup.SetTitle("Browser Action")
+	actionGroup.SetDescription("Select which browser opens matching URLs")
 
 	alwaysAskRow = adw.NewSwitchRow()
-	alwaysAskRow.SetTitle("Always ask")
-	alwaysAskRow.SetSubtitle("Show browser picker for this rule")
+	alwaysAskRow.SetTitle("Always show picker")
+	alwaysAskRow.SetSubtitle("Ask which browser to use each time")
 	if initialRule != nil {
 		alwaysAskRow.SetActive(initialRule.AlwaysAsk)
 	}
@@ -179,8 +179,8 @@ func createConditionRow(
 
 	// Type row
 	typeRow := adw.NewComboRow()
-	typeRow.SetTitle("Match type")
-	typeRow.SetModel(gtk.NewStringList([]string{"Domain", "Contains", "Wildcard", "Regex"}))
+	typeRow.SetTitle("Match Type")
+	typeRow.SetModel(gtk.NewStringList([]string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}))
 	typeRow.SetSelected(conditionTypeToIndex((*conditions)[condIdx].Type))
 	innerListBox.Append(typeRow)
 

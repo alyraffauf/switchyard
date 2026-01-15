@@ -98,7 +98,7 @@ func showSettingsWindow(app *adw.Application) {
 
 	showNamesRow := adw.NewSwitchRow()
 	showNamesRow.SetTitle("Show browser names in picker")
-	showNamesRow.SetSubtitle("Display browser names below icons")
+	showNamesRow.SetSubtitle("Show browser names below icons")
 	appearanceGroup.Add(showNamesRow)
 
 	content.Append(appearanceGroup)
@@ -109,12 +109,12 @@ func showSettingsWindow(app *adw.Application) {
 
 	checkDefaultRow := adw.NewSwitchRow()
 	checkDefaultRow.SetTitle("Check if Switchyard is default browser")
-	checkDefaultRow.SetSubtitle("Prompt to set Switchyard as system default browser on startup")
+	checkDefaultRow.SetSubtitle("Ask to set Switchyard as default browser on startup")
 	behaviorGroup.Add(checkDefaultRow)
 
 	promptRow := adw.NewSwitchRow()
-	promptRow.SetTitle("Prompt when no rule matches")
-	promptRow.SetSubtitle("Show browser picker for URLs without matching rules")
+	promptRow.SetTitle("Show picker when no rule matches")
+	promptRow.SetSubtitle("Let you choose a browser for unmatched URLs")
 	behaviorGroup.Add(promptRow)
 
 	// Fallback browser dropdown
@@ -126,8 +126,8 @@ func showSettingsWindow(app *adw.Application) {
 	browserList := gtk.NewStringList(browserNames)
 
 	defaultRow := adw.NewComboRow()
-	defaultRow.SetTitle("Fallback browser")
-	defaultRow.SetSubtitle("Browser to open when picker is disabled and no rule matches")
+	defaultRow.SetTitle("Default browser")
+	defaultRow.SetSubtitle("Used when picker is disabled and no rule matches")
 	defaultRow.SetModel(browserList)
 	behaviorGroup.Add(defaultRow)
 
@@ -371,7 +371,6 @@ func showSettingsWindow(app *adw.Application) {
 	infoRow.SetSubtitle(configPath())
 	infoRow.SetActivatable(true)
 	infoRow.AddSuffix(gtk.NewImageFromIconName("document-edit-symbolic"))
-	infoRow.SetTooltipText("Open config file in text editor")
 	infoRow.ConnectActivated(func() {
 		// Ensure config file exists
 		saveConfig(cfg)
