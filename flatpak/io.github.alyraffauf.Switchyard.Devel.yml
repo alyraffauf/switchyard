@@ -21,21 +21,28 @@ finish-args:
   # This is essential core functionality - the app cannot work without it.
   - --talk-name=org.freedesktop.Flatpak
 
-  # PERMISSION: Read-only access to Snap application desktop files
-  # JUSTIFICATION: Switchyard must discover ALL installed browsers to present
-  # them to the user. Many users install browsers (Firefox, Chrome, Chromium,
-  # Brave, etc.) via Snap. The path /var/lib/snapd/desktop/applications is the
-  # standard, well-known location where Snap exports .desktop files.
-  # Without this permission, Snap browsers are invisible to the app, breaking
-  # the core functionality for users who installed browsers via Snap.
-  # Note: The Flatpak runtime does NOT automatically expose this directory,
-  # unlike /usr/share/applications which is available via /run/host/usr/share.
-  - --filesystem=/var/lib/snapd/desktop/applications:ro
+  # PERMISSION: Read-only access to application directories for browser discovery
+  # JUSTIFICATION: Switchyard is a browser chooser that MUST discover ALL
+  # installed browsers (native, Flatpak, and Snap) to present them to users.
+  # This is essential core functionality - without it, the app cannot work.
+
+  # User applications directory (native apps installed to home)
+  - --filesystem=xdg-data/applications:ro
+
+  # User and system Flatpak exports
+  - --filesystem=xdg-data/flatpak:ro
+  - --filesystem=/var/lib/flatpak:ro
+
+  # Snap applications
+  - --filesystem=/var/lib/snapd:ro
+
+  # Host filesystem for native system browsers in /usr/share/applications
+  # NOTE: This triggers linter warnings but is required for full browser discovery
+  - --filesystem=host:ro
 
   # Extend XDG_DATA_DIRS to include all application sources
-  # The runtime provides: /app/share, /usr/share, /run/host/usr/share, /run/host/share
-  # We add: Snap desktop files at /var/lib/snapd/desktop
-  - --env=XDG_DATA_DIRS=/app/share:/usr/share:/run/host/usr/share:/run/host/share:/var/lib/snapd/desktop
+  # Required for GIO to discover browsers from all installation methods
+  - --env=XDG_DATA_DIRS=/app/share:/usr/share:/usr/share/runtime/share:/run/host/user-share:/run/host/share:/run/host/usr/share:/var/lib/flatpak/exports/share:~/.local/share/flatpak/exports/share:/var/lib/snapd/desktop
 modules:
   - name: glib
     buildsystem: meson
