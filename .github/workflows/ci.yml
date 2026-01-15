@@ -70,6 +70,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: io.github.alyraffauf.Switchyard.Devel-${{ github.ref_name }}-aarch64.flatpak
+      - name: List downloaded files
+        run: |
+          echo "Files in current directory:"
+          find . -name "*.flatpak" -type f
+          ls -laR
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
