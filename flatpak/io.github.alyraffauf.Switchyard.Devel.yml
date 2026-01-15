@@ -65,8 +65,12 @@ modules:
         # Build with vendored dependencies for reproducibility and smaller binary size
         go build -mod=vendor -trimpath -ldflags="-s -w" -o switchyard ./src
       - install -Dm755 switchyard /app/bin/switchyard
+      # Install desktop file and update app-id to .Devel
       - install -Dm644 data/io.github.alyraffauf.Switchyard.desktop /app/share/applications/io.github.alyraffauf.Switchyard.Devel.desktop
+      - sed -i 's/io.github.alyraffauf.Switchyard/io.github.alyraffauf.Switchyard.Devel/g' /app/share/applications/io.github.alyraffauf.Switchyard.Devel.desktop
+      # Install metainfo and update app-id and launchable to .Devel
       - install -Dm644 data/io.github.alyraffauf.Switchyard.metainfo.xml /app/share/metainfo/io.github.alyraffauf.Switchyard.Devel.metainfo.xml
+      - sed -i 's/io.github.alyraffauf.Switchyard/io.github.alyraffauf.Switchyard.Devel/g' /app/share/metainfo/io.github.alyraffauf.Switchyard.Devel.metainfo.xml
       - install -Dm644 data/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg /app/share/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.Devel.svg
       - install -Dm644 data/icons/hicolor/128x128/apps/io.github.alyraffauf.Switchyard.png /app/share/icons/hicolor/128x128/apps/io.github.alyraffauf.Switchyard.Devel.png
       - install -Dm644 data/icons/hicolor/64x64/apps/io.github.alyraffauf.Switchyard.png /app/share/icons/hicolor/64x64/apps/io.github.alyraffauf.Switchyard.Devel.png
