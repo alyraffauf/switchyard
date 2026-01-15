@@ -85,7 +85,6 @@ func setupAppActions(app *adw.Application, win *adw.Window) {
 
 	// Keyboard shortcuts
 	app.SetAccelsForAction("app.quit", []string{"<Ctrl>q"})
-	app.SetAccelsForAction("app.about", []string{"<Ctrl><Shift>a"})
 }
 
 func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView *adw.NavigationSplitView) gtk.Widgetter {
