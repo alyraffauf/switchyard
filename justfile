@@ -63,5 +63,5 @@ test-coverage:
     @echo "To view HTML coverage report, run: go tool cover -html=coverage.out"
 
 # Build and install Flatpak
-flatpak: install-flatpak-deps
+flatpak:
     flatpak-builder --user --install --force-clean build-dir flatpak/{{APPID}}.yml
