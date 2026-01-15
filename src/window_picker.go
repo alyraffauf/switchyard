@@ -40,6 +40,15 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	// Main layout - simple vertical box without title bar
 	mainBox := gtk.NewBox(gtk.OrientationVertical, 0)
 
+	// Create URL entry early so it can be referenced in button handlers
+	urlEntry := gtk.NewEntry()
+	urlEntry.SetText(url)
+	urlEntry.SetEditable(true)
+	urlEntry.SetCanFocus(true)
+	urlEntry.SetAlignment(0.5)
+	urlEntry.SetMaxWidthChars(50)
+	urlEntry.SetWidthChars(40)
+
 	// Content box with margins
 	contentBox := gtk.NewBox(gtk.OrientationVertical, 0)
 	contentBox.SetMarginStart(12)
@@ -102,7 +111,8 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		btn.SetChild(btnBox)
 
 		btn.ConnectClicked(func() {
-			launchBrowser(b, url)
+			currentURL := urlEntry.Text()
+			launchBrowser(b, currentURL)
 			win.Close()
 		})
 
@@ -110,7 +120,8 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		gesture := gtk.NewGestureClick()
 		gesture.SetButton(gdk.BUTTON_SECONDARY)
 		gesture.ConnectPressed(func(nPress int, x, y float64) {
-			showBrowserActionsMenu(btn, b, url)
+			currentURL := urlEntry.Text()
+			showBrowserActionsMenu(btn, b, currentURL)
 		})
 		btn.AddController(gesture)
 
@@ -154,14 +165,7 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	leftSpacer.SetHExpand(true)
 	bottomBar.Append(leftSpacer)
 
-	// URL entry (center, max 75% width)
-	urlEntry := gtk.NewEntry()
-	urlEntry.SetText(url)
-	urlEntry.SetEditable(false)
-	urlEntry.SetCanFocus(false)
-	urlEntry.SetAlignment(0.5)
-	urlEntry.SetMaxWidthChars(50)
-	urlEntry.SetWidthChars(40)
+	// Append the URL entry we created earlier
 	bottomBar.Append(urlEntry)
 
 	// Spacer after URL (to center it)
@@ -189,7 +193,8 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		if keyval >= gdk.KEY_1 && keyval <= gdk.KEY_9 && state&gdk.ControlMask != 0 {
 			idx := int(keyval - gdk.KEY_1)
 			if idx < len(sortedBrowsers) {
-				launchBrowser(sortedBrowsers[idx], url)
+				currentURL := urlEntry.Text()
+				launchBrowser(sortedBrowsers[idx], currentURL)
 				win.Close()
 				return true
 			}
