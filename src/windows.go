@@ -225,8 +225,9 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 func showSettingsWindow(app *adw.Application) {
 	win := adw.NewWindow()
 	win.SetTitle("Switchyard")
-	win.SetDefaultSize(550, 600)
 	win.SetApplication(&app.Application)
+	win.SetDefaultSize(700, 800)
+	win.SetResizable(true)
 
 	cfg := loadConfig()
 	browsers := detectBrowsers()
