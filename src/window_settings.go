@@ -72,7 +72,7 @@ func setupAppActions(app *adw.Application, win *adw.Window) {
 
 	donateAction := gio.NewSimpleAction("donate", nil)
 	donateAction.ConnectActivate(func(p *glib.Variant) {
-		launcher := gtk.NewURILauncher("https://ko-fi.com/alyraffauf")
+		launcher := gtk.NewURILauncher(DonateURL)
 		launcher.Launch(context.Background(), &win.Window, nil)
 	})
 	app.AddAction(donateAction)

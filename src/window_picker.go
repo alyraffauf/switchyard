@@ -238,7 +238,7 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 
 	donateAction := gio.NewSimpleAction("donate", nil)
 	donateAction.ConnectActivate(func(p *glib.Variant) {
-		launcher := gtk.NewURILauncher("https://ko-fi.com/alyraffauf")
+		launcher := gtk.NewURILauncher(DonateURL)
 		launcher.Launch(context.Background(), &win.Window, nil)
 	})
 	actionGroup.AddAction(donateAction)
