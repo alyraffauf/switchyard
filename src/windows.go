@@ -33,7 +33,7 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 
 	win := adw.NewWindow()
 	win.SetTitle("Switchyard")
-	win.SetDefaultSize(650, -1)
+	win.SetDefaultSize(700, -1)
 	win.SetResizable(false)
 	win.SetApplication(&app.Application)
 
@@ -63,21 +63,21 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		// Button for each browser
 		btn := gtk.NewButton()
 		btn.AddCSSClass("flat")
-		btn.SetSizeRequest(96, 96)
+		btn.SetSizeRequest(134, 134)
 
 		// Container inside button - icon above, name and shortcut below
-		btnBox := gtk.NewBox(gtk.OrientationVertical, 4)
+		btnBox := gtk.NewBox(gtk.OrientationVertical, 8)
 		btnBox.SetHAlign(gtk.AlignCenter)
 		btnBox.SetVAlign(gtk.AlignCenter)
 
 		// Fixed-size container for icon to ensure uniform sizing
 		iconBox := gtk.NewBox(gtk.OrientationVertical, 0)
-		iconBox.SetSizeRequest(64, 64)
+		iconBox.SetSizeRequest(128, 128)
 		iconBox.SetHAlign(gtk.AlignCenter)
 		iconBox.SetVAlign(gtk.AlignCenter)
 
 		// Large browser icon - use helper to load with fallback
-		icon := loadBrowserIcon(b.Icon, 64)
+		icon := loadBrowserIcon(b, 128)
 		icon.SetHAlign(gtk.AlignCenter)
 		icon.SetVAlign(gtk.AlignCenter)
 		iconBox.Append(icon)
@@ -92,6 +92,7 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 			label.SetMaxWidthChars(18)
 			label.SetJustify(gtk.JustifyCenter)
 			label.SetLines(1)
+			label.SetMarginTop(6)
 			btnBox.Append(label)
 		} else {
 			// Show as tooltip on hover
