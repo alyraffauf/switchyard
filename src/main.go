@@ -65,30 +65,6 @@ func setupIconPaths() {
 	}
 }
 
-// loadBrowserIcon loads a browser icon using GIcon for best quality.
-// Using GIcon allows GTK to select the optimal icon size from the theme,
-// avoiding blurry scaling that occurs with named icons.
-func loadBrowserIcon(browser *Browser, size int) *gtk.Image {
-	// Try to use GIcon from AppInfo for best quality
-	if browser.AppInfo != nil {
-		if gicon := browser.AppInfo.Icon(); gicon != nil {
-			image := gtk.NewImageFromGIcon(gicon)
-			image.SetPixelSize(size)
-			return image
-		}
-	}
-
-	// Fallback to icon name
-	iconName := browser.Icon
-	if iconName == "" {
-		iconName = "web-browser-symbolic"
-	}
-
-	image := gtk.NewImageFromIconName(iconName)
-	image.SetPixelSize(size)
-	return image
-}
-
 // handleURL routes a URL to the appropriate browser based on rules
 func handleURL(app *adw.Application, url string) {
 	cfg := loadConfig()
