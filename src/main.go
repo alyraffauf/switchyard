@@ -85,8 +85,8 @@ func handleURL(app *adw.Application, url string) {
 	}
 
 	// No rule matched
-	if !cfg.PromptOnClick && cfg.FallbackBrowser != "" {
-		if browser := findBrowserByID(browsers, cfg.FallbackBrowser); browser != nil {
+	if !cfg.PromptOnClick && cfg.FavoriteBrowser != "" {
+		if browser := findBrowserByID(browsers, cfg.FavoriteBrowser); browser != nil {
 			launchBrowser(browser, url)
 			return
 		}

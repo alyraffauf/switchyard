@@ -24,10 +24,22 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		adw.StyleManagerGetDefault().SetColorScheme(adw.ColorSchemeForceDark)
 	}
 
-	// Sort browsers alphabetically by name
+	// Sort browsers: favorite first, then alphabetically by name
 	sortedBrowsers := make([]*Browser, len(browsers))
 	copy(sortedBrowsers, browsers)
 	sort.Slice(sortedBrowsers, func(i, j int) bool {
+		// Favorite browser always comes first
+		isFavoriteI := cfg.FavoriteBrowser != "" && sortedBrowsers[i].ID == cfg.FavoriteBrowser
+		isFavoriteJ := cfg.FavoriteBrowser != "" && sortedBrowsers[j].ID == cfg.FavoriteBrowser
+
+		if isFavoriteI && !isFavoriteJ {
+			return true
+		}
+		if !isFavoriteI && isFavoriteJ {
+			return false
+		}
+
+		// Otherwise sort alphabetically
 		return sortedBrowsers[i].Name < sortedBrowsers[j].Name
 	})
 

@@ -117,7 +117,7 @@ func showSettingsWindow(app *adw.Application) {
 	promptRow.SetSubtitle("Let you choose a browser for unmatched URLs")
 	behaviorGroup.Add(promptRow)
 
-	// Fallback browser dropdown
+	// Favorite browser dropdown
 	browserNames := make([]string, len(browsers)+1)
 	browserNames[0] = "None"
 	for i, b := range browsers {
@@ -126,8 +126,8 @@ func showSettingsWindow(app *adw.Application) {
 	browserList := gtk.NewStringList(browserNames)
 
 	defaultRow := adw.NewComboRow()
-	defaultRow.SetTitle("Default browser")
-	defaultRow.SetSubtitle("Used when picker is disabled and no rule matches")
+	defaultRow.SetTitle("Favorite browser")
+	defaultRow.SetSubtitle("Appears first in picker and opens when picker is disabled")
 	defaultRow.SetModel(browserList)
 	behaviorGroup.Add(defaultRow)
 
@@ -136,18 +136,20 @@ func showSettingsWindow(app *adw.Application) {
 	// Function to update UI from config
 	updateUI := func() {
 		promptRow.SetActive(cfg.PromptOnClick)
-		defaultRow.SetSensitive(!cfg.PromptOnClick)
 		checkDefaultRow.SetActive(cfg.CheckDefaultBrowser)
 		showNamesRow.SetActive(cfg.ShowAppNames)
 		forceDarkRow.SetActive(cfg.ForceDarkMode)
 
-		// Update fallback browser selection
-		defaultRow.SetSelected(0)
+		// Update favorite browser selection only if it differs from current
+		var targetSelection uint = 0
 		for i, b := range browsers {
-			if b.ID == cfg.FallbackBrowser {
-				defaultRow.SetSelected(uint(i + 1))
+			if b.ID == cfg.FavoriteBrowser {
+				targetSelection = uint(i + 1)
 				break
 			}
+		}
+		if defaultRow.Selected() != targetSelection {
+			defaultRow.SetSelected(targetSelection)
 		}
 	}
 
@@ -185,9 +187,9 @@ func showSettingsWindow(app *adw.Application) {
 	defaultRow.Connect("notify::selected", func() {
 		idx := defaultRow.Selected()
 		if idx == 0 {
-			cfg.FallbackBrowser = ""
+			cfg.FavoriteBrowser = ""
 		} else if idx > 0 && int(idx) <= len(browsers) {
-			cfg.FallbackBrowser = browsers[idx-1].ID
+			cfg.FavoriteBrowser = browsers[idx-1].ID
 		}
 		saveConfigSafe(cfg)
 	})
@@ -403,7 +405,7 @@ func showSettingsWindow(app *adw.Application) {
 					// Reload config from disk
 					newCfg := loadConfig()
 					cfg.PromptOnClick = newCfg.PromptOnClick
-					cfg.FallbackBrowser = newCfg.FallbackBrowser
+					cfg.FavoriteBrowser = newCfg.FavoriteBrowser
 					cfg.CheckDefaultBrowser = newCfg.CheckDefaultBrowser
 					cfg.ShowAppNames = newCfg.ShowAppNames
 					cfg.Rules = newCfg.Rules
