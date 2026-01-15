@@ -13,35 +13,20 @@ finish-args:
   - --socket=wayland
   - --device=dri
 
-  # PERMISSION: Access to Flatpak service for spawning browsers
-  # JUSTIFICATION: Switchyard is a browser chooser that needs to:
-  #   1. Launch other Flatpak browsers using flatpak-spawn --host
-  #   2. Execute xdg-settings via host to check/set the default browser
-  #   3. Discover which browsers are installed (handled by GIO runtime)
-  # This is essential core functionality - the app cannot work without it.
+  # Access to Flatpak service
+  # Needed to launch other Flatpak browsers and run xdg-settings on the host
+  # to check/set the default browser
   - --talk-name=org.freedesktop.Flatpak
 
-  # PERMISSION: Read-only access to application directories for browser discovery
-  # JUSTIFICATION: Switchyard is a browser chooser that MUST discover ALL
-  # installed browsers (native, Flatpak, and Snap) to present them to users.
-  # This is essential core functionality - without it, the app cannot work.
-
-  # User applications directory (native apps installed to home)
+  # Read-only access to discover all installed browsers
+  # Covers native apps, Flatpak exports, and Snap installations
   - --filesystem=xdg-data/applications:ro
-
-  # User and system Flatpak exports
   - --filesystem=xdg-data/flatpak:ro
   - --filesystem=/var/lib/flatpak:ro
-
-  # Snap applications
   - --filesystem=/var/lib/snapd:ro
-
-  # Host filesystem for native system browsers in /usr/share/applications
-  # NOTE: This triggers linter warnings but is required for full browser discovery
   - --filesystem=host:ro
 
-  # Extend XDG_DATA_DIRS to include all application sources
-  # Required for GIO to discover browsers from all installation methods
+  # Extended data directories for full browser discovery
   - --env=XDG_DATA_DIRS=/app/share:/usr/share:/usr/share/runtime/share:/run/host/user-share:/run/host/share:/run/host/usr/share:/var/lib/flatpak/exports/share:~/.local/share/flatpak/exports/share:/var/lib/snapd/desktop
 modules:
   - name: glib

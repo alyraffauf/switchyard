@@ -5,32 +5,31 @@
   "end-of-life-rebase": null,
   "disable-external-data-checker": true,
   "automerge-flathubbot-prs": false,
-  "comment": "Switchyard is a browser chooser/selector that routes URLs to different browsers based on user-defined rules",
+  "comment": "Browser chooser that routes URLs to different browsers based on user-defined rules",
   "permissions": {
     "org.freedesktop.Flatpak": {
-      "reason": "REQUIRED: Switchyard must launch other Flatpak browsers using flatpak-spawn and execute xdg-settings on the host to check/set itself as the default browser. This is core functionality - the app is useless without it.",
+      "reason": "Required to launch Flatpak browsers and run xdg-settings on the host to manage default browser settings",
       "required": true
     },
     "--filesystem=host:ro": {
-      "reason": "REQUIRED: Switchyard is a browser chooser that MUST discover ALL installed browsers (native, Flatpak, and Snap). GIO's AppInfo API requires access to .desktop files in multiple locations: /usr/share/applications (native), /var/lib/flatpak/exports/share/applications (Flatpak), /var/lib/snapd/desktop/applications (Snap), and ~/.local/share/applications (user apps). We cannot use individual paths because: (1) Flatpak reserves /usr, (2) individual /var paths trigger warnings, and (3) the xdg-data permissions alone are insufficient. Without host:ro, the app cannot discover browsers and is completely non-functional. This is read-only access used only for application discovery via standard GIO APIs.",
+      "reason": "Browser discovery requires reading .desktop files from /usr/share/applications (native apps), /var/lib/flatpak (system Flatpak), and /var/lib/snapd (Snap). Individual path permissions trigger linter warnings and /usr is reserved by Flatpak, making host:ro the only viable option for comprehensive browser discovery",
       "required": true
     },
     "--filesystem=xdg-data/applications:ro": {
-      "reason": "REQUIRED: Access to user-installed applications in ~/.local/share/applications. Part of the comprehensive browser discovery system.",
+      "reason": "Access to user-installed applications in ~/.local/share/applications",
       "required": true
     },
     "--filesystem=xdg-data/flatpak:ro": {
-      "reason": "REQUIRED: Access to user Flatpak application exports in ~/.local/share/flatpak/exports/share/applications. Essential for discovering Flatpak browsers installed by the user.",
+      "reason": "Access to user Flatpak browser exports",
       "required": true
     },
     "--filesystem=/var/lib/flatpak:ro": {
-      "reason": "REQUIRED: Access to system-wide Flatpak application exports in /var/lib/flatpak/exports/share/applications. Essential for discovering Flatpak browsers installed system-wide.",
+      "reason": "Access to system-wide Flatpak browser exports",
       "required": true
     },
     "--filesystem=/var/lib/snapd:ro": {
-      "reason": "REQUIRED: Access to Snap application desktop files in /var/lib/snapd/desktop/applications. Many users install browsers (Firefox, Chrome, Chromium, Brave, Edge, Opera) via Snap. Without this, Snap browsers are invisible to the app, breaking core functionality.",
+      "reason": "Access to Snap browsers. Many users install browsers via Snap (Firefox, Chrome, Chromium, Brave, etc.)",
       "required": true
     }
-  },
-  "flathub-notes": "This app legitimately requires broad read access because it is a browser chooser/selector. Its entire purpose is to discover all installed browsers across multiple installation methods (native packages, Flatpak, Snap) and present them to the user for URL routing. Without these permissions, the app cannot fulfill its core function. All access is read-only and used exclusively through standard GIO AppInfo APIs for application discovery."
+  }
 }
