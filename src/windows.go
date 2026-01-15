@@ -135,8 +135,11 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 
 	menu := gio.NewMenu()
 	menu.Append("Settings", "win.settings")
-	menu.Append("Donate ❤️", "win.donate")
-	menu.Append("About", "win.about")
+
+	aboutSection := gio.NewMenu()
+	aboutSection.Append("Donate ❤️", "win.donate")
+	aboutSection.Append("About", "win.about")
+	menu.AppendSection("", aboutSection)
 
 	quitSection := gio.NewMenu()
 	quitSection.Append("Quit", "win.quit")
