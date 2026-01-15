@@ -46,9 +46,9 @@ func formatRuleSubtitleInternal(rule *Rule, browserName string, includePattern b
 func getTypeLabel(patternType string) string {
 	switch patternType {
 	case "domain":
-		return "Exact domain"
+		return "Exact Domain"
 	case "keyword":
-		return "URL contains"
+		return "URL Contains"
 	case "glob":
 		return "Wildcard"
 	case "regex":

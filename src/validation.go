@@ -38,25 +38,25 @@ func validateConditions(conditions []Condition) bool {
 // Domain patterns should be exact hostnames like "example.com" or "api.github.com".
 func validateDomainPattern(pattern string) error {
 	if pattern == "" {
-		return fmt.Errorf("domain cannot be empty")
+		return fmt.Errorf("Domain cannot be empty")
 	}
 
 	// Check for wildcard characters (not allowed in domain type)
 	if strings.Contains(pattern, "*") || strings.Contains(pattern, "?") {
-		return fmt.Errorf("wildcards not allowed in domain patterns (use Wildcard type instead)")
+		return fmt.Errorf("Wildcards not allowed in domain patterns (use Wildcard type instead)")
 	}
 
 	// Check for spaces
 	if strings.Contains(pattern, " ") {
-		return fmt.Errorf("domain cannot contain spaces")
+		return fmt.Errorf("Domain cannot contain spaces")
 	}
 
 	// Check for invalid starting/ending characters
 	if strings.HasPrefix(pattern, ".") || strings.HasSuffix(pattern, ".") {
-		return fmt.Errorf("domain cannot start or end with a dot")
+		return fmt.Errorf("Domain cannot start or end with a dot")
 	}
 	if strings.HasPrefix(pattern, "-") || strings.HasSuffix(pattern, "-") {
-		return fmt.Errorf("domain cannot start or end with a hyphen")
+		return fmt.Errorf("Domain cannot start or end with a hyphen")
 	}
 
 	// Validate characters: only alphanumeric, dots, hyphens, underscores
@@ -65,7 +65,7 @@ func validateDomainPattern(pattern string) error {
 			(ch >= 'A' && ch <= 'Z') ||
 			(ch >= '0' && ch <= '9') ||
 			ch == '.' || ch == '-' || ch == '_') {
-			return fmt.Errorf("domain contains invalid character: %c", ch)
+			return fmt.Errorf("Domain contains invalid character: %c", ch)
 		}
 	}
 
@@ -76,12 +76,12 @@ func validateDomainPattern(pattern string) error {
 // Glob patterns can contain * wildcards for matching multiple characters.
 func validateGlobPattern(pattern string) error {
 	if pattern == "" {
-		return fmt.Errorf("wildcard pattern cannot be empty")
+		return fmt.Errorf("Wildcard pattern cannot be empty")
 	}
 
 	// Check for spaces
 	if strings.Contains(pattern, " ") {
-		return fmt.Errorf("wildcard pattern cannot contain spaces")
+		return fmt.Errorf("Wildcard pattern cannot contain spaces")
 	}
 
 	// Remove wildcards temporarily for validation
@@ -93,16 +93,16 @@ func validateGlobPattern(pattern string) error {
 			(ch >= 'A' && ch <= 'Z') ||
 			(ch >= '0' && ch <= '9') ||
 			ch == '.' || ch == '-' || ch == '_') {
-			return fmt.Errorf("wildcard pattern contains invalid character: %c", ch)
+			return fmt.Errorf("Wildcard pattern contains invalid character: %c", ch)
 		}
 	}
 
 	// Check for problematic dot placement (unless adjacent to wildcard)
 	if strings.HasPrefix(pattern, ".") && !strings.HasPrefix(pattern, ".*") {
-		return fmt.Errorf("wildcard pattern cannot start with a dot")
+		return fmt.Errorf("Wildcard pattern cannot start with a dot")
 	}
 	if strings.HasSuffix(pattern, ".") && !strings.HasSuffix(pattern, "*.") {
-		return fmt.Errorf("wildcard pattern cannot end with a dot")
+		return fmt.Errorf("Wildcard pattern cannot end with a dot")
 	}
 
 	return nil
@@ -112,7 +112,7 @@ func validateGlobPattern(pattern string) error {
 // Returns an error with a descriptive message if invalid, nil if valid.
 func validateConditionPattern(condType, pattern string) error {
 	if pattern == "" {
-		return fmt.Errorf("pattern cannot be empty")
+		return fmt.Errorf("Pattern cannot be empty")
 	}
 
 	switch condType {
@@ -122,7 +122,7 @@ func validateConditionPattern(condType, pattern string) error {
 		return validateGlobPattern(pattern)
 	case "regex":
 		if _, err := regexp.Compile(pattern); err != nil {
-			return fmt.Errorf("invalid regex: %w", err)
+			return fmt.Errorf("Invalid regex: %w", err)
 		}
 	case "keyword":
 		// Keywords can be any non-empty string

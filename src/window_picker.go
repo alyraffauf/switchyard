@@ -139,6 +139,7 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	aboutSection := gio.NewMenu()
 	aboutSection.Append("Donate ❤️", "win.donate")
 	aboutSection.Append("About", "win.about")
+	aboutSection.Append("Keyboard Shortcuts", "win.shortcuts")
 	menu.AppendSection("", aboutSection)
 
 	quitSection := gio.NewMenu()
@@ -231,6 +232,13 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	})
 	actionGroup.AddAction(quitAction)
 
+	// Keyboard shortcuts action
+	shortcutsAction := gio.NewSimpleAction("shortcuts", nil)
+	shortcutsAction.ConnectActivate(func(p *glib.Variant) {
+		showShortcutsDialog(win)
+	})
+	actionGroup.AddAction(shortcutsAction)
+
 	// Action to launch browser with a specific action
 	// Parameter format: "browserID:actionID"
 	launchActionAction := gio.NewSimpleAction("launch-action", glib.NewVariantType("s"))
@@ -299,4 +307,18 @@ func showBrowserActionsMenu(btn *gtk.Button, browser *Browser, url string) {
 	popover := gtk.NewPopoverMenuFromModel(menu)
 	popover.SetParent(btn)
 	popover.Popup()
+}
+
+// showShortcutsDialog displays available keyboard shortcuts
+func showShortcutsDialog(parent *adw.Window) {
+	dialog := adw.NewAlertDialog(
+		"Keyboard Shortcuts",
+		"Ctrl+1 through Ctrl+9: Select browser 1-9\nEsc: Close picker window",
+	)
+
+	dialog.AddResponse("ok", "OK")
+	dialog.SetDefaultResponse("ok")
+	dialog.SetCloseResponse("ok")
+
+	dialog.Present(parent)
 }

@@ -23,7 +23,6 @@ func showAddRuleDialog(parent *adw.Window, cfg *Config, browsers []*Browser, reb
 
 	cancelBtn := gtk.NewButton()
 	cancelBtn.SetLabel("Cancel")
-	cancelBtn.SetTooltipText("Cancel and close")
 	cancelBtn.ConnectClicked(func() { dialog.Close() })
 	header.PackStart(cancelBtn)
 
@@ -31,7 +30,6 @@ func showAddRuleDialog(parent *adw.Window, cfg *Config, browsers []*Browser, reb
 	addBtn.SetLabel("Add")
 	addBtn.AddCSSClass("suggested-action")
 	addBtn.SetSensitive(false) // Insensitive until at least one valid condition is added
-	addBtn.SetTooltipText("Add this rule")
 	header.PackEnd(addBtn)
 
 	toolbarView.AddTopBar(header)

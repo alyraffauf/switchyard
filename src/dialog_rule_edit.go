@@ -32,14 +32,12 @@ func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, browsers []
 
 	cancelBtn := gtk.NewButton()
 	cancelBtn.SetLabel("Cancel")
-	cancelBtn.SetTooltipText("Cancel and close")
 	cancelBtn.ConnectClicked(func() { dialog.Close() })
 	header.PackStart(cancelBtn)
 
 	saveBtn := gtk.NewButton()
 	saveBtn.SetLabel("Save")
 	saveBtn.AddCSSClass("suggested-action")
-	saveBtn.SetTooltipText("Save changes to this rule")
 	header.PackEnd(saveBtn)
 
 	toolbarView.AddTopBar(header)
