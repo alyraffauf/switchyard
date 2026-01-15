@@ -208,6 +208,12 @@ func TestMatchGlob(t *testing.T) {
 			pattern: "*.example.*",
 			want:    true,
 		},
+		{
+			name:    "invalid pattern causes regex error",
+			url:     "https://example.com",
+			pattern: "[invalid",
+			want:    false,
+		},
 	}
 
 	for _, tt := range tests {
