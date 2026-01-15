@@ -152,8 +152,8 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	// Keyboard shortcuts
 	keyController := gtk.NewEventControllerKey()
 	keyController.ConnectKeyPressed(func(keyval, keycode uint, state gdk.ModifierType) bool {
-		// Number keys 1-9 for quick selection
-		if keyval >= gdk.KEY_1 && keyval <= gdk.KEY_9 {
+		// Ctrl+[1-9] for quick selection
+		if keyval >= gdk.KEY_1 && keyval <= gdk.KEY_9 && state&gdk.ControlMask != 0 {
 			idx := int(keyval - gdk.KEY_1)
 			if idx < len(sortedBrowsers) {
 				launchBrowser(sortedBrowsers[idx], url)
