@@ -62,20 +62,19 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
       - name: Download x86_64 Flatpak
         uses: actions/download-artifact@v4
         with:
-          name: flatpak-x86_64
+          name: io.github.alyraffauf.Switchyard.Devel-${{ github.ref_name }}-x86_64.flatpak
       - name: Download aarch64 Flatpak
         uses: actions/download-artifact@v4
         with:
-          name: flatpak-aarch64
+          name: io.github.alyraffauf.Switchyard.Devel-${{ github.ref_name }}-aarch64.flatpak
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            *.flatpak
+            **/*.flatpak
           draft: false
           prerelease: false
           generate_release_notes: true
