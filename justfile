@@ -65,7 +65,3 @@ test-coverage:
 # Build and install Flatpak (development version)
 flatpak:
     flatpak-builder --user --install --force-clean build-dir flatpak/{{APPID}}.Devel.yml
-
-# Build and install Flatpak (production version for testing Flathub manifest)
-flatpak-production:
-    flatpak-builder --user --install --force-clean build-dir flatpak/{{APPID}}.yml
