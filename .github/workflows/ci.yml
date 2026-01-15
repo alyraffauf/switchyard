@@ -40,6 +40,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          bundle: switchyard.flatpak
+          bundle: io.github.alyraffauf.Switchyard.Devel-${{ runner.arch }}-${{ github.sha }}.flatpak
           manifest-path: flatpak/io.github.alyraffauf.Switchyard.Devel.yml
           cache-key: flatpak-builder-stable
