@@ -11,7 +11,7 @@ import (
 func showDefaultBrowserPrompt(parent gtk.Widgetter, cfg *Config, updateUI func()) {
 	dialog := adw.NewAlertDialog(
 		"Set as Default Browser",
-		"Switchyard is not currently your default browser.",
+		"Switchyard needs to be your default browser to intercept and route URLs to the correct browser.",
 	)
 
 	dialog.AddResponse("no", "Skip")
