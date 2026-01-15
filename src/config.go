@@ -15,7 +15,7 @@ import (
 
 type Config struct {
 	PromptOnClick       bool   `toml:"prompt_on_click"`
-	FallbackBrowser     string `toml:"fallback_browser"`
+	FavoriteBrowser     string `toml:"favorite_browser"`
 	CheckDefaultBrowser bool   `toml:"check_default_browser"`
 	ShowAppNames        bool   `toml:"show_app_names"`
 	ForceDarkMode       bool   `toml:"force_dark_mode"`

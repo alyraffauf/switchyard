@@ -98,7 +98,7 @@ Config file location: `~/.config/switchyard/config.toml` or `~/.var/app/io.githu
 
 ```toml
 prompt_on_click = true
-fallback_browser = ""
+favorite_browser = ""
 check_default_browser = true
 
 # Simple rule with a single condition
@@ -190,7 +190,7 @@ Use `all` for precise targeting (e.g., "docs.google.com AND contains 'edit'") an
 | Setting | Description |
 |---------|-------------|
 | `prompt_on_click` | Show picker when no rule matches (default: true) |
-| `fallback_browser` | Default browser to use when picker is disabled and no rule matches |
+| `favorite_browser` | Favorite browser that always appears first in picker and is used as fallback when picker is disabled |
 | `check_default_browser` | Prompt to set Switchyard as system default browser on startup (default: true) |
 
 ## Development
