@@ -33,7 +33,7 @@ func showAboutDialog(parent *adw.Window) {
 	content.SetHAlign(gtk.AlignCenter)
 
 	// App icon
-	icon := gtk.NewImageFromIconName(appID)
+	icon := gtk.NewImageFromIconName(getAppID())
 	icon.SetPixelSize(96)
 	content.Append(icon)
 

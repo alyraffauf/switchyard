@@ -1,0 +1,72 @@
+app-id: io.github.alyraffauf.Switchyard.Devel
+runtime: org.gnome.Platform
+runtime-version: "49"
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.golang
+command: switchyard
+
+finish-args:
+  # Display
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+
+  # Access to Flatpak service
+  # Needed to launch other Flatpak browsers and run xdg-settings on the host
+  # to check/set the default browser
+  - --talk-name=org.freedesktop.Flatpak
+
+  # Read-only access to discover all installed browsers
+  # Covers native apps, Flatpak exports, and Snap installations
+  - --filesystem=xdg-data/applications:ro
+  - --filesystem=xdg-data/flatpak:ro
+  - --filesystem=/var/lib/flatpak:ro
+  - --filesystem=/var/lib/snapd:ro
+  - --filesystem=host:ro
+
+  # Extended data directories for full browser discovery
+  - --env=XDG_DATA_DIRS=/app/share:/usr/share:/usr/share/runtime/share:/run/host/user-share:/run/host/share:/run/host/usr/share:/var/lib/flatpak/exports/share:~/.local/share/flatpak/exports/share:/var/lib/snapd/desktop
+modules:
+  - name: glib
+    buildsystem: meson
+    config-opts:
+      - -Dtests=false
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/glib/2.86/glib-2.86.3.tar.xz
+        sha256: b3211d8d34b9df5dca05787ef0ad5d7ca75dec998b970e1aab0001d229977c65
+      - type: patch
+        path: patches/glib-appinfo.patch
+
+  - name: switchyard
+    buildsystem: simple
+    build-options:
+      env:
+        GOROOT: /usr/lib/sdk/golang
+        # Use flatpak-builder's cache directory for Go cache
+        GOPATH: /run/build/switchyard/go
+        GOCACHE: /run/ccache/go-build-cache
+        CGO_ENABLED: "1"
+    build-commands:
+      - |
+        . /usr/lib/sdk/golang/enable.sh
+        # Ensure Go cache directory exists
+        mkdir -p "$GOCACHE"
+        # Build with vendored dependencies for reproducibility and smaller binary size
+        go build -mod=vendor -trimpath -ldflags="-s -w" -o switchyard ./src
+      - install -Dm755 switchyard /app/bin/switchyard
+      # Install desktop file and update app-id to .Devel
+      - install -Dm644 data/io.github.alyraffauf.Switchyard.desktop /app/share/applications/io.github.alyraffauf.Switchyard.Devel.desktop
+      - sed -i 's/io.github.alyraffauf.Switchyard/io.github.alyraffauf.Switchyard.Devel/g' /app/share/applications/io.github.alyraffauf.Switchyard.Devel.desktop
+      # Install metainfo and update app-id and launchable to .Devel
+      - install -Dm644 data/io.github.alyraffauf.Switchyard.metainfo.xml /app/share/metainfo/io.github.alyraffauf.Switchyard.Devel.metainfo.xml
+      - sed -i 's/io.github.alyraffauf.Switchyard/io.github.alyraffauf.Switchyard.Devel/g' /app/share/metainfo/io.github.alyraffauf.Switchyard.Devel.metainfo.xml
+      - install -Dm644 data/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg /app/share/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.Devel.svg
+      - install -Dm644 data/icons/hicolor/128x128/apps/io.github.alyraffauf.Switchyard.png /app/share/icons/hicolor/128x128/apps/io.github.alyraffauf.Switchyard.Devel.png
+      - install -Dm644 data/icons/hicolor/64x64/apps/io.github.alyraffauf.Switchyard.png /app/share/icons/hicolor/64x64/apps/io.github.alyraffauf.Switchyard.Devel.png
+      - install -Dm644 data/icons/hicolor/symbolic/apps/io.github.alyraffauf.Switchyard-symbolic.svg /app/share/icons/hicolor/symbolic/apps/io.github.alyraffauf.Switchyard.Devel-symbolic.svg
+    sources:
+      - type: dir
+        path: ..

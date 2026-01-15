@@ -1,0 +1,35 @@
+{
+  "only-arches": ["x86_64", "aarch64"],
+  "skip-arches": [],
+  "end-of-life": null,
+  "end-of-life-rebase": null,
+  "disable-external-data-checker": true,
+  "automerge-flathubbot-prs": false,
+  "comment": "Browser chooser that routes URLs to different browsers based on user-defined rules",
+  "permissions": {
+    "org.freedesktop.Flatpak": {
+      "reason": "Required to launch Flatpak browsers and run xdg-settings on the host to manage default browser settings",
+      "required": true
+    },
+    "--filesystem=host:ro": {
+      "reason": "Browser discovery requires reading .desktop files from /usr/share/applications (native apps), /var/lib/flatpak (system Flatpak), and /var/lib/snapd (Snap). Individual path permissions trigger linter warnings and /usr is reserved by Flatpak, making host:ro the only viable option for comprehensive browser discovery",
+      "required": true
+    },
+    "--filesystem=xdg-data/applications:ro": {
+      "reason": "Access to user-installed applications in ~/.local/share/applications",
+      "required": true
+    },
+    "--filesystem=xdg-data/flatpak:ro": {
+      "reason": "Access to user Flatpak browser exports",
+      "required": true
+    },
+    "--filesystem=/var/lib/flatpak:ro": {
+      "reason": "Access to system-wide Flatpak browser exports",
+      "required": true
+    },
+    "--filesystem=/var/lib/snapd:ro": {
+      "reason": "Access to Snap browsers. Many users install browsers via Snap (Firefox, Chrome, Chromium, Brave, etc.)",
+      "required": true
+    }
+  }
+}

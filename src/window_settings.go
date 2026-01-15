@@ -256,8 +256,8 @@ func showSettingsWindow(app *adw.Application) {
 		if rule.AlwaysAsk {
 			// Find app's own browser entry to load its icon
 			appBrowser := &Browser{
-				ID:      appID,
-				Icon:    appID,
+				ID:      getAppID(),
+				Icon:    getAppID(),
 				AppInfo: nil,
 			}
 			icon = loadBrowserIcon(appBrowser, 24)
