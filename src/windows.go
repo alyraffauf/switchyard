@@ -531,14 +531,25 @@ func showSettingsWindow(app *adw.Application) {
 		row.SetActivatable(true)
 
 		// Browser icon - use Switchyard icon if AlwaysAsk is enabled
-		var iconName string
+		var icon *gtk.Image
 		if rule.AlwaysAsk {
-			iconName = appID
+			// Find app's own browser entry to load its icon
+			appBrowser := &Browser{
+				ID:      appID,
+				Icon:    appID,
+				AppInfo: nil,
+			}
+			icon = loadBrowserIcon(appBrowser, 24)
 		} else {
-			iconName = getBrowserIcon(rule.Browser)
+			browser := findBrowserByID(browsers, rule.Browser)
+			if browser != nil {
+				icon = loadBrowserIcon(browser, 24)
+			} else {
+				// Fallback icon if browser not found
+				icon = gtk.NewImageFromIconName("web-browser-symbolic")
+				icon.SetPixelSize(24)
+			}
 		}
-		icon := gtk.NewImageFromIconName(iconName)
-		icon.SetPixelSize(24)
 		row.AddPrefix(icon)
 
 		// Reorder buttons box
