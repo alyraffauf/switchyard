@@ -31,8 +31,15 @@ jobs:
           path: coverage.out
 
   flatpak:
-    name: "Flatpak"
-    runs-on: ubuntu-latest
+    name: "Flatpak (${{ matrix.variant.arch }})"
+    runs-on: ${{ matrix.variant.runner }}
+    strategy:
+      matrix:
+        variant:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-49
       options: --privileged
@@ -42,4 +49,5 @@ jobs:
         with:
           bundle: io.github.alyraffauf.Switchyard.Devel-${{ github.sha }}.flatpak
           manifest-path: flatpak/io.github.alyraffauf.Switchyard.Devel.yml
-          cache-key: flatpak-builder-stable
+          cache-key: flatpak-builder-${{ matrix.variant.arch }}
+          arch: ${{ matrix.variant.arch }}
