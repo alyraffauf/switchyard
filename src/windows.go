@@ -21,7 +21,6 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	cfg := loadConfig()
 
 	if cfg.ForceDarkMode {
-		// Optionally dark mode for picker window
 		adw.StyleManagerGetDefault().SetColorScheme(adw.ColorSchemeForceDark)
 	}
 
@@ -38,18 +37,15 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	win.SetResizable(false)
 	win.SetApplication(&app.Application)
 
-	// Main layout
-	toolbarView := adw.NewToolbarView()
-
-	header := adw.NewHeaderBar()
-	toolbarView.AddTopBar(header)
+	// Main layout - simple vertical box without title bar
+	mainBox := gtk.NewBox(gtk.OrientationVertical, 0)
 
 	// Content box with margins
 	contentBox := gtk.NewBox(gtk.OrientationVertical, 0)
 	contentBox.SetMarginStart(24)
 	contentBox.SetMarginEnd(24)
 	contentBox.SetMarginTop(24)
-	contentBox.SetMarginBottom(24)
+	contentBox.SetMarginBottom(16)
 
 	// FlowBox for browser buttons - wraps to multiple rows
 	flowBox := gtk.NewFlowBox()
@@ -69,7 +65,7 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		btn.AddCSSClass("flat")
 		btn.SetSizeRequest(140, -1)
 
-		// Container inside button - icon above, name and number below
+		// Container inside button - icon above, name and shortcut below
 		btnBox := gtk.NewBox(gtk.OrientationVertical, 8)
 		btnBox.SetHAlign(gtk.AlignCenter)
 		btnBox.SetVAlign(gtk.AlignCenter)
@@ -121,24 +117,65 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	}
 
 	contentBox.Append(flowBox)
+	mainBox.Append(contentBox)
 
-	// Add URL display at bottom
-	urlBox := gtk.NewBox(gtk.OrientationVertical, 0)
-	urlBox.SetMarginTop(16)
+	// Bottom bar with hamburger menu, URL, and close button
+	bottomBar := gtk.NewBox(gtk.OrientationHorizontal, 12)
+	bottomBar.SetMarginStart(12)
+	bottomBar.SetMarginEnd(12)
+	bottomBar.SetMarginTop(8)
+	bottomBar.SetMarginBottom(12)
 
-	// URL entry (read-only, centered text)
+	// Hamburger menu button (left)
+	menuBtn := gtk.NewMenuButton()
+	menuBtn.SetIconName("open-menu-symbolic")
+	menuBtn.SetTooltipText("Main menu")
+	menuBtn.AddCSSClass("flat")
+
+	menu := gio.NewMenu()
+	menu.Append("Settings", "win.settings")
+	menu.Append("Donate ❤️", "win.donate")
+	menu.Append("About", "win.about")
+
+	quitSection := gio.NewMenu()
+	quitSection.Append("Quit", "win.quit")
+	menu.AppendSection("", quitSection)
+
+	menuBtn.SetMenuModel(menu)
+	bottomBar.Append(menuBtn)
+
+	// Spacer before URL (to center it)
+	leftSpacer := gtk.NewBox(gtk.OrientationHorizontal, 0)
+	leftSpacer.SetHExpand(true)
+	bottomBar.Append(leftSpacer)
+
+	// URL entry (center, max 75% width)
 	urlEntry := gtk.NewEntry()
 	urlEntry.SetText(url)
 	urlEntry.SetEditable(false)
 	urlEntry.SetCanFocus(false)
-	urlEntry.SetHAlign(gtk.AlignCenter)
-	urlEntry.SetAlignment(0.5) // Center text within the entry
-	urlEntry.SetMaxWidthChars(60)
-	urlBox.Append(urlEntry)
+	urlEntry.SetAlignment(0.5)
+	urlEntry.SetMaxWidthChars(50)
+	urlEntry.SetWidthChars(40)
+	bottomBar.Append(urlEntry)
 
-	contentBox.Append(urlBox)
-	toolbarView.SetContent(contentBox)
-	win.SetContent(toolbarView)
+	// Spacer after URL (to center it)
+	rightSpacer := gtk.NewBox(gtk.OrientationHorizontal, 0)
+	rightSpacer.SetHExpand(true)
+	bottomBar.Append(rightSpacer)
+
+	// Close button (right, circular like standard GTK close button)
+	closeBtn := gtk.NewButton()
+	closeBtn.SetIconName("window-close-symbolic")
+	closeBtn.SetTooltipText("Close")
+	closeBtn.AddCSSClass("circular")
+	closeBtn.ConnectClicked(func() {
+		win.Close()
+	})
+	bottomBar.Append(closeBtn)
+
+	mainBox.Append(bottomBar)
+	win.SetContent(mainBox)
 
 	// Keyboard shortcuts
 	keyController := gtk.NewEventControllerKey()
@@ -161,8 +198,34 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	})
 	win.AddController(keyController)
 
-	// Set up action handlers for desktop file actions
+	// Set up action handlers for menu and desktop file actions
 	actionGroup := gio.NewSimpleActionGroup()
+
+	// Menu actions
+	settingsAction := gio.NewSimpleAction("settings", nil)
+	settingsAction.ConnectActivate(func(p *glib.Variant) {
+		showSettingsWindow(app)
+	})
+	actionGroup.AddAction(settingsAction)
+
+	aboutAction := gio.NewSimpleAction("about", nil)
+	aboutAction.ConnectActivate(func(p *glib.Variant) {
+		showAboutDialog(win)
+	})
+	actionGroup.AddAction(aboutAction)
+
+	donateAction := gio.NewSimpleAction("donate", nil)
+	donateAction.ConnectActivate(func(p *glib.Variant) {
+		launcher := gtk.NewURILauncher("https://ko-fi.com/alyraffauf")
+		launcher.Launch(context.Background(), &win.Window, nil)
+	})
+	actionGroup.AddAction(donateAction)
+
+	quitAction := gio.NewSimpleAction("quit", nil)
+	quitAction.ConnectActivate(func(p *glib.Variant) {
+		win.Close()
+	})
+	actionGroup.AddAction(quitAction)
 
 	// Action to launch browser with a specific action
 	// Parameter format: "browserID:actionID"
