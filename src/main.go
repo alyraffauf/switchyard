@@ -65,45 +65,28 @@ func setupIconPaths() {
 	}
 }
 
-// loadBrowserIcon loads a browser icon with fallback handling for Flatpak
-func loadBrowserIcon(iconName string, size int) *gtk.Image {
+// loadBrowserIcon loads a browser icon using GIcon for best quality.
+// Using GIcon allows GTK to select the optimal icon size from the theme,
+// avoiding blurry scaling that occurs with named icons.
+func loadBrowserIcon(browser *Browser, size int) *gtk.Image {
+	// Try to use GIcon from AppInfo for best quality
+	if browser.AppInfo != nil {
+		if gicon := browser.AppInfo.Icon(); gicon != nil {
+			image := gtk.NewImageFromGIcon(gicon)
+			image.SetPixelSize(size)
+			return image
+		}
+	}
+
+	// Fallback to icon name
+	iconName := browser.Icon
 	if iconName == "" {
 		iconName = "web-browser-symbolic"
 	}
 
-	// Try to load from icon theme first
-	icon := gtk.NewImageFromIconName(iconName)
-	icon.SetPixelSize(size)
-
-	// Check if we need to try loading from file (for Flatpak apps)
-	if os.Getenv("FLATPAK_ID") != "" && iconName != "web-browser-symbolic" {
-		// Try to find the icon file directly
-		iconPaths := []string{
-			"/var/lib/flatpak/exports/share/icons/hicolor/64x64/apps/" + iconName + ".png",
-			"/var/lib/flatpak/exports/share/icons/hicolor/128x128/apps/" + iconName + ".png",
-			"/var/lib/flatpak/exports/share/icons/hicolor/scalable/apps/" + iconName + ".svg",
-		}
-
-		home, _ := os.UserHomeDir()
-		if home != "" {
-			iconPaths = append(iconPaths,
-				home+"/.local/share/flatpak/exports/share/icons/hicolor/64x64/apps/"+iconName+".png",
-				home+"/.local/share/flatpak/exports/share/icons/hicolor/128x128/apps/"+iconName+".png",
-				home+"/.local/share/flatpak/exports/share/icons/hicolor/scalable/apps/"+iconName+".svg",
-			)
-		}
-
-		// Try each path
-		for _, path := range iconPaths {
-			if _, err := os.Stat(path); err == nil {
-				icon = gtk.NewImageFromFile(path)
-				icon.SetPixelSize(size)
-				break
-			}
-		}
-	}
-
-	return icon
+	image := gtk.NewImageFromIconName(iconName)
+	image.SetPixelSize(size)
+	return image
 }
 
 // handleURL routes a URL to the appropriate browser based on rules
