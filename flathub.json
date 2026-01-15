@@ -4,7 +4,7 @@
   "end-of-life": null,
   "end-of-life-rebase": null,
   "disable-external-data-checker": true,
-  "automerge-flathubbot-prs": false,
+  "automerge-flathubbot-prs": true,
   "comment": "Switchyard is a browser chooser that allows users to select which browser to open links with",
   "permissions": {
     "org.freedesktop.Flatpak": {
