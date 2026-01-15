@@ -41,5 +41,5 @@ jobs:
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: switchyard.flatpak
-          manifest-path: flatpak/io.github.alyraffauf.Switchyard.yml
+          manifest-path: flatpak/io.github.alyraffauf.Switchyard.Devel.yml
           cache-key: flatpak-builder-stable

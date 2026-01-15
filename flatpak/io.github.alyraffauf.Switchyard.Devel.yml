@@ -1,0 +1,78 @@
+app-id: io.github.alyraffauf.Switchyard.Devel
+runtime: org.gnome.Platform
+runtime-version: "49"
+sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.golang
+command: switchyard
+
+finish-args:
+  # Display
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+
+  # PERMISSION: Access to Flatpak service for spawning browsers
+  # JUSTIFICATION: Switchyard is a browser chooser that needs to:
+  #   1. Launch other Flatpak browsers using flatpak-spawn --host
+  #   2. Execute xdg-settings via host to check/set the default browser
+  #   3. Discover which browsers are installed (handled by GIO runtime)
+  # This is essential core functionality - the app cannot work without it.
+  - --talk-name=org.freedesktop.Flatpak
+
+  # PERMISSION: Read-only access to Snap application desktop files
+  # JUSTIFICATION: Switchyard must discover ALL installed browsers to present
+  # them to the user. Many users install browsers (Firefox, Chrome, Chromium,
+  # Brave, etc.) via Snap. The path /var/lib/snapd/desktop/applications is the
+  # standard, well-known location where Snap exports .desktop files.
+  # Without this permission, Snap browsers are invisible to the app, breaking
+  # the core functionality for users who installed browsers via Snap.
+  # Note: The Flatpak runtime does NOT automatically expose this directory,
+  # unlike /usr/share/applications which is available via /run/host/usr/share.
+  - --filesystem=/var/lib/snapd/desktop/applications:ro
+
+  # Extend XDG_DATA_DIRS to include all application sources
+  # The runtime provides: /app/share, /usr/share, /run/host/usr/share, /run/host/share
+  # We add: Snap desktop files at /var/lib/snapd/desktop
+  - --env=XDG_DATA_DIRS=/app/share:/usr/share:/run/host/usr/share:/run/host/share:/var/lib/snapd/desktop
+modules:
+  - name: glib
+    buildsystem: meson
+    config-opts:
+      - -Dtests=false
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/glib/2.86/glib-2.86.3.tar.xz
+        sha256: b3211d8d34b9df5dca05787ef0ad5d7ca75dec998b970e1aab0001d229977c65
+      - type: patch
+        path: patches/glib-appinfo.patch
+
+  - name: switchyard
+    buildsystem: simple
+    build-options:
+      env:
+        GOROOT: /usr/lib/sdk/golang
+        # Use flatpak-builder's cache directory for Go cache
+        GOPATH: /run/build/switchyard/go
+        GOCACHE: /run/ccache/go-build-cache
+        CGO_ENABLED: "1"
+    build-commands:
+      - |
+        . /usr/lib/sdk/golang/enable.sh
+        # Ensure Go cache directory exists
+        mkdir -p "$GOCACHE"
+        # Build with vendored dependencies for reproducibility and smaller binary size
+        go build -mod=vendor -trimpath -ldflags="-s -w" -o switchyard ./src
+      - install -Dm755 switchyard /app/bin/switchyard
+      - install -Dm644 data/io.github.alyraffauf.Switchyard.desktop /app/share/applications/io.github.alyraffauf.Switchyard.Devel.desktop
+      - install -Dm644 data/io.github.alyraffauf.Switchyard.metainfo.xml /app/share/metainfo/io.github.alyraffauf.Switchyard.Devel.metainfo.xml
+      - install -Dm644 data/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg /app/share/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.Devel.svg
+      - install -Dm644 data/icons/hicolor/128x128/apps/io.github.alyraffauf.Switchyard.png /app/share/icons/hicolor/128x128/apps/io.github.alyraffauf.Switchyard.Devel.png
+      - install -Dm644 data/icons/hicolor/64x64/apps/io.github.alyraffauf.Switchyard.png /app/share/icons/hicolor/64x64/apps/io.github.alyraffauf.Switchyard.Devel.png
+      - install -Dm644 data/icons/hicolor/symbolic/apps/io.github.alyraffauf.Switchyard-symbolic.svg /app/share/icons/hicolor/symbolic/apps/io.github.alyraffauf.Switchyard.Devel-symbolic.svg
+      # Validate appstream metadata
+      - appstream-util validate-relax --nonet /app/share/metainfo/io.github.alyraffauf.Switchyard.Devel.metainfo.xml
+    sources:
+      - type: dir
+        path: ..

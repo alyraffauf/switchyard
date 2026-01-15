@@ -10,27 +10,50 @@
   <description>
     <p>
       Switchyard routes clicked links to the right browser based on your rules. Like a railroad
-      switchyard directing trains to different tracks, it automatically opens URLs in the appropriate
-      browser, or shows a quick picker when no rule matches.
+      switchyard directing trains to different tracks, it <em
+            >automatically</em> opens URLs in the
+      appropriate browser, or shows a quick picker when no rule matches.
     </p>
     <p>Features:</p>
     <ul>
-      <li
-            >Rule-based routing: Automatically open URLs in specific browsers based on powerful patterns</li>
-      <li
-            >Multi-condition rules: Combine multiple conditions with AND/OR logic for precise control</li>
-      <li
-            >Multiple pattern types: Exact Domain, URL Contains, Wildcard, and Regex matching</li>
-      <li
-            >Quick browser picker with keyboard shortcuts (press Ctrl+1-9 to instantly select)</li>
-      <li>Lightweight: Runs only when needed, no background processes</li>
-      <li>Simple TOML configuration file for advanced customization</li>
+      <li><em
+                >Rule-based routing:</em> Automatically open URLs in specific browsers based on powerful patterns</li>
+      <li><em
+                >Multi-condition rules:</em> Combine multiple conditions with AND/OR logic for precise control</li>
+      <li><em
+                >Multiple pattern types:</em> Exact Domain, URL Contains, Wildcard, and Regex matching</li>
+      <li><em
+                >Quick browser picker:</em> Keyboard shortcuts (press Ctrl+1-9 to instantly select)</li>
+      <li><em
+                >Lightweight:</em> Runs only when needed, no background processes</li>
+      <li><em
+                >Powerful configuration:</em> Simple TOML configuration file for advanced customization</li>
     </ul>
   </description>
+
+  <screenshots>
+    <screenshot type="default">
+      <image
+            >https://raw.githubusercontent.com/alyraffauf/switchyard/master/docs/images/switchyard-picker.png</image>
+      <caption>Quick browser picker with keyboard shortcuts</caption>
+    </screenshot>
+    <screenshot>
+      <image
+            >https://raw.githubusercontent.com/alyraffauf/switchyard/master/docs/images/switchyard.png</image>
+      <caption>Settings window for managing rules</caption>
+    </screenshot>
+    <screenshot>
+      <image
+            >https://raw.githubusercontent.com/alyraffauf/switchyard/master/docs/images/switchyard-rulesedit.png</image>
+      <caption>Rule editor with multi-condition support</caption>
+    </screenshot>
+  </screenshots>
 
   <launchable
         type="desktop-id"
     >io.github.alyraffauf.Switchyard.desktop</launchable>
+
+  <update_contact>aly@aly.codes</update_contact>
 
   <branding>
     <color type="primary" scheme_preference="light">#62a0ea</color>
@@ -40,6 +63,7 @@
   <url type="homepage">https://github.com/alyraffauf/switchyard</url>
   <url type="bugtracker">https://github.com/alyraffauf/switchyard/issues</url>
   <url type="vcs-browser">https://github.com/alyraffauf/switchyard</url>
+  <url type="donation">https://ko-fi.com/alyraffauf</url>
 
   <developer id="io.github.alyraffauf">
     <name>Aly Raffauf</name>

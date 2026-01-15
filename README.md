@@ -5,7 +5,7 @@
 **A rules-based URL router for Linux.** When you click a link, Switchyard automatically opens it in the right browser based on your rules, or shows a quick picker to let you choose.
 
 <p align="center">
-  <img src="docs/images/switchyard-prompt.png" alt="Switchyard Prompt" width="600">
+  <img src="docs/images/switchyard-picker.png" alt="Switchyard Picker" width="600">
 </p>
 
 <p align="center">

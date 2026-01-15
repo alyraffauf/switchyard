@@ -1,0 +1,19 @@
+{
+  "only-arches": ["x86_64", "aarch64"],
+  "skip-arches": [],
+  "end-of-life": null,
+  "end-of-life-rebase": null,
+  "disable-external-data-checker": true,
+  "automerge-flathubbot-prs": false,
+  "comment": "Switchyard is a browser chooser that allows users to select which browser to open links with",
+  "permissions": {
+    "org.freedesktop.Flatpak": {
+      "reason": "Required to launch other Flatpak browsers and execute xdg-settings on the host to check/set default browser",
+      "required": true
+    },
+    "/var/lib/snapd/desktop/applications:ro": {
+      "reason": "Required to discover browsers installed via Snap. Many users install browsers (Firefox, Chrome, Chromium, Brave) via Snap. This is the standard location where Snap exports .desktop files. Without this, Snap browsers are invisible to the app.",
+      "required": true
+    }
+  }
+}
