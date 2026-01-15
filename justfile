@@ -52,12 +52,12 @@ vendor:
 # Run unit tests
 test:
     @echo "Running unit tests..."
-    go test -v ./src/config_test.go ./src/validation_test.go ./src/config.go ./src/validation.go
+    go test -v ./src/config_test.go ./src/validation_test.go ./src/app.go ./src/config.go ./src/validation.go
 
 # Run tests with coverage report
 test-coverage:
     @echo "Running tests with coverage..."
-    go test -coverprofile=coverage.out ./src/config_test.go ./src/validation_test.go ./src/config.go ./src/validation.go
+    go test -coverprofile=coverage.out ./src/config_test.go ./src/validation_test.go ./src/app.go ./src/config.go ./src/validation.go
     go tool cover -func=coverage.out
     @echo ""
     @echo "To view HTML coverage report, run: go tool cover -html=coverage.out"
