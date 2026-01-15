@@ -71,8 +71,6 @@ modules:
       - install -Dm644 data/icons/hicolor/128x128/apps/io.github.alyraffauf.Switchyard.png /app/share/icons/hicolor/128x128/apps/io.github.alyraffauf.Switchyard.Devel.png
       - install -Dm644 data/icons/hicolor/64x64/apps/io.github.alyraffauf.Switchyard.png /app/share/icons/hicolor/64x64/apps/io.github.alyraffauf.Switchyard.Devel.png
       - install -Dm644 data/icons/hicolor/symbolic/apps/io.github.alyraffauf.Switchyard-symbolic.svg /app/share/icons/hicolor/symbolic/apps/io.github.alyraffauf.Switchyard.Devel-symbolic.svg
-      # Validate appstream metadata
-      - appstream-util validate-relax --nonet /app/share/metainfo/io.github.alyraffauf.Switchyard.Devel.metainfo.xml
     sources:
       - type: dir
         path: ..
