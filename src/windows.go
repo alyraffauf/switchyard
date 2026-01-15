@@ -42,10 +42,10 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 
 	// Content box with margins
 	contentBox := gtk.NewBox(gtk.OrientationVertical, 0)
-	contentBox.SetMarginStart(24)
-	contentBox.SetMarginEnd(24)
+	contentBox.SetMarginStart(12)
+	contentBox.SetMarginEnd(12)
 	contentBox.SetMarginTop(24)
-	contentBox.SetMarginBottom(16)
+	contentBox.SetMarginBottom(8)
 
 	// FlowBox for browser buttons - wraps to multiple rows
 	flowBox := gtk.NewFlowBox()
@@ -63,10 +63,10 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		// Button for each browser
 		btn := gtk.NewButton()
 		btn.AddCSSClass("flat")
-		btn.SetSizeRequest(140, -1)
+		btn.SetSizeRequest(96, 96)
 
 		// Container inside button - icon above, name and shortcut below
-		btnBox := gtk.NewBox(gtk.OrientationVertical, 8)
+		btnBox := gtk.NewBox(gtk.OrientationVertical, 4)
 		btnBox.SetHAlign(gtk.AlignCenter)
 		btnBox.SetVAlign(gtk.AlignCenter)
 
@@ -121,10 +121,10 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 
 	// Bottom bar with hamburger menu, URL, and close button
 	bottomBar := gtk.NewBox(gtk.OrientationHorizontal, 12)
-	bottomBar.SetMarginStart(12)
-	bottomBar.SetMarginEnd(12)
+	bottomBar.SetMarginStart(8)
+	bottomBar.SetMarginEnd(8)
 	bottomBar.SetMarginTop(8)
-	bottomBar.SetMarginBottom(12)
+	bottomBar.SetMarginBottom(8)
 
 	// Hamburger menu button (left)
 	menuBtn := gtk.NewMenuButton()
