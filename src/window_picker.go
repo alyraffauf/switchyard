@@ -45,7 +45,7 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 
 	win := adw.NewWindow()
 	win.SetTitle("Switchyard")
-	win.SetDefaultSize(700, -1)
+	// win.SetDefaultSize(-1, -1)
 	win.SetResizable(false)
 	win.SetApplication(&app.Application)
 
@@ -71,7 +71,7 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	// FlowBox for browser buttons - wraps to multiple rows
 	flowBox := gtk.NewFlowBox()
 	flowBox.SetSelectionMode(gtk.SelectionNone)
-	flowBox.SetHomogeneous(true)
+	// flowBox.SetHomogeneous(true)
 	flowBox.SetColumnSpacing(16)
 	flowBox.SetRowSpacing(16)
 	flowBox.SetMaxChildrenPerLine(4)
