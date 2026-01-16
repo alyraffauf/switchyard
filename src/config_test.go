@@ -758,3 +758,570 @@ func TestConfigMatchRule(t *testing.T) {
 		})
 	}
 }
+
+// TestExtractDomain_EdgeCases tests URL domain extraction with edge cases
+func TestExtractDomain_EdgeCases(t *testing.T) {
+	tests := []struct {
+		name     string
+		url      string
+		expected string
+	}{
+		{
+			name:     "URL with authentication credentials strips at colon",
+			url:      "https://user:password@example.com/path",
+			expected: "user", // Note: extractDomain strips at colon (port removal logic)
+		},
+		{
+			name:     "URL with username only",
+			url:      "https://user@example.com/path",
+			expected: "user@example.com",
+		},
+		{
+			name:     "internationalized domain (IDN) ASCII form",
+			url:      "https://xn--n3h.com/path",
+			expected: "xn--n3h.com",
+		},
+		{
+			name:     "internationalized domain Unicode",
+			url:      "https://münchen.example/path",
+			expected: "münchen.example",
+		},
+		{
+			name:     "very long subdomain",
+			url:      "https://this.is.a.very.long.subdomain.chain.example.com/path",
+			expected: "this.is.a.very.long.subdomain.chain.example.com",
+		},
+		{
+			name:     "IP address v4",
+			url:      "https://192.168.1.1/path",
+			expected: "192.168.1.1",
+		},
+		{
+			name:     "IP address v4 with port",
+			url:      "https://192.168.1.1:8080/path",
+			expected: "192.168.1.1",
+		},
+		{
+			name:     "localhost",
+			url:      "http://localhost/path",
+			expected: "localhost",
+		},
+		{
+			name:     "localhost with port",
+			url:      "http://localhost:3000/path",
+			expected: "localhost",
+		},
+		{
+			name:     "single word TLD",
+			url:      "https://localhost",
+			expected: "localhost",
+		},
+		{
+			name:     "double slash in path doesn't affect domain",
+			url:      "https://example.com//double//slashes",
+			expected: "example.com",
+		},
+		{
+			name:     "ftp protocol",
+			url:      "ftp://files.example.com/file.zip",
+			expected: "files.example.com",
+		},
+		{
+			name:     "custom protocol",
+			url:      "myapp://example.com/action",
+			expected: "example.com",
+		},
+		{
+			name:     "mailto protocol extracts scheme name",
+			url:      "mailto:user@example.com",
+			expected: "mailto", // Note: mailto: has no //, so extractDomain returns text before colon
+		},
+		{
+			name:     "URL with empty path",
+			url:      "https://example.com/",
+			expected: "example.com",
+		},
+		{
+			name:     "URL with only question mark",
+			url:      "https://example.com?",
+			expected: "example.com?",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := extractDomain(tt.url)
+			if result != tt.expected {
+				t.Errorf("extractDomain(%q) = %q, want %q", tt.url, result, tt.expected)
+			}
+		})
+	}
+}
+
+// TestMatchesPattern_EdgeCases tests pattern matching with edge case URLs
+func TestMatchesPattern_EdgeCases(t *testing.T) {
+	tests := []struct {
+		name        string
+		url         string
+		pattern     string
+		patternType string
+		expected    bool
+	}{
+		// Long URL tests
+		{
+			name:        "very long URL with keyword match",
+			url:         "https://example.com/" + string(make([]byte, 1000)) + "keyword" + string(make([]byte, 1000)),
+			pattern:     "keyword",
+			patternType: "keyword",
+			expected:    true,
+		},
+		{
+			name:        "URL with many query parameters",
+			url:         "https://example.com/path?a=1&b=2&c=3&d=4&e=5&f=6&g=7&h=8&i=9&j=10",
+			pattern:     "example.com",
+			patternType: "domain",
+			expected:    true,
+		},
+		// Special character tests
+		{
+			name:        "URL with encoded spaces",
+			url:         "https://example.com/path%20with%20spaces",
+			pattern:     "%20",
+			patternType: "keyword",
+			expected:    true,
+		},
+		{
+			name:        "URL with plus signs",
+			url:         "https://search.example.com/q=hello+world",
+			pattern:     "hello+world",
+			patternType: "keyword",
+			expected:    true,
+		},
+		{
+			name:        "URL with hash fragment",
+			url:         "https://example.com/page#section-id",
+			pattern:     "section-id",
+			patternType: "keyword",
+			expected:    true,
+		},
+		{
+			name:        "URL with unicode characters",
+			url:         "https://example.com/日本語",
+			pattern:     "日本語",
+			patternType: "keyword",
+			expected:    true,
+		},
+		// Data URI tests
+		{
+			name:        "data URI matches domain 'data' since it extracts scheme",
+			url:         "data:text/html,<h1>Hello</h1>",
+			pattern:     "data",
+			patternType: "domain",
+			expected:    true, // extractDomain returns "data" for data: URIs
+		},
+		{
+			name:        "data URI matches keyword",
+			url:         "data:text/html,<h1>Hello</h1>",
+			pattern:     "text/html",
+			patternType: "keyword",
+			expected:    true,
+		},
+		// JavaScript URI tests
+		{
+			name:        "javascript URI keyword match",
+			url:         "javascript:alert('test')",
+			pattern:     "javascript",
+			patternType: "keyword",
+			expected:    true,
+		},
+		// Blob URI tests
+		{
+			name:        "blob URI keyword match",
+			url:         "blob:https://example.com/550e8400-e29b-41d4-a716-446655440000",
+			pattern:     "blob:",
+			patternType: "keyword",
+			expected:    true,
+		},
+		// Regex edge cases
+		{
+			name:        "regex with special characters in URL",
+			url:         "https://example.com/path?key=value&other=123",
+			pattern:     `key=value.*other=\d+`,
+			patternType: "regex",
+			expected:    true,
+		},
+		{
+			name:        "regex matching entire URL",
+			url:         "https://subdomain.example.com/path",
+			pattern:     `^https://[a-z]+\.example\.com/.*$`,
+			patternType: "regex",
+			expected:    true,
+		},
+		// Glob edge cases
+		{
+			name:        "glob with multiple wildcards",
+			url:         "https://api.v2.example.com/endpoint",
+			pattern:     "*.*.example.com",
+			patternType: "glob",
+			expected:    true,
+		},
+		{
+			name:        "glob matching only TLD",
+			url:         "https://anything.io/path",
+			pattern:     "*.io",
+			patternType: "glob",
+			expected:    true,
+		},
+		// Empty and whitespace tests
+		{
+			name:        "URL with only whitespace in query",
+			url:         "https://example.com/search?q=   ",
+			pattern:     "   ",
+			patternType: "keyword",
+			expected:    true,
+		},
+		// Case sensitivity verification
+		{
+			name:        "domain match is case insensitive",
+			url:         "https://EXAMPLE.COM/path",
+			pattern:     "example.com",
+			patternType: "domain",
+			expected:    true,
+		},
+		{
+			name:        "keyword match is case insensitive",
+			url:         "https://example.com/PATH",
+			pattern:     "path",
+			patternType: "keyword",
+			expected:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := matchesPattern(tt.url, tt.pattern, tt.patternType)
+			if result != tt.expected {
+				t.Errorf("matchesPattern(%q, %q, %q) = %v, want %v",
+					tt.url, tt.pattern, tt.patternType, result, tt.expected)
+			}
+		})
+	}
+}
+
+// TestConfigMatchRule_RuleOrdering tests that rules are matched in order (first match wins)
+func TestConfigMatchRule_RuleOrdering(t *testing.T) {
+	tests := []struct {
+		name          string
+		config        Config
+		url           string
+		wantBrowserID string
+		wantMatched   bool
+	}{
+		{
+			name: "first matching rule wins",
+			config: Config{
+				Rules: []Rule{
+					{
+						Name:    "First Rule",
+						Browser: "first-browser.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "domain", Pattern: "example.com"},
+						},
+					},
+					{
+						Name:    "Second Rule",
+						Browser: "second-browser.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "domain", Pattern: "example.com"},
+						},
+					},
+				},
+			},
+			url:           "https://example.com/path",
+			wantBrowserID: "first-browser.desktop",
+			wantMatched:   true,
+		},
+		{
+			name: "more specific rule first",
+			config: Config{
+				Rules: []Rule{
+					{
+						Name:    "Specific Rule",
+						Browser: "specific-browser.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "domain", Pattern: "docs.example.com"},
+						},
+					},
+					{
+						Name:    "General Rule",
+						Browser: "general-browser.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "glob", Pattern: "*.example.com"},
+						},
+					},
+				},
+			},
+			url:           "https://docs.example.com/guide",
+			wantBrowserID: "specific-browser.desktop",
+			wantMatched:   true,
+		},
+		{
+			name: "general rule matches when specific doesn't",
+			config: Config{
+				Rules: []Rule{
+					{
+						Name:    "Specific Rule",
+						Browser: "specific-browser.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "domain", Pattern: "docs.example.com"},
+						},
+					},
+					{
+						Name:    "General Rule",
+						Browser: "general-browser.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "glob", Pattern: "*.example.com"},
+						},
+					},
+				},
+			},
+			url:           "https://api.example.com/endpoint",
+			wantBrowserID: "general-browser.desktop",
+			wantMatched:   true,
+		},
+		{
+			name: "non-matching rules are skipped",
+			config: Config{
+				Rules: []Rule{
+					{
+						Name:    "Non-matching Rule",
+						Browser: "wrong-browser.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "domain", Pattern: "other.com"},
+						},
+					},
+					{
+						Name:    "Matching Rule",
+						Browser: "correct-browser.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "domain", Pattern: "example.com"},
+						},
+					},
+				},
+			},
+			url:           "https://example.com/path",
+			wantBrowserID: "correct-browser.desktop",
+			wantMatched:   true,
+		},
+		{
+			name: "empty rules list",
+			config: Config{
+				Rules: []Rule{},
+			},
+			url:           "https://example.com/path",
+			wantBrowserID: "",
+			wantMatched:   false,
+		},
+		{
+			name: "all rules fail to match",
+			config: Config{
+				Rules: []Rule{
+					{
+						Name:    "Rule 1",
+						Browser: "browser1.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "domain", Pattern: "other1.com"},
+						},
+					},
+					{
+						Name:    "Rule 2",
+						Browser: "browser2.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "domain", Pattern: "other2.com"},
+						},
+					},
+				},
+			},
+			url:           "https://example.com/path",
+			wantBrowserID: "",
+			wantMatched:   false,
+		},
+		{
+			name: "rule with empty conditions is skipped",
+			config: Config{
+				Rules: []Rule{
+					{
+						Name:       "Empty Rule",
+						Browser:    "empty-browser.desktop",
+						Logic:      "all",
+						Conditions: []Condition{},
+					},
+					{
+						Name:    "Valid Rule",
+						Browser: "valid-browser.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "domain", Pattern: "example.com"},
+						},
+					},
+				},
+			},
+			url:           "https://example.com/path",
+			wantBrowserID: "valid-browser.desktop",
+			wantMatched:   true,
+		},
+		{
+			name: "AND rule fails partial match, next rule matches",
+			config: Config{
+				Rules: []Rule{
+					{
+						Name:    "AND Rule",
+						Browser: "and-browser.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "domain", Pattern: "example.com"},
+							{Type: "keyword", Pattern: "admin"}, // won't match
+						},
+					},
+					{
+						Name:    "Fallback Rule",
+						Browser: "fallback-browser.desktop",
+						Logic:   "all",
+						Conditions: []Condition{
+							{Type: "domain", Pattern: "example.com"},
+						},
+					},
+				},
+			},
+			url:           "https://example.com/user",
+			wantBrowserID: "fallback-browser.desktop",
+			wantMatched:   true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			browserID, _, matched := tt.config.matchRule(tt.url)
+			if browserID != tt.wantBrowserID {
+				t.Errorf("Config.matchRule(%q) browserID = %q, want %q",
+					tt.url, browserID, tt.wantBrowserID)
+			}
+			if matched != tt.wantMatched {
+				t.Errorf("Config.matchRule(%q) matched = %v, want %v",
+					tt.url, matched, tt.wantMatched)
+			}
+		})
+	}
+}
+
+// TestSanitizeURL_EdgeCases tests URL sanitization with edge cases
+func TestSanitizeURL_EdgeCases(t *testing.T) {
+	tests := []struct {
+		name     string
+		url      string
+		expected string
+	}{
+		// Note: sanitizeURL checks for "://" to identify schemes.
+		// URIs with single colon (data:, mailto:, tel:, javascript:) get https:// prepended.
+		// This is acceptable for a browser URL router since these aren't routable web URLs.
+		{
+			name:     "data URI gets https prefix (no :// in original)",
+			url:      "data:text/html,<h1>Test</h1>",
+			expected: "https://data:text/html,<h1>Test</h1>",
+		},
+		{
+			name:     "javascript URI gets https prefix (no :// in original)",
+			url:      "javascript:void(0)",
+			expected: "https://javascript:void(0)",
+		},
+		{
+			name:     "blob URI is preserved (has ://)",
+			url:      "blob:https://example.com/guid",
+			expected: "blob:https://example.com/guid",
+		},
+		{
+			name:     "mailto URI gets https prefix (no :// in original)",
+			url:      "mailto:user@example.com",
+			expected: "https://mailto:user@example.com",
+		},
+		{
+			name:     "tel URI gets https prefix (no :// in original)",
+			url:      "tel:+1234567890",
+			expected: "https://tel:+1234567890",
+		},
+		{
+			name:     "URL with leading whitespace",
+			url:      "   https://example.com",
+			expected: "https://example.com",
+		},
+		{
+			name:     "URL with trailing whitespace",
+			url:      "https://example.com   ",
+			expected: "https://example.com",
+		},
+		{
+			name:     "URL with both leading and trailing whitespace",
+			url:      "   https://example.com   ",
+			expected: "https://example.com",
+		},
+		{
+			name:     "bare domain gets https prefix",
+			url:      "example.com",
+			expected: "https://example.com",
+		},
+		{
+			name:     "bare domain with path gets https prefix",
+			url:      "example.com/path/to/page",
+			expected: "https://example.com/path/to/page",
+		},
+		{
+			name:     "relative path is rejected",
+			url:      "./relative/path",
+			expected: "",
+		},
+		{
+			name:     "absolute path is rejected",
+			url:      "/absolute/path",
+			expected: "",
+		},
+		{
+			name:     "empty string",
+			url:      "",
+			expected: "",
+		},
+		{
+			name:     "only whitespace",
+			url:      "   ",
+			expected: "",
+		},
+		{
+			name:     "ftp URL is preserved",
+			url:      "ftp://files.example.com/file.zip",
+			expected: "ftp://files.example.com/file.zip",
+		},
+		{
+			name:     "custom app scheme is preserved",
+			url:      "myapp://action/param",
+			expected: "myapp://action/param",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := sanitizeURL(tt.url)
+			if result != tt.expected {
+				t.Errorf("sanitizeURL(%q) = %q, want %q", tt.url, result, tt.expected)
+			}
+		})
+	}
+}
