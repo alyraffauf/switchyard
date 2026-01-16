@@ -23,14 +23,12 @@ func main() {
 	app := adw.NewApplication(getAppID(), gio.ApplicationHandlesOpen)
 
 	app.ConnectActivate(func() {
-		// Add host icon paths for Flatpak compatibility
-		setupIconPaths()
+		setupApp()
 		showSettingsWindow(app)
 	})
 
 	app.ConnectOpen(func(files []gio.Filer, hint string) {
-		// Add host icon paths for Flatpak compatibility
-		setupIconPaths()
+		setupApp()
 
 		if len(files) == 0 {
 			showSettingsWindow(app)
@@ -47,13 +45,19 @@ func main() {
 	}
 }
 
-// setupIconPaths adds host system icon paths when running in Flatpak
-func setupIconPaths() {
+// setupApp initializes app-wide settings like dark mode and icon paths
+func setupApp() {
+	cfg := loadConfig()
+
+	// Apply dark mode app-wide
+	if cfg.ForceDarkMode {
+		adw.StyleManagerGetDefault().SetColorScheme(adw.ColorSchemeForceDark)
+	}
+
 	// Add host system icon paths when running in Flatpak
 	if os.Getenv("FLATPAK_ID") != "" {
 		iconTheme := gtk.IconThemeGetForDisplay(gdk.DisplayGetDefault())
 		if iconTheme != nil {
-			// Add Flatpak export paths for system and user flatpaks
 			iconTheme.AddSearchPath("/var/lib/flatpak/exports/share/icons")
 			home, _ := os.UserHomeDir()
 			if home != "" {
