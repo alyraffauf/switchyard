@@ -33,7 +33,7 @@ func detectBrowsers() []*Browser {
 		}
 
 		// Skip ourselves
-		if id == "io.github.alyraffauf.Switchyard.desktop" {
+		if id == getAppID()+".desktop" {
 			continue
 		}
 
