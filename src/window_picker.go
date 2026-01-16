@@ -5,7 +5,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"sort"
 	"strings"
 
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
@@ -24,24 +23,29 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		adw.StyleManagerGetDefault().SetColorScheme(adw.ColorSchemeForceDark)
 	}
 
-	// Sort browsers: favorite first, then alphabetically by name
-	sortedBrowsers := make([]*Browser, len(browsers))
-	copy(sortedBrowsers, browsers)
-	sort.Slice(sortedBrowsers, func(i, j int) bool {
-		// Favorite browser always comes first
-		isFavoriteI := cfg.FavoriteBrowser != "" && sortedBrowsers[i].ID == cfg.FavoriteBrowser
-		isFavoriteJ := cfg.FavoriteBrowser != "" && sortedBrowsers[j].ID == cfg.FavoriteBrowser
+	// Filter hidden_browsers from the list
+	hiddenSet := make(map[string]bool)
+	for _, id := range cfg.HiddenBrowsers {
+		hiddenSet[id] = true
+	}
 
-		if isFavoriteI && !isFavoriteJ {
-			return true
+	filteredBrowsers := make([]*Browser, 0, len(browsers))
+	for _, browser := range browsers {
+		if !hiddenSet[browser.ID] {
+			filteredBrowsers = append(filteredBrowsers, browser)
 		}
-		if !isFavoriteI && isFavoriteJ {
-			return false
-		}
+	}
 
-		// Otherwise sort alphabetically
-		return sortedBrowsers[i].Name < sortedBrowsers[j].Name
-	})
+	// Move favorite to front
+	if cfg.FavoriteBrowser != "" {
+		for i, browser := range filteredBrowsers {
+			if browser.ID == cfg.FavoriteBrowser {
+				favorite := browser
+				filteredBrowsers = append([]*Browser{favorite}, append(filteredBrowsers[:i], filteredBrowsers[i+1:]...)...)
+				break
+			}
+		}
+	}
 
 	win := adw.NewWindow()
 	win.SetTitle("Switchyard")
@@ -78,7 +82,7 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	flowBox.SetHAlign(gtk.AlignCenter)
 	flowBox.SetVAlign(gtk.AlignStart)
 
-	for _, browser := range sortedBrowsers {
+	for _, browser := range filteredBrowsers {
 		b := browser // capture
 
 		// Button for each browser
@@ -204,9 +208,9 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		// Ctrl+[1-9] for quick selection
 		if keyval >= gdk.KEY_1 && keyval <= gdk.KEY_9 && state&gdk.ControlMask != 0 {
 			idx := int(keyval - gdk.KEY_1)
-			if idx < len(sortedBrowsers) {
+			if idx < len(filteredBrowsers) {
 				currentURL := urlEntry.Text()
-				launchBrowser(sortedBrowsers[idx], currentURL)
+				launchBrowser(filteredBrowsers[idx], currentURL)
 				win.Close()
 				return true
 			}
@@ -276,7 +280,7 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 
 		// Find the browser
 		var selectedBrowser *Browser
-		for _, b := range sortedBrowsers {
+		for _, b := range filteredBrowsers {
 			if b.ID == browserID {
 				selectedBrowser = b
 				break

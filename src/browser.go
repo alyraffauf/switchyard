@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sort"
 	"strings"
 
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -32,7 +33,7 @@ func detectBrowsers() []*Browser {
 		}
 
 		// Skip ourselves
-		if id == "io.github.alyraffauf.Switchyard.desktop" {
+		if id == getAppID()+".desktop" {
 			continue
 		}
 
@@ -54,6 +55,11 @@ func detectBrowsers() []*Browser {
 			AppInfo: appInfo,
 		})
 	}
+
+	// Sort browsers alphabetically by name
+	sort.Slice(browsers, func(i, j int) bool {
+		return browsers[i].Name < browsers[j].Name
+	})
 
 	return browsers
 }
