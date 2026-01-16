@@ -19,10 +19,6 @@ import (
 func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	cfg := loadConfig()
 
-	if cfg.ForceDarkMode {
-		adw.StyleManagerGetDefault().SetColorScheme(adw.ColorSchemeForceDark)
-	}
-
 	// Filter hidden_browsers from the list
 	hiddenSet := make(map[string]bool)
 	for _, id := range cfg.HiddenBrowsers {
