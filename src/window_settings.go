@@ -237,6 +237,8 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 }
 
 func createAppearancePage(win *adw.Window, cfg *Config) gtk.Widgetter {
+	browsers := detectBrowsers()
+
 	// Use AdwToolbarView for proper page architecture
 	toolbarView := adw.NewToolbarView()
 
@@ -278,6 +280,22 @@ func createAppearancePage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	showNamesRow.SetSubtitle("Show browser names below icons")
 	showNamesRow.SetActive(cfg.ShowAppNames)
 	pickerGroup.Add(showNamesRow)
+
+	// Hidden browsers row
+	hiddenBrowsersRow := adw.NewActionRow()
+	hiddenBrowsersRow.SetTitle("Hidden browsers")
+	hiddenBrowsersRow.SetSubtitle("Choose which browsers to hide from the picker")
+	hiddenBrowsersRow.SetActivatable(true)
+
+	// Show arrow icon to indicate it's clickable
+	chevron := gtk.NewImageFromIconName("go-next-symbolic")
+	hiddenBrowsersRow.AddSuffix(chevron)
+
+	hiddenBrowsersRow.ConnectActivated(func() {
+		showHiddenBrowsersDialog(win, cfg, browsers)
+	})
+
+	pickerGroup.Add(hiddenBrowsersRow)
 
 	content.Append(pickerGroup)
 
@@ -681,6 +699,7 @@ func watchConfigFile(cfg *Config, onChange func()) {
 					cfg.CheckDefaultBrowser = newCfg.CheckDefaultBrowser
 					cfg.ShowAppNames = newCfg.ShowAppNames
 					cfg.ForceDarkMode = newCfg.ForceDarkMode
+					cfg.HiddenBrowsers = newCfg.HiddenBrowsers
 					cfg.Rules = newCfg.Rules
 
 					if onChange != nil {
