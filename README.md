@@ -86,10 +86,12 @@ switchyard "https://example.com"
 ### Keyboard Shortcuts
 
 **In the picker:**
+
 - `Ctrl+1-9` - Select browser by number
 - `Escape` - Close picker
 
 **In settings:**
+
 - `Ctrl+Q` - Quit
 
 ## Configuration
@@ -154,29 +156,29 @@ pattern = "amazon"
 
 ### Rule Options
 
-| Field | Description |
-|-------|-------------|
-| `name` | Optional friendly name displayed in the UI |
-| `conditions` | Array of conditions to match (see below) |
-| `logic` | How to combine conditions: `all` (AND) or `any` (OR). Default: `all` |
-| `browser` | Desktop file ID of the target browser |
+| Field        | Description                                                           |
+| ------------ | --------------------------------------------------------------------- |
+| `name`       | Optional friendly name displayed in the UI                            |
+| `conditions` | Array of conditions to match (see below)                              |
+| `logic`      | How to combine conditions: `all` (AND) or `any` (OR). Default: `all`  |
+| `browser`    | Desktop file ID of the target browser                                 |
 | `always_ask` | If true, show browser picker instead of auto-opening (default: false) |
 
 ### Condition Options
 
-| Field | Description |
-|-------|-------------|
-| `type` | Match type: `domain`, `keyword`, `glob`, or `regex` |
-| `pattern` | The pattern to match against |
+| Field     | Description                                         |
+| --------- | --------------------------------------------------- |
+| `type`    | Match type: `domain`, `keyword`, `glob`, or `regex` |
+| `pattern` | The pattern to match against                        |
 
 ### Condition Types
 
-| Type | Description | Example |
-|------|-------------|---------|
-| `domain` | Exact Domain - matches specific hostname | `github.com` |
-| `keyword` | URL Contains - matches if URL contains text | `youtube.com/watch` |
-| `glob` | Wildcard - pattern with * wildcards | `*.github.com` |
-| `regex` | Regex - regular expression matching | `^https://.*\.example\.(com\|org)` |
+| Type      | Description                                 | Example                            |
+| --------- | ------------------------------------------- | ---------------------------------- |
+| `domain`  | Exact Domain - matches specific hostname    | `github.com`                       |
+| `keyword` | URL Contains - matches if URL contains text | `youtube.com/watch`                |
+| `glob`    | Wildcard - pattern with \* wildcards        | `*.github.com`                     |
+| `regex`   | Regex - regular expression matching         | `^https://.*\.example\.(com\|org)` |
 
 ### Logic Modes
 
@@ -187,11 +189,11 @@ Use `all` for precise targeting (e.g., "docs.google.com AND contains 'edit'") an
 
 ### Settings
 
-| Setting | Description |
-|---------|-------------|
-| `prompt_on_click` | Show picker when no rule matches (default: true) |
-| `favorite_browser` | Favorite browser that always appears first in picker and is used as fallback when picker is disabled |
-| `check_default_browser` | Prompt to set Switchyard as system default browser on startup (default: true) |
+| Setting                 | Description                                                                                          |
+| ----------------------- | ---------------------------------------------------------------------------------------------------- |
+| `prompt_on_click`       | Show picker when no rule matches (default: true)                                                     |
+| `favorite_browser`      | Favorite browser that always appears first in picker and is used as fallback when picker is disabled |
+| `check_default_browser` | Prompt to set Switchyard as system default browser on startup (default: true)                        |
 
 ## Development
 
@@ -217,17 +219,21 @@ Tests are automatically run in CI on every push and pull request.
 Switchyard draws inspiration from other excellent URL routers and browser pickers:
 
 **Linux:**
+
 - **[Junction](https://github.com/sonnyp/Junction)** - Elegant browser picker with a modern interface.
 - **[Braus](https://braus.properlypurple.com/)** - GTK/Python browser picker for selecting browsers on each link click.
 
 **macOS:**
+
 - **[Choosy](https://choosy.app/)** - The gold standard URL router with beautiful UI and powerful rule-based routing.
 
 **Windows:**
+
 - **[BrowseRouter](https://github.com/nref/BrowseRouter)** - JSON-configured browser router for Windows 10/11.
 - **[BrowserPicker](https://browserpicker.z13.web.core.windows.net/)** - Microsoft Store app for picking browsers and routing by URL patterns.
 
 **Cross-platform:**
+
 - **[Linklever](https://linklever.net/)** - Fast browser router with URL filtering available on Windows, macOS, and Linux.
 
 Switchyard combines the best ideas from these tools: powerful rule-based routing with a fast, native Linux experience built on GTK4 and libadwaita.

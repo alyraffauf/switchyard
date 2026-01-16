@@ -1,25 +1,14 @@
-# Build outputs
-switchyard
-build/
-*.o
-
-# Flatpak build artifacts
-.flatpak-builder/
-build-dir/
 *.flatpak
-repo/
-
-# Go
-# vendor/ - committed for Flatpak reproducible builds
-
-# Test artifacts
-coverage.out
-
-# IDE
-.idea/
-.vscode/
+*.o
 *.swp
 *~
-
-# macOS
 .DS_Store
+.flatpak-builder/
+.idea/
+.pre-commit-config.yaml
+.vscode/
+build-dir/
+build/
+coverage.out
+repo/
+switchyard
