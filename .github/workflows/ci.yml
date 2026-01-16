@@ -51,7 +51,7 @@ jobs:
         with:
           bundle: io.github.alyraffauf.Switchyard.Devel-${{ github.sha }}-${{ matrix.variant.arch }}.flatpak
           manifest-path: flatpak/io.github.alyraffauf.Switchyard.Devel.yml
-          cache-key: flatpak-builder-${{ matrix.variant.arch }}
+          cache-key: flatpak-builder
           arch: ${{ matrix.variant.arch }}
 
   release:
