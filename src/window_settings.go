@@ -265,15 +265,21 @@ func createAppearancePage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	clamp.SetChild(content)
 	scrolled.SetChild(clamp)
 
-	// Browser Picker section
-	pickerGroup := adw.NewPreferencesGroup()
-	pickerGroup.SetTitle("Picker Window")
+	// App-wide appearance settings
+	appearanceGroup := adw.NewPreferencesGroup()
+	appearanceGroup.SetTitle("General")
 
 	forceDarkRow := adw.NewSwitchRow()
 	forceDarkRow.SetTitle("Force dark mode")
-	forceDarkRow.SetSubtitle("Always use dark mode for the picker window")
+	forceDarkRow.SetSubtitle("Always use dark mode")
 	forceDarkRow.SetActive(cfg.ForceDarkMode)
-	pickerGroup.Add(forceDarkRow)
+	appearanceGroup.Add(forceDarkRow)
+
+	content.Append(appearanceGroup)
+
+	// Picker Window section
+	pickerGroup := adw.NewPreferencesGroup()
+	pickerGroup.SetTitle("Picker Window")
 
 	showNamesRow := adw.NewSwitchRow()
 	showNamesRow.SetTitle("Show browser names")
