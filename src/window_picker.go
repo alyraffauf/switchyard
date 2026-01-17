@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
@@ -112,6 +113,10 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		iconBox.Append(icon)
 
 		btnBox.Append(iconBox)
+
+		// Set accessible label for screen readers (always, regardless of visual label)
+		labelValue := coreglib.NewValue(b.Name)
+		btn.UpdateProperty([]gtk.AccessibleProperty{gtk.AccessiblePropertyLabel}, []coreglib.Value{*labelValue})
 
 		// Show browser name based on config
 		if cfg.ShowAppNames {
