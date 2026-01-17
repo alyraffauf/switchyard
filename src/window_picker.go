@@ -69,7 +69,8 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 
 	// FlowBox for browser buttons - wraps to multiple rows
 	flowBox := gtk.NewFlowBox()
-	flowBox.SetSelectionMode(gtk.SelectionNone)
+	flowBox.SetSelectionMode(gtk.SelectionSingle)
+	flowBox.SetActivateOnSingleClick(false)
 	flowBox.SetColumnSpacing(16)
 	flowBox.SetRowSpacing(16)
 	flowBox.SetMaxChildrenPerLine(6)
@@ -151,6 +152,21 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 		btn.AddController(gesture)
 
 		flowBox.Insert(btn, -1)
+	}
+
+	// Handle Enter/Space activation on selected FlowBox child
+	flowBox.ConnectChildActivated(func(child *gtk.FlowBoxChild) {
+		idx := child.Index()
+		if idx >= 0 && idx < len(filteredBrowsers) {
+			currentURL := urlEntry.Text()
+			launchBrowser(filteredBrowsers[idx], currentURL)
+			win.Close()
+		}
+	})
+
+	// Select first browser by default for keyboard navigation
+	if first := flowBox.ChildAtIndex(0); first != nil {
+		flowBox.SelectChild(first)
 	}
 
 	contentBox.Append(flowBox)
