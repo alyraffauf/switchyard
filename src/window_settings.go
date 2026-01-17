@@ -514,7 +514,7 @@ func createRulesPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.Widg
 
 		// Delete button
 		deleteBtn := gtk.NewButton()
-		deleteBtn.SetIconName("user-trash-symbolic")
+		deleteBtn.SetIconName("edit-delete-symbolic")
 		deleteBtn.AddCSSClass("flat")
 		deleteBtn.AddCSSClass("destructive-action")
 		deleteBtn.SetTooltipText("Delete rule")
