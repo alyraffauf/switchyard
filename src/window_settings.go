@@ -5,6 +5,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -173,7 +174,7 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 			page = createRulesPage(win, cfg, browsers)
 			title = "Rules"
 		case 3: // Advanced
-			page = createAdvancedPage(cfg)
+			page = createAdvancedPage(win, cfg)
 			title = "Advanced"
 		}
 
@@ -577,7 +578,7 @@ func createRulesPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.Widg
 	return toolbarView
 }
 
-func createAdvancedPage(cfg *Config) gtk.Widgetter {
+func createAdvancedPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	// Use AdwToolbarView for proper page architecture
 	toolbarView := adw.NewToolbarView()
 
@@ -624,6 +625,99 @@ func createAdvancedPage(cfg *Config) gtk.Widgetter {
 		go cmd.Wait()
 	})
 	configGroup.Add(configRow)
+
+	// Export config
+	exportRow := adw.NewActionRow()
+	exportRow.SetTitle("Export Configuration")
+	exportRow.SetSubtitle("Save configuration to a file")
+	exportRow.SetActivatable(true)
+	exportRow.AddSuffix(gtk.NewImageFromIconName("document-save-symbolic"))
+	exportRow.ConnectActivated(func() {
+		dialog := gtk.NewFileDialog()
+		dialog.SetTitle("Export Configuration")
+		dialog.SetInitialName("switchyard.toml")
+
+		tomlFilter := gtk.NewFileFilter()
+		tomlFilter.SetName("TOML files")
+		tomlFilter.AddPattern("*.toml")
+
+		allFilter := gtk.NewFileFilter()
+		allFilter.SetName("All files")
+		allFilter.AddPattern("*")
+
+		filters := gio.NewListStore(glib.TypeObject)
+		filters.Append(tomlFilter.Object)
+		filters.Append(allFilter.Object)
+		dialog.SetFilters(filters)
+
+		dialog.Save(context.Background(), &win.Window, func(res gio.AsyncResulter) {
+			file, err := dialog.SaveFinish(res)
+			if err != nil || file == nil {
+				return
+			}
+			path := file.Path()
+			if path == "" {
+				return
+			}
+			if err := exportConfig(cfg, path); err != nil {
+				fmt.Fprintf(os.Stderr, "Failed to export config: %v\n", err)
+			}
+		})
+	})
+	configGroup.Add(exportRow)
+
+	// Import config
+	importRow := adw.NewActionRow()
+	importRow.SetTitle("Import Configuration")
+	importRow.SetSubtitle("Load configuration from a file")
+	importRow.SetActivatable(true)
+	importRow.AddSuffix(gtk.NewImageFromIconName("document-open-symbolic"))
+	importRow.ConnectActivated(func() {
+		fileDialog := gtk.NewFileDialog()
+		fileDialog.SetTitle("Import Configuration")
+
+		tomlFilter := gtk.NewFileFilter()
+		tomlFilter.SetName("TOML files")
+		tomlFilter.AddPattern("*.toml")
+
+		allFilter := gtk.NewFileFilter()
+		allFilter.SetName("All files")
+		allFilter.AddPattern("*")
+
+		filters := gio.NewListStore(glib.TypeObject)
+		filters.Append(tomlFilter.Object)
+		filters.Append(allFilter.Object)
+		fileDialog.SetFilters(filters)
+
+		fileDialog.Open(context.Background(), &win.Window, func(res gio.AsyncResulter) {
+			file, err := fileDialog.OpenFinish(res)
+			if err != nil || file == nil {
+				return
+			}
+			path := file.Path()
+			if path == "" {
+				return
+			}
+
+			// Show warning dialog before replacing
+			warnDialog := adw.NewAlertDialog("Import Configuration?", "This will replace all your current settings and rules with the imported configuration.")
+			warnDialog.AddResponse("cancel", "Cancel")
+			warnDialog.AddResponse("import", "Import")
+			warnDialog.SetResponseAppearance("import", adw.ResponseDestructive)
+			warnDialog.SetDefaultResponse("cancel")
+			warnDialog.SetCloseResponse("cancel")
+
+			warnDialog.ConnectResponse(func(response string) {
+				if response == "import" {
+					if err := importConfig(cfg, path); err != nil {
+						fmt.Fprintf(os.Stderr, "Failed to import config: %v\n", err)
+					}
+				}
+			})
+			warnDialog.Present(win)
+		})
+	})
+	configGroup.Add(importRow)
 
 	content.Append(configGroup)
 
