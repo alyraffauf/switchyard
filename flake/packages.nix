@@ -9,12 +9,9 @@
 
       switchyard = pkgs.buildGoModule {
         pname = "switchyard";
-        version = "0.1.0";
-
+        version = "dev";
         src = inputs.self;
-
         vendorHash = null;
-
         subPackages = ["src"];
 
         postBuild = ''
@@ -37,9 +34,6 @@
         postInstall = ''
           install -Dm644 data/io.github.alyraffauf.Switchyard.desktop \
             $out/share/applications/io.github.alyraffauf.Switchyard.desktop
-
-          install -Dm644 data/io.github.alyraffauf.Switchyard.metainfo.xml \
-            $out/share/metainfo/io.github.alyraffauf.Switchyard.metainfo.xml
 
           install -Dm644 data/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg \
             $out/share/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg
