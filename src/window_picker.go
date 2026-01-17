@@ -45,8 +45,6 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 
 	win := adw.NewWindow()
 	win.SetTitle("Switchyard")
-	// win.SetDefaultSize(-1, -1)
-	win.SetResizable(false)
 	win.SetApplication(&app.Application)
 
 	// Main layout - simple vertical box without title bar
@@ -71,12 +69,22 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	// FlowBox for browser buttons - wraps to multiple rows
 	flowBox := gtk.NewFlowBox()
 	flowBox.SetSelectionMode(gtk.SelectionNone)
-	// flowBox.SetHomogeneous(true)
 	flowBox.SetColumnSpacing(16)
 	flowBox.SetRowSpacing(16)
-	flowBox.SetMaxChildrenPerLine(4)
+	flowBox.SetMaxChildrenPerLine(6)
+	flowBox.SetMinChildrenPerLine(2)
 	flowBox.SetHAlign(gtk.AlignCenter)
 	flowBox.SetVAlign(gtk.AlignStart)
+
+	// Add breakpoint for narrow windows (mobile/small screens)
+	narrowBreakpoint := adw.NewBreakpoint(adw.NewBreakpointConditionLength(adw.BreakpointConditionMaxWidth, 400, adw.LengthUnitPx))
+	narrowBreakpoint.AddSetter(flowBox, "max-children-per-line", uint(2))
+	win.AddBreakpoint(narrowBreakpoint)
+
+	// Add breakpoint for medium windows
+	mediumBreakpoint := adw.NewBreakpoint(adw.NewBreakpointConditionLength(adw.BreakpointConditionMaxWidth, 600, adw.LengthUnitPx))
+	mediumBreakpoint.AddSetter(flowBox, "max-children-per-line", uint(3))
+	win.AddBreakpoint(mediumBreakpoint)
 
 	for _, browser := range filteredBrowsers {
 		b := browser // capture
