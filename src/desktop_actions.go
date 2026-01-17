@@ -102,7 +102,6 @@ func parseDesktopFileActions(path string) []DesktopAction {
 	defer file.Close()
 
 	var actions []DesktopAction
-	var actionIDs []string
 	var currentSection string
 	var currentActionID string
 	var currentActionName string
@@ -153,17 +152,6 @@ func parseDesktopFileActions(path string) []DesktopAction {
 			key := strings.TrimSpace(parts[0])
 			value := strings.TrimSpace(parts[1])
 
-			// In [Desktop Entry], look for Actions= list
-			if currentSection == "Desktop Entry" && key == "Actions" {
-				// Parse semicolon-separated list
-				for _, id := range strings.Split(value, ";") {
-					id = strings.TrimSpace(id)
-					if id != "" {
-						actionIDs = append(actionIDs, id)
-					}
-				}
-			}
-
 			// In [Desktop Action ...], look for Name and Exec
 			if strings.HasPrefix(currentSection, "Desktop Action ") {
 				if key == "Name" {
@@ -178,13 +166,11 @@ func parseDesktopFileActions(path string) []DesktopAction {
 	// Don't forget to save the last action if file ends while in an action section
 	if currentSection != "" && strings.HasPrefix(currentSection, "Desktop Action ") {
 		if currentActionID != "" && currentActionName != "" && currentActionExec != "" {
-			if strings.Contains(currentActionExec, "%u") || strings.Contains(currentActionExec, "%U") {
-				actions = append(actions, DesktopAction{
-					ID:   currentActionID,
-					Name: currentActionName,
-					Exec: currentActionExec,
-				})
-			}
+			actions = append(actions, DesktopAction{
+				ID:   currentActionID,
+				Name: currentActionName,
+				Exec: currentActionExec,
+			})
 		}
 	}
 
