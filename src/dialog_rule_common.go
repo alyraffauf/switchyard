@@ -92,6 +92,17 @@ func buildRuleDialogContent(
 			conditionRows = append(conditionRows, row)
 		}
 
+		// Add "Add Condition" row at the end of the list
+		addConditionRow := adw.NewActionRow()
+		addConditionRow.SetTitle("Add Condition")
+		addConditionRow.AddPrefix(gtk.NewImageFromIconName("list-add-symbolic"))
+		addConditionRow.SetActivatable(true)
+		addConditionRow.ConnectActivated(func() {
+			*conditions = append(*conditions, Condition{Type: "domain", Pattern: ""})
+			rebuildConditions()
+		})
+		conditionsListBox.Append(addConditionRow)
+
 		// Update action button state
 		actionBtn.SetSensitive(areAllConditionsValid(*conditions))
 	}
@@ -99,18 +110,6 @@ func buildRuleDialogContent(
 	rebuildConditions()
 	conditionsGroup.Add(conditionsListBox)
 	content.Append(conditionsGroup)
-
-	// Add condition button
-	addConditionGroup := adw.NewPreferencesGroup()
-	addConditionRow := adw.NewButtonRow()
-	addConditionRow.SetTitle("Add Condition")
-	addConditionRow.SetStartIconName("list-add-symbolic")
-	addConditionRow.ConnectActivated(func() {
-		*conditions = append(*conditions, Condition{Type: "domain", Pattern: ""})
-		rebuildConditions()
-	})
-	addConditionGroup.Add(addConditionRow)
-	content.Append(addConditionGroup)
 
 	// Action section
 	actionGroup := adw.NewPreferencesGroup()
@@ -165,62 +164,39 @@ func createConditionRow(
 	conditionRow.SetActivatable(false)
 	conditionRow.SetSelectable(false)
 
-	conditionContainer := gtk.NewBox(gtk.OrientationHorizontal, 6)
-	conditionContainer.SetMarginTop(12)
-	conditionContainer.SetMarginBottom(12)
+	conditionContainer := gtk.NewBox(gtk.OrientationHorizontal, 8)
+	conditionContainer.SetMarginTop(8)
+	conditionContainer.SetMarginBottom(8)
 	conditionContainer.SetMarginStart(12)
 	conditionContainer.SetMarginEnd(12)
 
-	// Inner listbox for type and pattern fields
-	innerListBox := gtk.NewListBox()
-	innerListBox.SetSelectionMode(gtk.SelectionNone)
-	innerListBox.AddCSSClass("boxed-list")
-	innerListBox.SetHExpand(true)
+	// Match type dropdown
+	typeDropdown := gtk.NewDropDown(
+		gtk.NewStringList([]string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}),
+		nil,
+	)
+	typeDropdown.SetSelected(conditionTypeToIndex((*conditions)[condIdx].Type))
+	typeDropdown.SetVAlign(gtk.AlignCenter)
+	typeDropdown.SetSizeRequest(150, -1) // Fixed width for consistent alignment
+	conditionContainer.Append(typeDropdown)
 
-	// Type row
-	typeRow := adw.NewComboRow()
-	typeRow.SetTitle("Match Type")
-	typeRow.SetModel(gtk.NewStringList([]string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}))
-	typeRow.SetSelected(conditionTypeToIndex((*conditions)[condIdx].Type))
-	innerListBox.Append(typeRow)
+	// Pattern entry
+	patternEntry := gtk.NewEntry()
+	patternEntry.SetText((*conditions)[condIdx].Pattern)
+	patternEntry.SetHExpand(true)
+	patternEntry.SetPlaceholderText("Pattern")
+	conditionContainer.Append(patternEntry)
 
-	// Pattern row
-	patternRow := adw.NewEntryRow()
-	patternRow.SetTitle("Pattern")
-	patternRow.SetText((*conditions)[condIdx].Pattern)
-	innerListBox.Append(patternRow)
-
-	// Connect handlers after both widgets are created
-	typeRow.Connect("notify::selected", func() {
-		(*conditions)[condIdx].Type = indexToConditionType(typeRow.Selected())
-		validateAndUpdateCondition(conditions, condIdx, typeRow, patternRow, actionBtn)
+	// Connect handlers
+	typeDropdown.Connect("notify::selected", func() {
+		(*conditions)[condIdx].Type = indexToConditionType(typeDropdown.Selected())
+		validateConditionEntry(conditions, condIdx, typeDropdown, patternEntry, actionBtn)
 	})
 
-	patternRow.Connect("changed", func() {
-		(*conditions)[condIdx].Pattern = patternRow.Text()
-		validateAndUpdateCondition(conditions, condIdx, typeRow, patternRow, actionBtn)
+	patternEntry.Connect("changed", func() {
+		(*conditions)[condIdx].Pattern = patternEntry.Text()
+		validateConditionEntry(conditions, condIdx, typeDropdown, patternEntry, actionBtn)
 	})
-
-	conditionContainer.Append(innerListBox)
-
-	// Buttons box
-	btnBox := gtk.NewBox(gtk.OrientationVertical, 3)
-	btnBox.SetVAlign(gtk.AlignCenter)
-
-	// Move up button
-	upBtn := gtk.NewButton()
-	upBtn.SetIconName("go-up-symbolic")
-	upBtn.SetTooltipText("Move condition up")
-	upBtn.AddCSSClass("flat")
-	upBtn.AddCSSClass("circular")
-	upBtn.SetSensitive(condIdx > 0)
-	upBtn.ConnectClicked(func() {
-		if condIdx > 0 && condIdx < len(*conditions) {
-			(*conditions)[condIdx], (*conditions)[condIdx-1] = (*conditions)[condIdx-1], (*conditions)[condIdx]
-			rebuildConditions()
-		}
-	})
-	btnBox.Append(upBtn)
 
 	// Delete button
 	deleteBtn := gtk.NewButton()
@@ -229,6 +205,7 @@ func createConditionRow(
 	deleteBtn.AddCSSClass("flat")
 	deleteBtn.AddCSSClass("circular")
 	deleteBtn.AddCSSClass("destructive-action")
+	deleteBtn.SetVAlign(gtk.AlignCenter)
 	deleteBtn.SetSensitive(len(*conditions) > 1)
 	deleteBtn.ConnectClicked(func() {
 		if len(*conditions) > 1 && condIdx < len(*conditions) {
@@ -236,45 +213,28 @@ func createConditionRow(
 			rebuildConditions()
 		}
 	})
-	btnBox.Append(deleteBtn)
+	conditionContainer.Append(deleteBtn)
 
-	// Move down button
-	downBtn := gtk.NewButton()
-	downBtn.SetIconName("go-down-symbolic")
-	downBtn.SetTooltipText("Move condition down")
-	downBtn.AddCSSClass("flat")
-	downBtn.AddCSSClass("circular")
-	downBtn.SetSensitive(condIdx < len(*conditions)-1)
-	downBtn.ConnectClicked(func() {
-		if condIdx >= 0 && condIdx < len(*conditions)-1 {
-			(*conditions)[condIdx], (*conditions)[condIdx+1] = (*conditions)[condIdx+1], (*conditions)[condIdx]
-			rebuildConditions()
-		}
-	})
-	btnBox.Append(downBtn)
-
-	conditionContainer.Append(btnBox)
 	conditionRow.SetChild(conditionContainer)
-
 	return conditionRow
 }
 
-// validateAndUpdateCondition validates a pattern and updates UI accordingly
-func validateAndUpdateCondition(
+// validateConditionEntry validates a pattern and updates UI accordingly
+func validateConditionEntry(
 	conditions *[]Condition,
 	condIdx int,
-	typeRow *adw.ComboRow,
-	patternRow *adw.EntryRow,
+	typeDropdown *gtk.DropDown,
+	patternEntry *gtk.Entry,
 	actionBtn *gtk.Button,
 ) {
-	pattern := patternRow.Text()
-	condType := indexToConditionType(typeRow.Selected())
+	pattern := patternEntry.Text()
+	condType := indexToConditionType(typeDropdown.Selected())
 
 	err := validateConditionPattern(condType, pattern)
 	if err != nil {
-		patternRow.AddCSSClass("error")
+		patternEntry.AddCSSClass("error")
 	} else {
-		patternRow.RemoveCSSClass("error")
+		patternEntry.RemoveCSSClass("error")
 	}
 
 	actionBtn.SetSensitive(areAllConditionsValid(*conditions))
