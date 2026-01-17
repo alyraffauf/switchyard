@@ -41,6 +41,29 @@ Requires [just](https://github.com/casey/just) for building.
 just flatpak
 ```
 
+### Nix Flake
+
+A flake is provided for NixOS or Nix users. It also supplies a devShell and a formatter.
+
+Add this repository to your flake inputs:
+
+```nix
+{
+  inputs.switchyard.url = "github:alyraffauf/switchyard";
+}
+```
+
+Then, add this to your NixOS configuration:
+
+```nix
+# Add to your NixOS configuration
+{
+  environment.systemPackages = [
+    inputs.switchyard.packages.${system}.default
+  ];
+}
+```
+
 ### Building from Source
 
 For non-Flatpak builds, requires Go 1.24+, GTK4/libadwaita development libraries, and [just](https://github.com/casey/just).
