@@ -15,21 +15,6 @@ func showHiddenBrowsersDialog(parent *adw.Window, cfg *Config, browsers []*Brows
 		"Select browsers to hide from the picker window. Hidden browsers won't appear in the picker, but can still be used in rules and settings.",
 	)
 
-	// Wrap saveConfig to set the global saving flag
-	saveConfigSafe := func(c *Config) error {
-		savingMux.Lock()
-		isSaving = true
-		savingMux.Unlock()
-		err := saveConfig(c)
-		glib.TimeoutAdd(100, func() bool {
-			savingMux.Lock()
-			isSaving = false
-			savingMux.Unlock()
-			return false
-		})
-		return err
-	}
-
 	// Create a scrolled window for the browser list
 	scrolled := gtk.NewScrolledWindow()
 	scrolled.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
@@ -104,7 +89,7 @@ func showHiddenBrowsersDialog(parent *adw.Window, cfg *Config, browsers []*Brows
 			}
 
 			// Save config
-			saveConfigSafe(cfg)
+			saveConfigWithFlag(cfg)
 		})
 
 		rowBox.Append(checkBox)

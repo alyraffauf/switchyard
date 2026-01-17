@@ -305,30 +305,15 @@ func createAppearancePage(win *adw.Window, cfg *Config) gtk.Widgetter {
 
 	content.Append(pickerGroup)
 
-	// Wrap saveConfig to set the global saving flag
-	saveConfigSafe := func(c *Config) error {
-		savingMux.Lock()
-		isSaving = true
-		savingMux.Unlock()
-		err := saveConfig(c)
-		glib.TimeoutAdd(100, func() bool {
-			savingMux.Lock()
-			isSaving = false
-			savingMux.Unlock()
-			return false
-		})
-		return err
-	}
-
 	// Connect change handlers
 	forceDarkRow.Connect("notify::active", func() {
 		cfg.ForceDarkMode = forceDarkRow.Active()
-		saveConfigSafe(cfg)
+		saveConfigWithFlag(cfg)
 	})
 
 	showNamesRow.Connect("notify::active", func() {
 		cfg.ShowAppNames = showNamesRow.Active()
-		saveConfigSafe(cfg)
+		saveConfigWithFlag(cfg)
 	})
 
 	toolbarView.SetContent(scrolled)
@@ -404,30 +389,15 @@ func createBehaviorPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.W
 	behaviorGroup.Add(defaultRow)
 	content.Append(behaviorGroup)
 
-	// Wrap saveConfig to set the global saving flag
-	saveConfigSafe := func(c *Config) error {
-		savingMux.Lock()
-		isSaving = true
-		savingMux.Unlock()
-		err := saveConfig(c)
-		glib.TimeoutAdd(100, func() bool {
-			savingMux.Lock()
-			isSaving = false
-			savingMux.Unlock()
-			return false
-		})
-		return err
-	}
-
 	// Connect change handlers
 	checkDefaultRow.Connect("notify::active", func() {
 		cfg.CheckDefaultBrowser = checkDefaultRow.Active()
-		saveConfigSafe(cfg)
+		saveConfigWithFlag(cfg)
 	})
 
 	promptRow.Connect("notify::active", func() {
 		cfg.PromptOnClick = promptRow.Active()
-		saveConfigSafe(cfg)
+		saveConfigWithFlag(cfg)
 	})
 
 	defaultRow.Connect("notify::selected", func() {
@@ -437,7 +407,7 @@ func createBehaviorPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.W
 		} else if idx > 0 && int(idx) <= len(browsers) {
 			cfg.FavoriteBrowser = browsers[idx-1].ID
 		}
-		saveConfigSafe(cfg)
+		saveConfigWithFlag(cfg)
 	})
 
 	toolbarView.SetContent(scrolled)
