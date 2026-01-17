@@ -18,7 +18,7 @@ install-flatpak-deps:
 
 # Build the application
 build:
-    go build -o switchyard ./src
+    go build -mod=vendor -trimpath -ldflags="-s -w" -o switchyard ./src
 
 # Install to system
 install: build
