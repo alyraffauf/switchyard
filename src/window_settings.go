@@ -405,7 +405,7 @@ func createRulesPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.Widg
 	content.SetMarginTop(12)
 	content.SetMarginBottom(12)
 
-	// Info banner
+	// Info banner (shown when rules exist)
 	infoLabel := gtk.NewLabel("Rules are evaluated in order. First match wins.")
 	infoLabel.SetWrap(true)
 	infoLabel.SetXAlign(0)
@@ -419,6 +419,13 @@ func createRulesPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.Widg
 	rulesListBox := gtk.NewListBox()
 	rulesListBox.SetSelectionMode(gtk.SelectionNone)
 	rulesListBox.AddCSSClass("boxed-list")
+
+	// Empty state (shown when no rules exist)
+	emptyState := adw.NewStatusPage()
+	emptyState.SetIconName("list-add-symbolic")
+	emptyState.SetTitle("No Rules")
+	emptyState.SetDescription("Add rules to automatically route URLs to specific browsers")
+	emptyState.SetVExpand(true)
 
 	// Helper to get browser name from ID
 	getBrowserName := func(id string) string {
@@ -536,10 +543,21 @@ func createRulesPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.Widg
 			rulesListBox.Remove(child)
 		}
 
-		// Add all rule rows
-		for i := range cfg.Rules {
-			row := createRuleRow(i)
-			rulesListBox.Append(row)
+		// Show/hide empty state vs rules list
+		if len(cfg.Rules) == 0 {
+			infoLabel.SetVisible(false)
+			rulesListBox.SetVisible(false)
+			emptyState.SetVisible(true)
+		} else {
+			infoLabel.SetVisible(true)
+			rulesListBox.SetVisible(true)
+			emptyState.SetVisible(false)
+
+			// Add all rule rows
+			for i := range cfg.Rules {
+				row := createRuleRow(i)
+				rulesListBox.Append(row)
+			}
 		}
 	}
 
@@ -547,6 +565,7 @@ func createRulesPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.Widg
 	rebuildRulesList()
 
 	content.Append(rulesListBox)
+	content.Append(emptyState)
 	scrolled.SetChild(content)
 	toolbarView.SetContent(scrolled)
 
