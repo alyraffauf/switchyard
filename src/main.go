@@ -84,6 +84,7 @@ func handleURL(app *adw.Application, url string) {
 		// Find the browser and launch it
 		if browser := findBrowserByID(browsers, browserID); browser != nil {
 			launchBrowser(browser, url)
+			app.Quit()
 			return
 		}
 	}
@@ -92,6 +93,7 @@ func handleURL(app *adw.Application, url string) {
 	if !cfg.PromptOnClick && cfg.FavoriteBrowser != "" {
 		if browser := findBrowserByID(browsers, cfg.FavoriteBrowser); browser != nil {
 			launchBrowser(browser, url)
+			app.Quit()
 			return
 		}
 	}
