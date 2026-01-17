@@ -278,3 +278,28 @@ func setAsDefaultBrowser() error {
 	cmd := hostCommand("xdg-settings", "set", "default-web-browser", desktopFile)
 	return cmd.Run()
 }
+
+// save the current cfg to the specified path
+func exportConfig(cfg *Config, path string) error {
+	data, err := toml.Marshal(cfg)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(path, data, 0644)
+}
+
+// load cfg from the specified path and replace current config
+func importConfig(cfg *Config, path string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+
+	newCfg := &Config{}
+	if err := toml.Unmarshal(data, newCfg); err != nil {
+		return err
+	}
+
+	*cfg = *newCfg
+	return saveConfig(cfg)
+}
