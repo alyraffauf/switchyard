@@ -1,12 +1,12 @@
 [Desktop Entry]
+Version=1.0
 Type=Application
+
 Name=Switchyard
-GenericName=Browser Chooser
-Comment=Choose which browser opens each link
-Exec=switchyard %U
-Icon=io.github.alyraffauf.Switchyard
-Terminal=false
-Categories=Network;WebBrowser;
+Comment=Rules-based URL router and browser launcher for Linux
+Categories=Network;WebBrowser;GNOME;
 MimeType=x-scheme-handler/http;x-scheme-handler/https;
-StartupNotify=true
-Keywords=browser;web;url;link;chooser;picker;router;switch;
+
+Icon=io.github.alyraffauf.Switchyard
+Exec=switchyard %U
+Terminal=false

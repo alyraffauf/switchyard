@@ -12,7 +12,7 @@
       "required": true
     },
     "--filesystem=host:ro": {
-      "reason": "Browser discovery requires reading .desktop files from /usr/share/applications (native apps), /var/lib/flatpak (system Flatpak), and /var/lib/snapd (Snap). Individual path permissions trigger linter warnings and /usr is reserved by Flatpak, making host:ro the only viable option for comprehensive browser discovery",
+      "reason": "Browser discovery requires reading .desktop files from /usr/share/applications (native apps).",
       "required": true
     },
     "--filesystem=xdg-data/applications:ro": {
@@ -20,15 +20,15 @@
       "required": true
     },
     "--filesystem=xdg-data/flatpak:ro": {
-      "reason": "Access to user Flatpak browser exports",
+      "reason": "Access to Flatpak browser exports in ~/.local/share/flatpak/exports/share",
       "required": true
     },
     "--filesystem=/var/lib/flatpak:ro": {
-      "reason": "Access to system-wide Flatpak browser exports",
+      "reason": "Access to Flatpak browser exports in /var/lib/flatpak/exports/share",
       "required": true
     },
     "--filesystem=/var/lib/snapd:ro": {
-      "reason": "Access to Snap browsers. Many users install browsers via Snap (Firefox, Chrome, Chromium, Brave, etc.)",
+      "reason": "Access to Snap browser .desktop files in /var/lib/snapd/desktop",
       "required": true
     }
   }
