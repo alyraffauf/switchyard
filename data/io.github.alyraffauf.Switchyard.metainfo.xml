@@ -76,19 +76,16 @@
     <screenshot type="default">
       <caption>The Switchyard browser picker.</caption>
       <image
-                xml:lang="en"
             >https://github.com/alyraffauf/switchyard/blob/d396b0652886dc498d6941f2201acbb40e235eb3/docs/images/switchyard-picker.png</image>
     </screenshot>
     <screenshot>
       <caption>The Switchyard settings panel.</caption>
       <image
-                xml:lang="en"
             >https://github.com/alyraffauf/switchyard/blob/d396b0652886dc498d6941f2201acbb40e235eb3/docs/images/switchyard.png</image>
     </screenshot>
     <screenshot>
       <caption>The Switchyard rule editor.</caption>
       <image
-                xml:lang="en"
             >https://github.com/alyraffauf/switchyard/blob/d396b0652886dc498d6941f2201acbb40e235eb3/docs/images/switchyard-rulesedit.png</image>
     </screenshot>
   </screenshots>
