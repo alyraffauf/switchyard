@@ -41,6 +41,17 @@
     >io.github.alyraffauf.Switchyard.desktop</launchable>
 
     <releases>
+        <release version="0.9.1" date="2026-01-17">
+        <url
+                type="details"
+            >https://github.com/alyraffauf/switchyard/releases/tag/v0.9.0</url>
+        <description translate="no">
+            <p>This release comes with the following improvements:</p>
+            <ul>
+            <li>Fixed up metainfo.</li>
+            </ul>
+        </description>
+        </release>
         <release version="0.9.0" date="2026-01-17">
         <url
                 type="details"
