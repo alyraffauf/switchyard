@@ -47,11 +47,7 @@ func showSettingsWindow(app *adw.Application) {
 
 	// Check if we should prompt to set as default browser
 	if cfg.CheckDefaultBrowser && !isDefaultBrowser() {
-		showDefaultBrowserPrompt(win, cfg, func() {
-			// Reload the behavior page after setting as default
-			newPage := adw.NewNavigationPage(createBehaviorPage(win, cfg, browsers), "Behavior")
-			splitView.SetContent(newPage)
-		})
+		showDefaultBrowserPrompt(win, cfg, func() {})
 	}
 
 	// Watch config file for external changes
