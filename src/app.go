@@ -12,7 +12,7 @@ const (
 	AppName       = "Switchyard"
 	DeveloperName = "Aly Raffauf"
 	Copyright     = "© 2026 Aly Raffauf"
-	Version       = "0.8.2"
+	Version       = "0.9.0"
 
 	// Links
 	WebsiteURL = "https://github.com/alyraffauf/switchyard"
