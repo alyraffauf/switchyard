@@ -13,7 +13,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-func showSettingsWindow(app *adw.Application) {
+func showSettingsWindow(app *adw.Application, cfg *Config) {
 	win := adw.NewWindow()
 	win.SetTitle("Switchyard")
 	win.SetApplication(&app.Application)
@@ -23,7 +23,6 @@ func showSettingsWindow(app *adw.Application) {
 	// Set minimum size to prevent too-small window
 	win.SetSizeRequest(700, 500)
 
-	cfg := loadConfig()
 	browsers := detectBrowsers()
 
 	// Setup app-level actions

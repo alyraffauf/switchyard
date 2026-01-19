@@ -17,8 +17,7 @@ import (
 )
 
 // showPickerWindow displays the browser picker window
-func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
-	cfg := loadConfig()
+func showPickerWindow(app *adw.Application, url string, browsers []*Browser, cfg *Config) {
 
 	// Filter hidden_browsers from the list
 	hiddenSet := make(map[string]bool)
@@ -255,7 +254,7 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser) {
 	// Menu actions
 	settingsAction := gio.NewSimpleAction("settings", nil)
 	settingsAction.ConnectActivate(func(p *glib.Variant) {
-		showSettingsWindow(app)
+		showSettingsWindow(app, loadConfig())
 	})
 	actionGroup.AddAction(settingsAction)
 

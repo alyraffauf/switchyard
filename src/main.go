@@ -23,21 +23,23 @@ func main() {
 	app := adw.NewApplication(getAppID(), gio.ApplicationHandlesOpen)
 
 	app.ConnectActivate(func() {
-		setupApp()
-		showSettingsWindow(app)
+		cfg := loadConfig()
+		setupApp(cfg)
+		showSettingsWindow(app, cfg)
 	})
 
 	app.ConnectOpen(func(files []gio.Filer, hint string) {
-		setupApp()
+		cfg := loadConfig()
+		setupApp(cfg)
 
 		if len(files) == 0 {
-			showSettingsWindow(app)
+			showSettingsWindow(app, cfg)
 			return
 		}
 
 		url := files[0].URI()
 		url = sanitizeURL(url)
-		handleURL(app, url)
+		handleURL(app, cfg, url)
 	})
 
 	if code := app.Run(os.Args); code > 0 {
@@ -46,9 +48,7 @@ func main() {
 }
 
 // setupApp initializes app-wide settings like dark mode and icon paths
-func setupApp() {
-	cfg := loadConfig()
-
+func setupApp(cfg *Config) {
 	// Apply dark mode app-wide
 	if cfg.ForceDarkMode {
 		adw.StyleManagerGetDefault().SetColorScheme(adw.ColorSchemeForceDark)
@@ -68,8 +68,7 @@ func setupApp() {
 }
 
 // handleURL routes a URL to the appropriate browser based on rules
-func handleURL(app *adw.Application, url string) {
-	cfg := loadConfig()
+func handleURL(app *adw.Application, cfg *Config, url string) {
 	browsers := detectBrowsers()
 
 	// Try to match a rule
@@ -77,7 +76,7 @@ func handleURL(app *adw.Application, url string) {
 	if matched {
 		// Check if rule has AlwaysAsk enabled
 		if alwaysAsk {
-			showPickerWindow(app, url, browsers)
+			showPickerWindow(app, url, browsers, cfg)
 			return
 		}
 
@@ -99,5 +98,5 @@ func handleURL(app *adw.Application, url string) {
 	}
 
 	// Show picker
-	showPickerWindow(app, url, browsers)
+	showPickerWindow(app, url, browsers, cfg)
 }
