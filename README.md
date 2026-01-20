@@ -5,9 +5,11 @@
 
 <br clear="left"/>
 
-[![CI](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml/badge.svg)](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml)
+**A rules-based URL router for Linux.**
 
-**A rules-based URL router for Linux.** When you click a link, Switchyard automatically opens it in the right browser based on your rules, or shows a quick picker to let you choose.
+Click a link and Switchyard automatically opens it in the right browser based on your rules, or shows a quick launcher to let you decide.
+
+[![CI](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml/badge.svg)](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml)
 
 <p align="center">
   <img src="docs/images/switchyard-picker.png" alt="Switchyard Picker" width="600">
