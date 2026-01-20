@@ -1,4 +1,9 @@
-# Switchyard
+<h1>
+  <img src="data/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg" width="64" height="64" align="left" style="margin-right: 10px;">
+  Switchyard
+</h1>
+
+<br clear="left"/>
 
 [![CI](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml/badge.svg)](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml)
 
