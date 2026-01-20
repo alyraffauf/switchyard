@@ -31,8 +31,10 @@
 
   <description>
     <p>
-      Switchyard routes clicked links to the right browser based on your preferences. Like a railroad dispatch directing trains to different tracks, it <em
-            >automatically</em> opens URLs in the appropriate browser, or shows a quick picker when no rule matches. Create simple domain matches or complex regular expressions to get the right browser every time. Whether you&apos;re browser-hopping or juggling work and play, Switchyard takes you where you need to be.
+      Switchyard routes links to the right browser based on your rules. Like a railroad switchyard directing trains to different tracks, it automatically opens URLs in the appropriate browser, or shows a quick picker when no rule matches.
+    </p>
+    <p>
+      Create simple domain matches or powerful regular expressions. Set up automatic routing for work sites, personal accounts, and everything in between. When rules don&apos;t match, choose your browser with keyboard shortcuts or a quick click.
     </p>
   </description>
 
