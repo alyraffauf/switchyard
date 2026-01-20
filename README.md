@@ -7,7 +7,7 @@
 
 **A rules-based URL router for Linux.**
 
-Click a link and Switchyard automatically opens it in the right browser based on your rules, or shows a quick launcher to let you decide.
+Set up smart, automatic routing. Or choose your browser on the fly.
 
 [![CI](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml/badge.svg)](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml)
 
