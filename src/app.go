@@ -19,6 +19,7 @@ const (
 	IssueURL   = "https://github.com/alyraffauf/switchyard/issues"
 	DonateURL  = "https://ko-fi.com/alyraffauf"
 )
+
 type Contributor struct {
 	Name string
 	URL  string
