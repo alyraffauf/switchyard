@@ -15,7 +15,7 @@ const (
 	Version       = "0.9.2"
 
 	// Links
-	WebsiteURL = "https://github.com/alyraffauf/switchyard"
+	WebsiteURL = "https://switchyard.aly.codes/"
 	IssueURL   = "https://github.com/alyraffauf/switchyard/issues"
 	DonateURL  = "https://ko-fi.com/alyraffauf"
 )

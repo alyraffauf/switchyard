@@ -24,7 +24,7 @@
     <mediatype>x-scheme-handler/https</mediatype>
   </provides>
 
-  <url type="homepage">https://github.com/alyraffauf/switchyard</url>
+  <url type="homepage">https://switchyard.aly.codes/</url>
   <url type="bugtracker">https://github.com/alyraffauf/switchyard/issues</url>
   <url type="vcs-browser">https://github.com/alyraffauf/switchyard</url>
   <url type="donation">https://ko-fi.com/alyraffauf</url>
