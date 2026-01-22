@@ -1,26 +1,21 @@
-<h1>
-  <img src="data/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg" width="64" height="64" align="left" style="margin-right: 10px;">
-  Switchyard
-</h1>
+[![CI](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml/badge.svg)](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
-<br clear="left"/>
-
-**A rules-based URL router for Linux.**
-
-Set up smart, automatic routing. Or choose your browser on the fly.
-
-[![CI](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml/badge.svg)](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml)
+<p align="center">
+  <img src="data/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg" width="64" height="64">
+  <br>
+  <strong style="font-size: 2em;">Switchyard</strong>
+  <br><br>
+  <strong>A rules-based browser launcher for Linux.</strong>
+  <br>
+  Set up smart, automatic routing. Or choose your browser on the fly.
+</p>
 
 <p align="center">
   <img src="docs/images/switchyard-picker.png" alt="Switchyard Picker" width="600">
 </p>
 
 <p align="center">
-  <img src="docs/images/switchyard.png" alt="Switchyard Settings" width="600">
-</p>
-
-<p align="center">
-  <img src="docs/images/switchyard-rulesedit.png" alt="Switchyard Rule Editor" width="600">
+  <a href="https://flathub.org/apps/io.github.alyraffauf.Switchyard"><img src="https://flathub.org/api/badge?locale=en&style=flat" alt="Get it on Flathub"></a>
 </p>
 
 ## Features
@@ -38,34 +33,16 @@ Set up smart, automatic routing. Or choose your browser on the fly.
 
 ### Flatpak (Recommended)
 
-Requires [just](https://github.com/casey/just) for building.
+Switchyard is available on [Flathub](https://flathub.org/apps/io.github.alyraffauf.Switchyard):
 
 ```bash
-# Build and install (automatically installs Flatpak runtimes if needed)
-just flatpak
+flatpak install flathub io.github.alyraffauf.Switchyard
 ```
 
 ### Nix Flake
 
-A flake is provided for NixOS or Nix users. It also supplies a devShell and a formatter.
-
-Add this repository to your flake inputs:
-
-```nix
-{
-  inputs.switchyard.url = "github:alyraffauf/switchyard";
-}
-```
-
-Then, add this to your NixOS configuration:
-
-```nix
-# Add to your NixOS configuration
-{
-  environment.systemPackages = [
-    inputs.switchyard.packages.${system}.default
-  ];
-}
+```bash
+nix run github:alyraffauf/switchyard
 ```
 
 ### Building from Source
@@ -73,79 +50,20 @@ Then, add this to your NixOS configuration:
 For non-Flatpak builds, requires Go 1.24+, GTK4/libadwaita development libraries, and [just](https://github.com/casey/just).
 
 ```bash
-# Install dependencies (Fedora)
-just install-deps
-
-# Build
+just install-deps # For Fedora
 just build
-
-# Install to /usr/local
-sudo just install
-
-# Or install to custom prefix
-sudo PREFIX=/usr just install
+sudo just install # To /usr/local
 ```
 
-### Set as Default Browser
-
-After installation, set Switchyard as your default browser so it can route all clicked links:
+#### Building Flatpak
 
 ```bash
-xdg-settings set default-web-browser io.github.alyraffauf.Switchyard.desktop
+just flatpak # Build and install
 ```
-
-Or use your desktop environment's graphical settings to set Switchyard as the default browser.
-
-## Usage
-
-```bash
-# Open settings
-flatpak run io.github.alyraffauf.Switchyard
-
-# Open a URL (typically called automatically by the system)
-flatpak run io.github.alyraffauf.Switchyard "https://example.com"
-
-# Non-Flatpak
-switchyard
-switchyard "https://example.com"
-```
-
-### Keyboard Shortcuts
-
-**In the picker:**
-
-- `Ctrl+1-9` - Select browser by number
-- `Escape` - Close picker
-
-**In settings:**
-
-- `Ctrl+Q` - Quit
 
 ## Documentation
 
+- [Using](docs/Using.md) - Set as default browser, usage examples.
 - [Configuration](docs/Configuration.md) - Config file format, rules, and settings.
 - [URI Scheme](docs/URI%20Scheme.md) - Custom `switchyard://` URLs for specifying browser preferences.
 - [Prior Art](docs/Prior%20Art.md) - Similar tools that inspired Switchyard.
-
-## Development
-
-### Running Tests
-
-The project includes unit tests for the core rule matching logic. Tests can run without GTK dependencies.
-
-```bash
-# Run tests
-just test
-
-# Run tests with coverage report
-just test-coverage
-
-# View HTML coverage report
-go tool cover -html=coverage.out
-```
-
-Tests are automatically run in CI on every push and pull request.
-
-## License
-
-[GPL-3.0-or-later](LICENSE.md)
