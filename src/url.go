@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"net/url"
 	"regexp"
 	"strings"
@@ -90,4 +91,27 @@ func matchGlob(url, pattern string) bool {
 
 	// Match against domain or full URL
 	return re.MatchString(domain) || re.MatchString(url)
+}
+
+func parseSwitchyardURL(rawURL string) (targetURL string, browserPrefs []string, err error) {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return "", nil, err
+	}
+
+	if u.Scheme != "switchyard" || u.Host != "open" {
+		return "", nil, fmt.Errorf("invalid switchyard URL")
+	}
+
+	query := u.Query()
+	targetURL = query.Get("url")
+	if targetURL == "" {
+		return "", nil, fmt.Errorf("missing url parameter")
+	}
+
+	if browser := query.Get("browser"); browser != "" {
+		browserPrefs = strings.Split(browser, ",")
+	}
+
+	return targetURL, browserPrefs, nil
 }
