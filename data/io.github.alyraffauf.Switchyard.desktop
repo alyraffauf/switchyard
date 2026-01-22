@@ -5,7 +5,7 @@ Type=Application
 Name=Switchyard
 Comment=Rules-based URL router and browser launcher for Linux
 Categories=Network;WebBrowser;GNOME;
-MimeType=x-scheme-handler/http;x-scheme-handler/https;
+MimeType=x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/switchyard;
 
 Icon=io.github.alyraffauf.Switchyard
 Exec=switchyard %U

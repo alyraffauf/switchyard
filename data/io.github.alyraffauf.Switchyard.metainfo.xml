@@ -22,6 +22,7 @@
     <binary>switchyard</binary>
     <mediatype>x-scheme-handler/http</mediatype>
     <mediatype>x-scheme-handler/https</mediatype>
+    <mediatype>x-scheme-handler/switchyard</mediatype>
   </provides>
 
   <url type="homepage">https://switchyard.aly.codes/</url>
