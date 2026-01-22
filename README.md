@@ -20,7 +20,7 @@
 - **Multi-condition rules**: Combine multiple conditions with AND/OR logic for precise control.
 - **Multiple pattern types**: Exact Domain, URL Contains, Wildcard, and Regex matching.
 - **Custom URI scheme**: Create links that specify browser preferences directly with `switchyard://` URLs.
-- **Quick browser picker**: When no rule matches, choose from your installed browsers with keyboard or mouse.
+- **Quick browser picker**: When no rule matches, quickly select a browser with keyboard or mouse.
 - **Keyboard shortcuts**: Press Ctrl+1-9 to instantly select a browser.
 - **Lightweight**: Runs only when needed, no background processes.
 - **GTK4 + libadwaita**: Native GNOME look and feel.
