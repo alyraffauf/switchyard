@@ -5,7 +5,6 @@ package main
 import (
 	"fmt"
 	"net/url"
-	"regexp"
 	"strings"
 )
 
@@ -50,47 +49,6 @@ func sanitizeURL(rawURL string) string {
 	default:
 		return ""
 	}
-}
-
-func matchesPattern(url, pattern, patternType string) bool {
-	domain := extractDomain(url)
-
-	switch patternType {
-	case "domain":
-		// Exact domain match
-		return strings.EqualFold(domain, pattern)
-	case "keyword":
-		// URL contains text
-		return strings.Contains(strings.ToLower(url), strings.ToLower(pattern))
-	case "regex":
-		re, err := regexp.Compile(pattern)
-		if err != nil {
-			return false
-		}
-		return re.MatchString(url)
-	case "glob":
-		return matchGlob(url, pattern)
-	default:
-		return false
-	}
-}
-
-func matchGlob(url, pattern string) bool {
-	// Extract domain from URL for matching
-	domain := extractDomain(url)
-
-	// Simple glob matching: * matches any characters
-	pattern = strings.ReplaceAll(pattern, ".", "\\.")
-	pattern = strings.ReplaceAll(pattern, "*", ".*")
-	pattern = "^" + pattern + "$"
-
-	re, err := regexp.Compile(pattern)
-	if err != nil {
-		return false
-	}
-
-	// Match against domain or full URL
-	return re.MatchString(domain) || re.MatchString(url)
 }
 
 func parseSwitchyardURL(rawURL string) (targetURL string, browserPrefs []string, err error) {

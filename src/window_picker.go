@@ -3,15 +3,10 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"strings"
-
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
-	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 	"github.com/diamondburned/gotk4/pkg/pango"
 )
@@ -248,122 +243,9 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser, cfg
 	})
 	win.AddController(keyController)
 
-	// Set up action handlers for menu and desktop file actions
-	actionGroup := gio.NewSimpleActionGroup()
-
-	// Menu actions
-	settingsAction := gio.NewSimpleAction("settings", nil)
-	settingsAction.ConnectActivate(func(p *glib.Variant) {
-		showSettingsWindow(app, loadConfig())
-	})
-	actionGroup.AddAction(settingsAction)
-
-	aboutAction := gio.NewSimpleAction("about", nil)
-	aboutAction.ConnectActivate(func(p *glib.Variant) {
-		showAboutDialog(win)
-	})
-	actionGroup.AddAction(aboutAction)
-
-	donateAction := gio.NewSimpleAction("donate", nil)
-	donateAction.ConnectActivate(func(p *glib.Variant) {
-		launcher := gtk.NewURILauncher(DonateURL)
-		launcher.Launch(context.Background(), &win.Window, nil)
-	})
-	actionGroup.AddAction(donateAction)
-
-	quitAction := gio.NewSimpleAction("quit", nil)
-	quitAction.ConnectActivate(func(p *glib.Variant) {
-		win.Close()
-	})
-	actionGroup.AddAction(quitAction)
-
-	// Keyboard shortcuts action
-	shortcutsAction := gio.NewSimpleAction("shortcuts", nil)
-	shortcutsAction.ConnectActivate(func(p *glib.Variant) {
-		showShortcutsDialog(win)
-	})
-	actionGroup.AddAction(shortcutsAction)
-
-	// Action to launch browser with a specific action
-	// Parameter format: "browserID:actionID"
-	launchActionAction := gio.NewSimpleAction("launch-action", glib.NewVariantType("s"))
-	launchActionAction.ConnectActivate(func(param *glib.Variant) {
-		if param == nil {
-			return
-		}
-
-		// Parse "browserID:actionID" from the parameter
-		actionSpec := param.String()
-		parts := strings.Split(actionSpec, ":")
-		if len(parts) != 2 {
-			return
-		}
-
-		browserID := parts[0]
-		actionID := parts[1]
-
-		// Find the browser
-		var selectedBrowser *Browser
-		for _, b := range filteredBrowsers {
-			if b.ID == browserID {
-				selectedBrowser = b
-				break
-			}
-		}
-
-		if selectedBrowser == nil {
-			return
-		}
-
-		// Find the action and launch it
-		actions := ListDesktopActions(selectedBrowser.AppInfo)
-		for _, action := range actions {
-			if action.ID == actionID {
-				launchBrowserAction(selectedBrowser, action, url)
-				win.Close()
-				return
-			}
-		}
-	})
-	actionGroup.AddAction(launchActionAction)
-
+	// Set up action handlers
+	actionGroup := setupPickerActions(win, app, filteredBrowsers, url, func() { win.Close() })
 	win.InsertActionGroup("win", actionGroup)
 
 	win.Present()
-}
-
-// showBrowserActionsMenu shows a context menu with desktop file actions
-func showBrowserActionsMenu(btn *gtk.Button, browser *Browser, url string) {
-	actions := ListDesktopActions(browser.AppInfo)
-	if len(actions) == 0 {
-		return
-	}
-
-	// Build menu model
-	menu := gio.NewMenu()
-
-	// Add desktop file actions
-	for _, action := range actions {
-		// Use the action ID as a unique identifier for the action
-		menu.Append(action.Name, fmt.Sprintf("win.launch-action::%s:%s", browser.ID, action.ID))
-	}
-
-	// Create and show popover
-	popover := gtk.NewPopoverMenuFromModel(menu)
-	popover.SetParent(btn)
-	popover.Popup()
-}
-
-// showShortcutsDialog displays available keyboard shortcuts
-func showShortcutsDialog(parent *adw.Window) {
-	dialog := adw.NewAlertDialog(
-		"Keyboard Shortcuts",
-		"Ctrl+1 through Ctrl+9: Select browser 1-9\nEsc: Close picker window",
-	)
-
-	dialog.AddResponse("ok", "OK")
-	dialog.SetDefaultResponse("ok")
-	dialog.SetCloseResponse("ok")
-
-	dialog.Present(parent)
 }

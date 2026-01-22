@@ -4,6 +4,7 @@ package main
 
 import (
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
+	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
@@ -62,4 +63,51 @@ func findBrowserByID(browsers []*Browser, id string) *Browser {
 		}
 	}
 	return nil
+}
+
+// settingsPageLayout creates the standard layout for settings pages.
+// Returns the toolbar view, content box for adding widgets, and the header bar.
+func settingsPageLayout(title string) (*adw.ToolbarView, *gtk.Box, *adw.HeaderBar) {
+	toolbarView := adw.NewToolbarView()
+
+	header := adw.NewHeaderBar()
+	header.SetShowEndTitleButtons(true)
+	titleLabel := gtk.NewLabel(title)
+	titleLabel.AddCSSClass("title")
+	header.SetTitleWidget(titleLabel)
+	toolbarView.AddTopBar(header)
+
+	scrolled := gtk.NewScrolledWindow()
+	scrolled.SetVExpand(true)
+	scrolled.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
+
+	content := gtk.NewBox(gtk.OrientationVertical, 24)
+	content.SetMarginStart(24)
+	content.SetMarginEnd(24)
+	content.SetMarginTop(24)
+	content.SetMarginBottom(24)
+
+	clamp := adw.NewClamp()
+	clamp.SetMaximumSize(600)
+	clamp.SetChild(content)
+	scrolled.SetChild(clamp)
+
+	toolbarView.SetContent(scrolled)
+	return toolbarView, content, header
+}
+
+// configFileFilters creates the standard file filter list for config import/export.
+func configFileFilters() *gio.ListStore {
+	tomlFilter := gtk.NewFileFilter()
+	tomlFilter.SetName("TOML files")
+	tomlFilter.AddPattern("*.toml")
+
+	allFilter := gtk.NewFileFilter()
+	allFilter.SetName("All files")
+	allFilter.AddPattern("*")
+
+	filters := gio.NewListStore(glib.TypeObject)
+	filters.Append(tomlFilter.Object)
+	filters.Append(allFilter.Object)
+	return filters
 }

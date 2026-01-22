@@ -9,40 +9,15 @@ import (
 
 // showAddRuleDialog displays the add rule dialog.
 func showAddRuleDialog(parent *adw.Window, cfg *Config, browsers []*Browser, rebuildRulesList func()) {
-	dialog := adw.NewDialog()
-	dialog.SetTitle("Add Rule")
-	dialog.SetContentWidth(600)
-	dialog.SetContentHeight(650)
-	dialog.SetCanClose(true)
-
-	toolbarView := adw.NewToolbarView()
-
-	header := adw.NewHeaderBar()
-	header.SetShowStartTitleButtons(false)
-	header.SetShowEndTitleButtons(false)
-
-	cancelBtn := gtk.NewButton()
-	cancelBtn.SetLabel("Cancel")
-	cancelBtn.ConnectClicked(func() { dialog.Close() })
-	header.PackStart(cancelBtn)
-
-	addBtn := gtk.NewButton()
-	addBtn.SetLabel("Add")
-	addBtn.AddCSSClass("suggested-action")
+	var dialog *adw.Dialog
+	header, addBtn := dialogHeader("Cancel", "Add", func() { dialog.Close() }, nil)
 	addBtn.SetSensitive(false) // Insensitive until at least one valid condition is added
-	header.PackEnd(addBtn)
 
-	toolbarView.AddTopBar(header)
+	var scrolledWindow *gtk.ScrolledWindow
+	dialog, _, scrolledWindow = dialogWithToolbar("Add Rule", 600, 650, header)
 
-	scrolledWindow := gtk.NewScrolledWindow()
-	scrolledWindow.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
-	scrolledWindow.SetVExpand(true)
-
-	nameEntry, conditions, logicRow, alwaysAskRow, browserRow, content := buildRuleDialogContent(nil, browsers, addBtn)
-
-	scrolledWindow.SetChild(content)
-	toolbarView.SetContent(scrolledWindow)
-	dialog.SetChild(toolbarView)
+	nameEntry, conditions, logicRow, alwaysAskRow, browserRow, formContent := buildRuleDialogContent(nil, browsers, addBtn)
+	scrolledWindow.SetChild(formContent)
 
 	addBtn.ConnectClicked(func() {
 		browserIdx := browserRow.Selected()

@@ -11,35 +11,9 @@ import (
 
 // showEditConditionDialog displays a dialog for editing a single condition.
 func showEditConditionDialog(parent *adw.Window, cond *Condition, onSave func()) {
-	dialog := adw.NewDialog()
-	dialog.SetTitle("Edit Condition")
-	dialog.SetContentWidth(400)
-	dialog.SetContentHeight(300)
-	dialog.SetCanClose(true)
-
-	toolbarView := adw.NewToolbarView()
-
-	header := adw.NewHeaderBar()
-	header.SetShowStartTitleButtons(false)
-	header.SetShowEndTitleButtons(false)
-
-	cancelBtn := gtk.NewButton()
-	cancelBtn.SetLabel("Cancel")
-	cancelBtn.ConnectClicked(func() { dialog.Close() })
-	header.PackStart(cancelBtn)
-
-	saveBtn := gtk.NewButton()
-	saveBtn.SetLabel("Save")
-	saveBtn.AddCSSClass("suggested-action")
-	header.PackEnd(saveBtn)
-
-	toolbarView.AddTopBar(header)
-
-	content := gtk.NewBox(gtk.OrientationVertical, 18)
-	content.SetMarginStart(18)
-	content.SetMarginEnd(18)
-	content.SetMarginTop(18)
-	content.SetMarginBottom(18)
+	var dialog *adw.Dialog
+	header, saveBtn := dialogHeader("Cancel", "Save", func() { dialog.Close() }, nil)
+	dialog, content := simpleDialogWithToolbar("Edit Condition", 400, 300, header)
 
 	// Preferences group
 	group := adw.NewPreferencesGroup()
@@ -92,9 +66,6 @@ func showEditConditionDialog(parent *adw.Window, cond *Condition, onSave func())
 
 	content.Append(group)
 	content.Append(errorLabel)
-
-	toolbarView.SetContent(content)
-	dialog.SetChild(toolbarView)
 
 	// Initial validation check
 	updateValidation()

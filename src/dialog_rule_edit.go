@@ -18,39 +18,14 @@ func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, browsers []
 		rule.Logic = "all"
 	}
 
-	dialog := adw.NewDialog()
-	dialog.SetTitle("Edit Rule")
-	dialog.SetContentWidth(600)
-	dialog.SetContentHeight(650)
-	dialog.SetCanClose(true)
+	var dialog *adw.Dialog
+	header, saveBtn := dialogHeader("Cancel", "Save", func() { dialog.Close() }, nil)
 
-	toolbarView := adw.NewToolbarView()
+	var scrolledWindow *gtk.ScrolledWindow
+	dialog, _, scrolledWindow = dialogWithToolbar("Edit Rule", 600, 650, header)
 
-	header := adw.NewHeaderBar()
-	header.SetShowStartTitleButtons(false)
-	header.SetShowEndTitleButtons(false)
-
-	cancelBtn := gtk.NewButton()
-	cancelBtn.SetLabel("Cancel")
-	cancelBtn.ConnectClicked(func() { dialog.Close() })
-	header.PackStart(cancelBtn)
-
-	saveBtn := gtk.NewButton()
-	saveBtn.SetLabel("Save")
-	saveBtn.AddCSSClass("suggested-action")
-	header.PackEnd(saveBtn)
-
-	toolbarView.AddTopBar(header)
-
-	scrolledWindow := gtk.NewScrolledWindow()
-	scrolledWindow.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
-	scrolledWindow.SetVExpand(true)
-
-	nameEntry, conditions, logicRow, alwaysAskRow, browserRow, content := buildRuleDialogContent(rule, browsers, saveBtn)
-
-	scrolledWindow.SetChild(content)
-	toolbarView.SetContent(scrolledWindow)
-	dialog.SetChild(toolbarView)
+	nameEntry, conditions, logicRow, alwaysAskRow, browserRow, formContent := buildRuleDialogContent(rule, browsers, saveBtn)
+	scrolledWindow.SetChild(formContent)
 
 	saveBtn.ConnectClicked(func() {
 		browserIdx := browserRow.Selected()
