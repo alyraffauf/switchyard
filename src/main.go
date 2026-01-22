@@ -37,8 +37,14 @@ func main() {
 			return
 		}
 
-		url := files[0].URI()
-		url = sanitizeURL(url)
+		rawURL := files[0].URI()
+		url := sanitizeURL(rawURL)
+		if url == "" {
+			// URL was rejected (mailto:, tel:, etc.) - pass to xdg-open
+			cmd := hostCommand("xdg-open", rawURL)
+			cmd.Start()
+			return
+		}
 		handleURL(app, cfg, url)
 	})
 
