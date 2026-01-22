@@ -4,7 +4,6 @@ package main
 
 import (
 	"net/url"
-	"os"
 	"regexp"
 	"strings"
 )
@@ -40,56 +39,16 @@ func sanitizeURL(rawURL string) string {
 	// Add https scheme if missing
 	if u.Scheme == "" {
 		rawURL = "https://" + rawURL
-		u, err = url.Parse(rawURL)
-		if err != nil {
-			return ""
-		}
+		u, _ = url.Parse(rawURL)
 	}
 
-	// Handle special schemes
+	// Only allow browser-routable schemes
 	switch u.Scheme {
-	case "file":
-		// Handle file:// URIs that GIO sometimes creates from bare domains
-		if _, err := os.Stat(u.Path); os.IsNotExist(err) {
-			// File doesn't exist - might be a bare domain that GIO converted
-			// Extract the last path component as a potential domain
-			lastSlash := strings.LastIndex(u.Path, "/")
-			if lastSlash != -1 {
-				possibleDomain := u.Path[lastSlash+1:]
-				if looksLikeDomain(possibleDomain) {
-					return "https://" + possibleDomain
-				}
-			}
-		}
-		// Real file path - pass through for local HTML files
+	case "http", "https", "file", "ftp":
 		return u.String()
-	case "mailto", "tel", "sms", "data", "javascript":
-		// These should be handled by xdg-open, not routed to browsers
+	default:
 		return ""
 	}
-
-	return u.String()
-}
-
-func looksLikeDomain(s string) bool {
-	if strings.Contains(s, " ") || !strings.Contains(s, ".") {
-		return false
-	}
-
-	parts := strings.Split(s, ".")
-	if len(parts) < 2 {
-		return false
-	}
-
-	// Reject common file extensions
-	fileExtensions := map[string]bool{
-		"txt": true, "pdf": true, "doc": true, "docx": true,
-		"jpg": true, "jpeg": true, "png": true, "gif": true,
-		"zip": true, "tar": true, "gz": true,
-	}
-
-	lastPart := strings.ToLower(parts[len(parts)-1])
-	return len(lastPart) > 1 && !fileExtensions[lastPart]
 }
 
 func matchesPattern(url, pattern, patternType string) bool {

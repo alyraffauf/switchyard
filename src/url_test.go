@@ -138,9 +138,9 @@ func TestSanitizeURL(t *testing.T) {
 			expected: "file:///etc/hosts",
 		},
 		{
-			name:     "file:// uri that looks like bare domain converted",
+			name:     "file:// uri with nonexistent path passed through",
 			url:      "file:///nonexistent/path/example.com",
-			expected: "https://example.com",
+			expected: "file:///nonexistent/path/example.com",
 		},
 		{
 			name:     "file:// uri with nonexistent file passed through",
@@ -148,7 +148,7 @@ func TestSanitizeURL(t *testing.T) {
 			expected: "file:///nonexistent/file.txt",
 		},
 		{
-			name:     "custom protocol",
+			name:     "ftp protocol",
 			url:      "ftp://example.com",
 			expected: "ftp://example.com",
 		},
@@ -633,9 +633,9 @@ func TestSanitizeURL_EdgeCases(t *testing.T) {
 			expected: "",
 		},
 		{
-			name:     "blob URI is preserved",
+			name:     "blob URI is rejected",
 			url:      "blob:https://example.com/guid",
-			expected: "blob:https://example.com/guid",
+			expected: "",
 		},
 		{
 			name:     "mailto URI is rejected",
@@ -698,9 +698,9 @@ func TestSanitizeURL_EdgeCases(t *testing.T) {
 			expected: "ftp://files.example.com/file.zip",
 		},
 		{
-			name:     "custom app scheme is preserved",
+			name:     "custom app scheme is rejected",
 			url:      "myapp://action/param",
-			expected: "myapp://action/param",
+			expected: "",
 		},
 	}
 
