@@ -1,14 +1,10 @@
 [![CI](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml/badge.svg)](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
-<p align="center">
-  <img src="data/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg" width="64" height="64">
-  <br>
-  <strong style="font-size: 2em;">Switchyard</strong>
-  <br><br>
-  <strong>A rules-based browser launcher for Linux.</strong>
-  <br>
-  Set up smart, automatic routing. Or choose your browser on the fly.
-</p>
+<div align="center">
+  <img width="128" height="128" src="data/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg" alt="Switchyard Icon">
+  <h1>Switchyard</h1>
+  <h3>A rules-based browser launcher for Linux.</h3>
+</div>
 
 <p align="center">
   <img src="docs/images/switchyard-picker.png" alt="Switchyard Picker" width="600">
