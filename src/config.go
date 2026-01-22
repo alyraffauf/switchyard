@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/pelletier/go-toml/v2"
@@ -124,128 +123,6 @@ func (r *Rule) matchesConditions(url string) bool {
 		}
 		return false
 	}
-}
-
-func matchesPattern(url, pattern, patternType string) bool {
-	domain := extractDomain(url)
-
-	switch patternType {
-	case "domain":
-		// Exact domain match
-		return strings.EqualFold(domain, pattern)
-	case "keyword":
-		// URL contains text
-		return strings.Contains(strings.ToLower(url), strings.ToLower(pattern))
-	case "regex":
-		re, err := regexp.Compile(pattern)
-		if err != nil {
-			return false
-		}
-		return re.MatchString(url)
-	case "glob":
-		return matchGlob(url, pattern)
-	default:
-		return false
-	}
-}
-
-func matchGlob(url, pattern string) bool {
-	// Extract domain from URL for matching
-	domain := extractDomain(url)
-
-	// Simple glob matching: * matches any characters
-	pattern = strings.ReplaceAll(pattern, ".", "\\.")
-	pattern = strings.ReplaceAll(pattern, "*", ".*")
-	pattern = "^" + pattern + "$"
-
-	re, err := regexp.Compile(pattern)
-	if err != nil {
-		return false
-	}
-
-	// Match against domain or full URL
-	return re.MatchString(domain) || re.MatchString(url)
-}
-
-func extractDomain(url string) string {
-	// Remove protocol
-	u := url
-	if idx := strings.Index(u, "://"); idx != -1 {
-		u = u[idx+3:]
-	}
-	// Remove path
-	if idx := strings.Index(u, "/"); idx != -1 {
-		u = u[:idx]
-	}
-	// Remove port
-	if idx := strings.Index(u, ":"); idx != -1 {
-		u = u[:idx]
-	}
-	return u
-}
-
-func sanitizeURL(url string) string {
-	// Trim whitespace
-	url = strings.TrimSpace(url)
-
-	if url == "" {
-		return ""
-	}
-
-	// Handle file:// URIs that GIO sometimes creates from bare domains
-	// If it's a file:// URI but the path doesn't exist and looks like a domain, convert it
-	if strings.HasPrefix(url, "file://") {
-		filePath := strings.TrimPrefix(url, "file://")
-
-		// Check if file actually exists
-		if _, err := os.Stat(filePath); os.IsNotExist(err) {
-			// File doesn't exist - might be a bare domain that GIO converted
-			// Extract just the filename (last component)
-			lastSlash := strings.LastIndex(filePath, "/")
-			if lastSlash != -1 {
-				possibleDomain := filePath[lastSlash+1:]
-				// Check if it looks like a domain (not a file extension)
-				// Domain should have multiple parts separated by dots, not just "file.txt"
-				if strings.Contains(possibleDomain, ".") && !strings.Contains(possibleDomain, " ") {
-					// Split by dot to check if it looks like a domain vs a filename
-					parts := strings.Split(possibleDomain, ".")
-					// A domain typically has at least 2 parts and the TLD is not a file extension
-					// Common file extensions to reject: .txt, .pdf, .doc, .jpg, etc.
-					if len(parts) >= 2 {
-						lastPart := strings.ToLower(parts[len(parts)-1])
-						// List of common file extensions to reject
-						fileExtensions := []string{"txt", "pdf", "doc", "docx", "jpg", "jpeg", "png", "gif", "zip", "tar", "gz"}
-						isFileExt := false
-						for _, ext := range fileExtensions {
-							if lastPart == ext {
-								isFileExt = true
-								break
-							}
-						}
-						// If it doesn't look like a file extension, treat as domain
-						if !isFileExt && len(lastPart) > 1 {
-							return "https://" + possibleDomain
-						}
-					}
-				}
-			}
-		}
-		// Real file path - reject (browsers handle file:// directly)
-		return ""
-	}
-
-	// Reject local file paths (browsers don't need routing for these)
-	if strings.HasPrefix(url, "/") || strings.HasPrefix(url, ".") {
-		return ""
-	}
-
-	// If it already has a scheme, return as-is
-	if strings.Contains(url, "://") {
-		return url
-	}
-
-	// Add https:// prefix for bare domains/URLs
-	return "https://" + url
 }
 
 // hostCommand creates a command that runs on the host system when in flatpak,
