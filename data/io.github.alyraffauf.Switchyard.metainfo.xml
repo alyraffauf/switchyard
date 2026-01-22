@@ -44,6 +44,17 @@
     >io.github.alyraffauf.Switchyard.desktop</launchable>
 
     <releases>
+        <release version="0.10.0" date="2026-01-22">
+        <url type="details"
+            >https://github.com/alyraffauf/switchyard/releases/tag/v0.10.0</url>
+        <description translate="no">
+            <p>This release comes with the following improvements:</p>
+            <ul>
+            <li>Added switchyard:// custom URI scheme.</li>
+            <li>Fixed crashes for hamburger menu in browser picker.</li>
+            </ul>
+        </description>
+        </release>
         <release version="0.9.2" date="2026-01-20">
         <url
                 type="details"
