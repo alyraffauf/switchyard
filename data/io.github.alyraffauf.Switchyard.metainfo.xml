@@ -32,10 +32,10 @@
 
   <description>
     <p>
-      Switchyard routes links to the right browser based on your rules. Like a railroad switchyard directing trains to different tracks, it automatically opens URLs in the appropriate browser, or shows a quick launcher when no rule matches.
+      Work links in Chrome. Personal links in Firefox. Switchyard automatically routes URLs to the right browser based on your rules.
     </p>
     <p>
-      Create simple domain matches or powerful regular expressions. Set up automatic routing for work sites, personal accounts, and everything in between. When rules don&apos;t match, choose your browser with keyboard shortcuts or a quick click.
+      Match URLs by domain, keyword, or regular expression. No matching rule? Choose your browser with a quick keystroke or mouse click.
     </p>
   </description>
 
