@@ -35,11 +35,6 @@ func detectBrowsers() []*Browser {
 			continue
 		}
 
-		// Skip apps that shouldn't be shown
-		if !appInfo.ShouldShow() {
-			continue
-		}
-
 		name := appInfo.Name()
 		icon := ""
 		if gicon := appInfo.Icon(); gicon != nil {
