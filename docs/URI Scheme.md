@@ -24,16 +24,19 @@ Desktop file IDs match the `.desktop` filename without the extension (e.g. `org.
 ## Examples
 
 Open in Firefox:
+
 ```
 switchyard://open?url=https://example.com&browser=org.mozilla.firefox
 ```
 
 Open in Firefox if installed, otherwise Chrome:
+
 ```
 switchyard://open?url=https://example.com&browser=org.mozilla.firefox,com.google.Chrome
 ```
 
 Percent-encoded special characters:
+
 ```
 switchyard://open?url=https%3A%2F%2Fexample.com%3Ffoo%3Dbar&browser=org.mozilla.firefox
 ```
