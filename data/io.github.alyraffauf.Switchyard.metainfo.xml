@@ -3,7 +3,7 @@
   <id>io.github.alyraffauf.Switchyard</id>
 
   <name>Switchyard</name>
-  <summary>Rules-based link router and launcher</summary>
+  <summary>Rules-based browser launcher</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <content_rating type="oars-1.0" />
@@ -22,6 +22,7 @@
     <binary>switchyard</binary>
     <mediatype>x-scheme-handler/http</mediatype>
     <mediatype>x-scheme-handler/https</mediatype>
+    <mediatype>x-scheme-handler/switchyard</mediatype>
   </provides>
 
   <url type="homepage">https://switchyard.aly.codes/</url>
