@@ -23,10 +23,6 @@ Set up smart, automatic routing. Or choose your browser on the fly.
   <img src="docs/images/switchyard-rulesedit.png" alt="Switchyard Rule Editor" width="600">
 </p>
 
-## Why Switchyard?
-
-Like a railroad switchyard directing trains to different tracks, Switchyard routes URLs to the appropriate browser based on your rules. Work links go to your work browser, personal sites to another, and you can manually choose when needed.
-
 ## Features
 
 - **Rule-based routing**: Automatically open URLs in specific browsers based on powerful patterns.
