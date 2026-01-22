@@ -89,3 +89,81 @@ func TestExtractDomain(t *testing.T) {
 		})
 	}
 }
+
+func TestParseSwitchyardURL(t *testing.T) {
+	tests := []struct {
+		name         string
+		input        string
+		wantURL      string
+		wantBrowsers []string
+		wantErr      bool
+	}{
+		// Valid URLs
+		{
+			name:         "basic with browser",
+			input:        "switchyard://open?url=https://example.com&browser=org.mozilla.firefox",
+			wantURL:      "https://example.com",
+			wantBrowsers: []string{"org.mozilla.firefox"},
+		},
+		{
+			name:         "multiple browsers",
+			input:        "switchyard://open?url=https://example.com&browser=org.mozilla.firefox,com.google.Chrome",
+			wantURL:      "https://example.com",
+			wantBrowsers: []string{"org.mozilla.firefox", "com.google.Chrome"},
+		},
+		{
+			name:         "no browser specified",
+			input:        "switchyard://open?url=https://example.com",
+			wantURL:      "https://example.com",
+			wantBrowsers: nil,
+		},
+		{
+			name:         "encoded URL",
+			input:        "switchyard://open?url=https%3A%2F%2Fexample.com%3Ffoo%3Dbar&browser=org.mozilla.firefox",
+			wantURL:      "https://example.com?foo=bar",
+			wantBrowsers: []string{"org.mozilla.firefox"},
+		},
+
+		// Invalid URLs
+		{
+			name:    "wrong scheme",
+			input:   "http://open?url=https://example.com",
+			wantErr: true,
+		},
+		{
+			name:    "wrong host",
+			input:   "switchyard://launch?url=https://example.com",
+			wantErr: true,
+		},
+		{
+			name:    "missing url parameter",
+			input:   "switchyard://open?browser=org.mozilla.firefox",
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotURL, gotBrowsers, err := parseSwitchyardURL(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("parseSwitchyardURL() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if tt.wantErr {
+				return
+			}
+			if gotURL != tt.wantURL {
+				t.Errorf("parseSwitchyardURL() url = %q, want %q", gotURL, tt.wantURL)
+			}
+			if len(gotBrowsers) != len(tt.wantBrowsers) {
+				t.Errorf("parseSwitchyardURL() browsers = %v, want %v", gotBrowsers, tt.wantBrowsers)
+				return
+			}
+			for i, b := range gotBrowsers {
+				if b != tt.wantBrowsers[i] {
+					t.Errorf("parseSwitchyardURL() browsers[%d] = %q, want %q", i, b, tt.wantBrowsers[i])
+				}
+			}
+		})
+	}
+}
