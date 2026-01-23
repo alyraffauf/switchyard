@@ -44,8 +44,21 @@
     >io.github.alyraffauf.Switchyard.desktop</launchable>
 
     <releases>
+        <release version="0.10.1" date="2026-01-22">
+        <url
+                type="details"
+            >https://github.com/alyraffauf/switchyard/releases/tag/v0.10.1</url>
+        <description translate="no">
+            <p>This release comes with the following improvements:</p>
+            <ul>
+            <li>Don't automatically hide browsers where NoDisplay=true.</li>
+            <li>Fix duplicate 'Add Condition' button in rules editor.</li>
+            </ul>
+        </description>
+        </release>
         <release version="0.10.0" date="2026-01-22">
-        <url type="details"
+        <url
+                type="details"
             >https://github.com/alyraffauf/switchyard/releases/tag/v0.10.0</url>
         <description translate="no">
             <p>This release comes with the following improvements:</p>
