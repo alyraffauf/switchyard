@@ -70,6 +70,7 @@ func buildRuleDialogContent(
 	conditionsListBox.Append(logicRow)
 
 	var conditionRows []*gtk.ListBoxRow
+	var addConditionRow *adw.ActionRow
 	var rebuildConditions func()
 
 	rebuildConditions = func() {
@@ -78,6 +79,12 @@ func buildRuleDialogContent(
 			conditionsListBox.Remove(row)
 		}
 		conditionRows = nil
+
+		// Clear the "Add Condition" button if it exists
+		// Avoids losing track and having multiple buttons unexpectedly
+		if addConditionRow != nil {
+			conditionsListBox.Remove(addConditionRow)
+		}
 
 		// Build condition rows
 		for i := range *conditions {
@@ -93,7 +100,7 @@ func buildRuleDialogContent(
 		}
 
 		// Add "Add Condition" row at the end of the list
-		addConditionRow := adw.NewActionRow()
+		addConditionRow = adw.NewActionRow()
 		addConditionRow.SetTitle("Add Condition")
 		addConditionRow.AddPrefix(gtk.NewImageFromIconName("list-add-symbolic"))
 		addConditionRow.SetActivatable(true)
