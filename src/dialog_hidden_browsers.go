@@ -7,7 +7,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-// showHiddenBrowsersDialog displays a dialog for selecting which browsers to hide from the picker.
 func showHiddenBrowsersDialog(parent *adw.Window, cfg *Config, browsers []*Browser) {
 	dialog := adw.NewAlertDialog(
 		"Hidden Browsers",

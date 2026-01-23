@@ -7,7 +7,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-// showEditRuleDialog displays the edit rule dialog.
 func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, browsers []*Browser, rebuildRulesList func()) {
 	// Ensure rules have at least one condition
 	if len(rule.Conditions) == 0 {

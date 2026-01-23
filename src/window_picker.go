@@ -11,7 +11,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/pango"
 )
 
-// showPickerWindow displays the browser picker window
 func showPickerWindow(app *adw.Application, url string, browsers []*Browser, cfg *Config) {
 
 	// Filter hidden_browsers from the list

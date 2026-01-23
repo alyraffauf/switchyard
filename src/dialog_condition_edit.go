@@ -37,7 +37,7 @@ func showEditConditionDialog(parent *adw.Window, cond *Condition, onSave func())
 	errorLabel.AddCSSClass("error")
 	errorLabel.SetVisible(false)
 
-	// Function to validate and update error display
+	// Validate and update error display
 	updateValidation := func() {
 		condType := indexToConditionType(typeRow.Selected())
 		pattern := patternRow.Text()
@@ -84,7 +84,6 @@ func showEditConditionDialog(parent *adw.Window, cond *Condition, onSave func())
 			}
 		}
 
-		// Update condition
 		cond.Type = indexToConditionType(selectedType)
 		cond.Pattern = pattern
 

@@ -118,10 +118,8 @@ func createRulesPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.Widg
 		return id
 	}
 
-	// Function to rebuild the rules list UI
 	var rebuildRulesList func()
 
-	// Function to create a rule row
 	createRuleRow := func(ruleIndex int) *adw.ActionRow {
 		rule := &cfg.Rules[ruleIndex]
 

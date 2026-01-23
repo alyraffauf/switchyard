@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-// validateConditions checks if all conditions have non-empty patterns and valid types
 func validateConditions(conditions []Condition) bool {
 	validTypes := map[string]bool{
 		"domain":  true,
@@ -34,7 +33,6 @@ func validateConditions(conditions []Condition) bool {
 	return true
 }
 
-// validateDomainPattern checks if a domain pattern is valid (no wildcards allowed).
 // Domain patterns should be exact hostnames like "example.com" or "api.github.com".
 func validateDomainPattern(pattern string) error {
 	if pattern == "" {
@@ -72,7 +70,6 @@ func validateDomainPattern(pattern string) error {
 	return nil
 }
 
-// validateGlobPattern checks if a glob (wildcard) pattern is valid.
 // Glob patterns can contain * wildcards for matching multiple characters.
 func validateGlobPattern(pattern string) error {
 	if pattern == "" {
@@ -108,7 +105,6 @@ func validateGlobPattern(pattern string) error {
 	return nil
 }
 
-// validateConditionPattern checks if a condition's pattern is valid for its type.
 // Returns an error with a descriptive message if invalid, nil if valid.
 func validateConditionPattern(condType, pattern string) error {
 	if pattern == "" {

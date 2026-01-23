@@ -13,7 +13,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-// showBrowserActionsMenu shows a context menu with desktop file actions
 func showBrowserActionsMenu(btn *gtk.Button, browser *Browser, url string) {
 	actions := ListDesktopActions(browser.AppInfo)
 	if len(actions) == 0 {
@@ -44,7 +43,6 @@ func showShortcutsDialog(parent *adw.Window) {
 	dialog.Present(parent)
 }
 
-// setupPickerActions sets up the action group for the picker window
 func setupPickerActions(win *adw.Window, app *adw.Application, browsers []*Browser, url string, onClose func()) *gio.SimpleActionGroup {
 	actionGroup := gio.NewSimpleActionGroup()
 

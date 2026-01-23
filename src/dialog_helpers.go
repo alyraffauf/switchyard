@@ -7,8 +7,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-// dialogHeader creates a standard dialog header with cancel and action buttons.
-// The action button will have the "suggested-action" CSS class applied.
 func dialogHeader(cancelLabel, actionLabel string, onCancel, onAction func()) (*adw.HeaderBar, *gtk.Button) {
 	header := adw.NewHeaderBar()
 	header.SetShowStartTitleButtons(false)
@@ -82,7 +80,7 @@ func simpleDialogWithToolbar(title string, width, height int, header *adw.Header
 	return dialog, content
 }
 
-// conditionTypeToIndex converts a condition type string to combo row index.
+// converts condition type string to combo row index.
 func conditionTypeToIndex(condType string) uint {
 	switch condType {
 	case "domain":
@@ -98,7 +96,7 @@ func conditionTypeToIndex(condType string) uint {
 	}
 }
 
-// indexToConditionType converts a combo row index to condition type string.
+// convert a combo row index to condition type string.
 func indexToConditionType(index uint) string {
 	switch index {
 	case 0:
@@ -114,7 +112,6 @@ func indexToConditionType(index uint) string {
 	}
 }
 
-// conditionTypeComboRow creates a standardized combo row for selecting condition types.
 func conditionTypeComboRow(title string, initialType string) *adw.ComboRow {
 	typeRow := adw.NewComboRow()
 	typeRow.SetTitle(title)
@@ -123,7 +120,6 @@ func conditionTypeComboRow(title string, initialType string) *adw.ComboRow {
 	return typeRow
 }
 
-// getConditionTypeLabels returns the display labels for condition types in order.
 func getConditionTypeLabels() []string {
 	return []string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}
 }

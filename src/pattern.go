@@ -7,7 +7,6 @@ import (
 	"strings"
 )
 
-// matchesPattern checks if a URL matches a given pattern based on the pattern type
 func matchesPattern(url, pattern, patternType string) bool {
 	switch patternType {
 	case "domain":

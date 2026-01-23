@@ -7,7 +7,6 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-// showDefaultBrowserPrompt displays a dialog asking to set Switchyard as default browser.
 func showDefaultBrowserPrompt(parent gtk.Widgetter, cfg *Config, updateUI func()) {
 	dialog := adw.NewAlertDialog(
 		"Set as Default Browser?",
