@@ -1,12 +1,13 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-
 Name=Switchyard
-Comment=Rules-based URL router and browser launcher for Linux
+GenericName=Browser Launcher
+Comment=Rules-based URL browser launcher for Linux
 Categories=Network;WebBrowser;GNOME;
 MimeType=x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/switchyard;
-
+Keywords=Choosy;BrowserChooser;Braus;Browserosaurus;Finicky;Buffet;OpenIn;BrowserSelect;Junction;
 Icon=io.github.alyraffauf.Switchyard
 Exec=switchyard %U
 Terminal=false
+X-Flatpak=io.github.alyraffauf.Switchyard
