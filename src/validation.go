@@ -146,7 +146,7 @@ func areAllConditionsValid(conditions []Condition) bool {
 	return true
 }
 
-func validateRewrite(r Rewrite) error {
+func validateRedirection(r Redirection) error {
 	if r.Find == "" {
 		return fmt.Errorf("Find pattern cannot be empty")
 	}
@@ -159,24 +159,24 @@ func validateRewrite(r Rewrite) error {
 	switch rwType {
 	case "domain":
 		return validateDomainPattern(r.Find)
-	case "url":
+	case "pattern":
 		pattern := wildcardToRegex(r.Find)
 		if _, err := regexp.Compile("(?i)" + pattern); err != nil {
 			return fmt.Errorf("Invalid pattern: %w", err)
 		}
 	default:
-		return fmt.Errorf("Invalid rewrite type: %s", rwType)
+		return fmt.Errorf("Invalid redirection type: %s", rwType)
 	}
 	return nil
 }
 
-func isRewriteValid(r Rewrite) bool {
-	return validateRewrite(r) == nil
+func isRedirectionValid(r Redirection) bool {
+	return validateRedirection(r) == nil
 }
 
-func areAllRewritesValid(rewrites []Rewrite) bool {
-	for _, r := range rewrites {
-		if !isRewriteValid(r) {
+func areAllRedirectionsValid(redirections []Redirection) bool {
+	for _, r := range redirections {
+		if !isRedirectionValid(r) {
 			return false
 		}
 	}

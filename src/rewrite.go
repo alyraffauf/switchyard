@@ -8,14 +8,14 @@ import (
 	"strings"
 )
 
-func applyRewrites(rawURL string, rewrites []Rewrite) string {
-	for _, r := range rewrites {
-		rawURL = applyRewrite(rawURL, r)
+func applyRedirections(rawURL string, redirections []Redirection) string {
+	for _, r := range redirections {
+		rawURL = applyRedirection(rawURL, r)
 	}
 	return rawURL
 }
 
-func applyRewrite(rawURL string, r Rewrite) string {
+func applyRedirection(rawURL string, r Redirection) string {
 	rwType := r.Type
 	if rwType == "" {
 		rwType = "domain"
@@ -23,15 +23,15 @@ func applyRewrite(rawURL string, r Rewrite) string {
 
 	switch rwType {
 	case "domain":
-		return applyDomainRewrite(rawURL, r)
-	case "url":
-		return applyURLRewrite(rawURL, r)
+		return applyDomainRedirection(rawURL, r)
+	case "pattern":
+		return applyPatternRedirection(rawURL, r)
 	default:
 		return rawURL
 	}
 }
 
-func applyDomainRewrite(rawURL string, r Rewrite) string {
+func applyDomainRedirection(rawURL string, r Redirection) string {
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		return rawURL
@@ -45,7 +45,7 @@ func applyDomainRewrite(rawURL string, r Rewrite) string {
 	return u.String()
 }
 
-func applyURLRewrite(rawURL string, r Rewrite) string {
+func applyPatternRedirection(rawURL string, r Redirection) string {
 	pattern := wildcardToRegex(r.Find)
 	re, ok := getCompiledRegex("(?i)" + pattern) // case-insensitive
 	if !ok {

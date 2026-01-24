@@ -117,13 +117,13 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 	behaviorRow.AddPrefix(gtk.NewImageFromIconName("preferences-system-symbolic"))
 	listBox.Append(behaviorRow)
 
-	rewritesRow := adw.NewActionRow()
-	rewritesRow.SetTitle("URL Rewrites")
-	rewritesRow.AddPrefix(gtk.NewImageFromIconName("edit-find-replace-symbolic"))
-	listBox.Append(rewritesRow)
+	redirectionsRow := adw.NewActionRow()
+	redirectionsRow.SetTitle("Link Redirections")
+	redirectionsRow.AddPrefix(gtk.NewImageFromIconName("edit-find-replace-symbolic"))
+	listBox.Append(redirectionsRow)
 
 	rulesRow := adw.NewActionRow()
-	rulesRow.SetTitle("Rules")
+	rulesRow.SetTitle("Browser Rules")
 	rulesRow.AddPrefix(gtk.NewImageFromIconName("view-list-symbolic"))
 	listBox.Append(rulesRow)
 
@@ -150,11 +150,11 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 			page = createBehaviorPage(win, browsers, cfg)
 			title = "Behavior"
 		case 2:
-			page = createRewritesPage(win, cfg)
-			title = "URL Rewrites"
+			page = createRedirectionsPage(win, cfg)
+			title = "Link Redirections"
 		case 3:
 			page = createRulesPage(win, browsers, cfg)
-			title = "Rules"
+			title = "Browser Rules"
 		case 4:
 			page = createAdvancedPage(win, cfg)
 			title = "Advanced"
@@ -201,7 +201,7 @@ func watchConfigFile(cfg *Config, onChange func()) {
 					cfg.ShowAppNames = newCfg.ShowAppNames
 					cfg.ForceDarkMode = newCfg.ForceDarkMode
 					cfg.HiddenBrowsers = newCfg.HiddenBrowsers
-					cfg.Rewrites = newCfg.Rewrites
+					cfg.Redirections = newCfg.Redirections
 					cfg.Rules = newCfg.Rules
 
 					if onChange != nil {

@@ -14,22 +14,22 @@ prompt_on_click = true
 favorite_browser = ""
 check_default_browser = true
 
-# URL rewrites (domain type is default)
-[[rewrites]]
+# Link redirections (domain type is default)
+[[redirections]]
 find = "x.com"
 replace = "twitter.com"
 
-[[rewrites]]
+[[redirections]]
 find = "reddit.com"
 replace = "old.reddit.com"
 
-# URL rewrite to remove query parameters
-[[rewrites]]
-type = "url"
+# Pattern redirection to remove query parameters
+[[redirections]]
+type = "pattern"
 find = "?utm_*"
 replace = "" 
 
-# Simple rule with a single condition
+# Browser rule with a single condition
 [[rules]]
 name = "Work GitHub"
 browser = "firefox.desktop"
@@ -101,9 +101,9 @@ pattern = "amazon"
 - **favorite_browser**: Favorite browser that always appears first in launcher and is used as fallback when launcher is disabled.
 - **check_default_browser**: Prompt to set Switchyard as system default browser on startup (default: true).
 
-## Rules
+## Browser Rules
 
-Rules define how URLs are routed to browsers. Each rule has conditions that determine when it matches.
+Browser rules define how URLs are routed to browsers. Each rule has conditions that determine when it matches.
 
 - **name**: Optional friendly name displayed in the UI.
 - **conditions**: Array of conditions to match (see below).
@@ -133,40 +133,40 @@ Each condition specifies a pattern to match against the URL.
 
 Use `all` for precise targeting (e.g., "docs.google.com AND contains 'edit'") and `any` for broad matching (e.g., "youtube.com OR vimeo.com OR twitch.tv").
 
-## URL Rewrites
+## Link Redirections
 
-Rewrites modify URLs before routing rules are evaluated. There are two types:
+Link redirections modify URLs before browser rules are evaluated. There are two types:
 
-- **type**: `domain` (default) or `url`.
+- **type**: `domain` (default) or `pattern`.
 - **find**: Pattern to match.
 - **replace**: Text to replace with. Leave empty to remove matches.
 
-### Rewrite Types
+### Redirection Types
 
-**Domain** rewrites match the exact hostname. Use this to switch between sites:
+**Domain** redirections match the exact hostname. Use this to switch between sites:
 
 ```toml
-[[rewrites]]
+[[redirections]]
 find = "reddit.com"
 replace = "old.reddit.com"
 
-[[rewrites]]
+[[redirections]]
 find = "x.com"
 replace = "twitter.com"
 ```
 
-**URL** rewrites match anywhere in the URL and support `*` wildcards. Use this to clean up links:
+**Pattern** redirections match anywhere in the URL and support `*` wildcards. Use this to clean up links:
 
 ```toml
-[[rewrites]]
-type = "url"
+[[redirections]]
+type = "pattern"
 find = "?utm_*"
 replace = ""
 
-[[rewrites]]
-type = "url"
+[[redirections]]
+type = "pattern"
 find = "&fbclid=*"
 replace = ""
 ```
 
-Rewrites are applied in order, and matching is case-insensitive.
+Redirections are applied in order, and matching is case-insensitive.

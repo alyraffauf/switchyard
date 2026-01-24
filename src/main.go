@@ -57,8 +57,8 @@ func main() {
 			return
 		}
 
-		if len(cfg.Rewrites) > 0 {
-			sanitized = applyRewrites(sanitized, cfg.Rewrites)
+		if len(cfg.Redirections) > 0 {
+			sanitized = applyRedirections(sanitized, cfg.Redirections)
 		}
 
 		handleURL(app, browsers, cfg, sanitized)
@@ -106,8 +106,8 @@ func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config,
 		return
 	}
 
-	if len(cfg.Rewrites) > 0 {
-		sanitized = applyRewrites(sanitized, cfg.Rewrites)
+	if len(cfg.Redirections) > 0 {
+		sanitized = applyRedirections(sanitized, cfg.Redirections)
 	}
 
 	// If browser preferences specified, try each in order

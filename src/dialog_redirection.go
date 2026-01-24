@@ -7,23 +7,23 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-func showAddRewriteDialog(parent *adw.Window, cfg *Config, onSave func()) {
-	showRewriteDialog(parent, cfg, nil, onSave)
+func showAddRedirectionDialog(parent *adw.Window, cfg *Config, onSave func()) {
+	showRedirectionDialog(parent, cfg, nil, onSave)
 }
 
-func showEditRewriteDialog(parent *adw.Window, cfg *Config, rewrite *Rewrite, onSave func()) {
-	showRewriteDialog(parent, cfg, rewrite, onSave)
+func showEditRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirection, onSave func()) {
+	showRedirectionDialog(parent, cfg, redirection, onSave)
 }
 
-func showRewriteDialog(parent *adw.Window, cfg *Config, rewrite *Rewrite, onSave func()) {
-	isNew := rewrite == nil
+func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirection, onSave func()) {
+	isNew := redirection == nil
 
 	var title, actionLabel string
 	if isNew {
-		title = "Add Rewrite"
+		title = "Add Redirection"
 		actionLabel = "Add"
 	} else {
-		title = "Edit Rewrite"
+		title = "Edit Redirection"
 		actionLabel = "Save"
 	}
 
@@ -35,23 +35,23 @@ func showRewriteDialog(parent *adw.Window, cfg *Config, rewrite *Rewrite, onSave
 
 	typeRow := adw.NewComboRow()
 	typeRow.SetTitle("Type")
-	typeRow.SetModel(gtk.NewStringList(getRewriteTypeLabels()))
+	typeRow.SetModel(gtk.NewStringList(getRedirectionTypeLabels()))
 	if !isNew {
-		typeRow.SetSelected(rewriteTypeToIndex(rewrite.Type))
+		typeRow.SetSelected(redirectionTypeToIndex(redirection.Type))
 	}
 	group.Add(typeRow)
 
 	findRow := adw.NewEntryRow()
-	findRow.SetTitle("Find")
+	findRow.SetTitle("Match")
 	if !isNew {
-		findRow.SetText(rewrite.Find)
+		findRow.SetText(redirection.Find)
 	}
 	group.Add(findRow)
 
 	replaceRow := adw.NewEntryRow()
-	replaceRow.SetTitle("Replace with")
+	replaceRow.SetTitle("Replace With")
 	if !isNew {
-		replaceRow.SetText(rewrite.Replace)
+		replaceRow.SetText(redirection.Replace)
 	}
 	group.Add(replaceRow)
 
@@ -64,8 +64,8 @@ func showRewriteDialog(parent *adw.Window, cfg *Config, rewrite *Rewrite, onSave
 	updateHelpText := func() {
 		if typeRow.Selected() == 0 { // Domain
 			helpLabel.SetLabel("Matches the exact domain name")
-		} else { // URL
-			helpLabel.SetLabel("Use * to match any text")
+		} else { // Pattern
+			helpLabel.SetLabel("Use * as a wildcard to match any text")
 		}
 	}
 	updateHelpText()
@@ -77,9 +77,9 @@ func showRewriteDialog(parent *adw.Window, cfg *Config, rewrite *Rewrite, onSave
 
 	validateInputs := func() {
 		find := findRow.Text()
-		rwType := indexToRewriteType(typeRow.Selected())
-		r := Rewrite{Type: rwType, Find: find, Replace: replaceRow.Text()}
-		err := validateRewrite(r)
+		rwType := indexToRedirectionType(typeRow.Selected())
+		r := Redirection{Type: rwType, Find: find, Replace: replaceRow.Text()}
+		err := validateRedirection(r)
 		saveBtn.SetSensitive(err == nil)
 	}
 
@@ -89,18 +89,18 @@ func showRewriteDialog(parent *adw.Window, cfg *Config, rewrite *Rewrite, onSave
 
 	saveBtn.ConnectClicked(func() {
 		find := findRow.Text()
-		rwType := indexToRewriteType(typeRow.Selected())
+		rwType := indexToRedirectionType(typeRow.Selected())
 
 		if isNew {
-			cfg.Rewrites = append(cfg.Rewrites, Rewrite{
+			cfg.Redirections = append(cfg.Redirections, Redirection{
 				Type:    rwType,
 				Find:    find,
 				Replace: replaceRow.Text(),
 			})
 		} else {
-			rewrite.Type = rwType
-			rewrite.Find = find
-			rewrite.Replace = replaceRow.Text()
+			redirection.Type = rwType
+			redirection.Find = find
+			redirection.Replace = replaceRow.Text()
 		}
 
 		saveConfig(cfg)

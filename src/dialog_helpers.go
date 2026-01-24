@@ -124,24 +124,24 @@ func getConditionTypeLabels() []string {
 	return []string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}
 }
 
-func rewriteTypeToIndex(rwType string) uint {
+func redirectionTypeToIndex(rwType string) uint {
 	switch rwType {
-	case "url":
+	case "pattern":
 		return 1
 	default:
 		return 0 // "domain" is default
 	}
 }
 
-func indexToRewriteType(index uint) string {
+func indexToRedirectionType(index uint) string {
 	switch index {
 	case 1:
-		return "url"
+		return "pattern"
 	default:
 		return "domain"
 	}
 }
 
-func getRewriteTypeLabels() []string {
-	return []string{"Domain", "URL"}
+func getRedirectionTypeLabels() []string {
+	return []string{"Domain", "Pattern"}
 }

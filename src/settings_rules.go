@@ -80,14 +80,14 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 
 	header := adw.NewHeaderBar()
 	header.SetShowEndTitleButtons(true)
-	titleLabel := gtk.NewLabel("Rules")
+	titleLabel := gtk.NewLabel("Browser Rules")
 	titleLabel.AddCSSClass("title")
 	header.SetTitleWidget(titleLabel)
 
 	// Add Rule button in header
 	addButton := gtk.NewButton()
 	addButton.SetIconName("list-add-symbolic")
-	addButton.SetTooltipText("Add New Rule")
+	addButton.SetTooltipText("Add Rule")
 	addButton.SetHasFrame(false)
 	header.PackEnd(addButton)
 
@@ -105,7 +105,7 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 	content.SetMarginBottom(12)
 
 	// Info banner
-	infoLabel := gtk.NewLabel("Rules are evaluated in order. First match wins.")
+	infoLabel := gtk.NewLabel("Rules route links to browsers. First match wins.")
 	infoLabel.SetWrap(true)
 	infoLabel.SetXAlign(0)
 	infoLabel.AddCSSClass("dim-label")
@@ -122,8 +122,8 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 	// Empty state
 	emptyState := adw.NewStatusPage()
 	emptyState.SetIconName("list-add-symbolic")
-	emptyState.SetTitle("No Rules")
-	emptyState.SetDescription("Add rules to automatically route URLs to specific browsers")
+	emptyState.SetTitle("No Browser Rules")
+	emptyState.SetDescription("Add rules to automatically open links in specific browsers")
 	emptyState.SetVExpand(true)
 
 	// Helper to get browser name from ID

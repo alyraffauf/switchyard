@@ -29,7 +29,7 @@ func TestWildcardToRegex(t *testing.T) {
 	}
 }
 
-func TestApplyDomainRewrite(t *testing.T) {
+func TestApplyDomainRedirection(t *testing.T) {
 	tests := []struct {
 		name    string
 		url     string
@@ -90,16 +90,16 @@ func TestApplyDomainRewrite(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := Rewrite{Type: "domain", Find: tt.find, Replace: tt.replace}
-			got := applyRewrite(tt.url, r)
+			r := Redirection{Type: "domain", Find: tt.find, Replace: tt.replace}
+			got := applyRedirection(tt.url, r)
 			if got != tt.want {
-				t.Errorf("applyRewrite() = %q, want %q", got, tt.want)
+				t.Errorf("applyRedirection() = %q, want %q", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestApplyURLRewrite(t *testing.T) {
+func TestApplyPatternRedirection(t *testing.T) {
 	tests := []struct {
 		name    string
 		url     string
@@ -160,58 +160,58 @@ func TestApplyURLRewrite(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := Rewrite{Type: "url", Find: tt.find, Replace: tt.replace}
-			got := applyRewrite(tt.url, r)
+			r := Redirection{Type: "pattern", Find: tt.find, Replace: tt.replace}
+			got := applyRedirection(tt.url, r)
 			if got != tt.want {
-				t.Errorf("applyRewrite() = %q, want %q", got, tt.want)
+				t.Errorf("applyRedirection() = %q, want %q", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestApplyRewriteDefaultType(t *testing.T) {
+func TestApplyRedirectionDefaultType(t *testing.T) {
 	// Empty type should default to domain
-	r := Rewrite{Find: "reddit.com", Replace: "old.reddit.com"}
-	got := applyRewrite("https://reddit.com/r/test", r)
+	r := Redirection{Find: "reddit.com", Replace: "old.reddit.com"}
+	got := applyRedirection("https://reddit.com/r/test", r)
 	want := "https://old.reddit.com/r/test"
 	if got != want {
-		t.Errorf("applyRewrite() with empty type = %q, want %q", got, want)
+		t.Errorf("applyRedirection() with empty type = %q, want %q", got, want)
 	}
 
 	// Should not match subdomain with default type
-	got = applyRewrite("https://old.reddit.com/r/test", r)
+	got = applyRedirection("https://old.reddit.com/r/test", r)
 	want = "https://old.reddit.com/r/test"
 	if got != want {
-		t.Errorf("applyRewrite() should not match subdomain = %q, want %q", got, want)
+		t.Errorf("applyRedirection() should not match subdomain = %q, want %q", got, want)
 	}
 }
 
-func TestApplyRewrites(t *testing.T) {
+func TestApplyRedirections(t *testing.T) {
 	tests := []struct {
-		name     string
-		url      string
-		rewrites []Rewrite
-		want     string
+		name         string
+		url          string
+		redirections []Redirection
+		want         string
 	}{
 		{
-			name: "domain then url rewrite",
+			name: "domain then pattern redirection",
 			url:  "https://twitter.com/user?utm_source=share",
-			rewrites: []Rewrite{
+			redirections: []Redirection{
 				{Type: "domain", Find: "twitter.com", Replace: "nitter.net"},
-				{Type: "url", Find: "?utm_source=*", Replace: ""},
+				{Type: "pattern", Find: "?utm_source=*", Replace: ""},
 			},
 			want: "https://nitter.net/user",
 		},
 		{
-			name:     "empty rewrites list",
-			url:      "https://example.com",
-			rewrites: []Rewrite{},
-			want:     "https://example.com",
+			name:         "empty redirections list",
+			url:          "https://example.com",
+			redirections: []Redirection{},
+			want:         "https://example.com",
 		},
 		{
-			name: "chained domain rewrites",
+			name: "chained domain redirections",
 			url:  "https://x.com/user",
-			rewrites: []Rewrite{
+			redirections: []Redirection{
 				{Type: "domain", Find: "x.com", Replace: "twitter.com"},
 				{Type: "domain", Find: "twitter.com", Replace: "nitter.net"},
 			},
@@ -221,62 +221,62 @@ func TestApplyRewrites(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := applyRewrites(tt.url, tt.rewrites)
+			got := applyRedirections(tt.url, tt.redirections)
 			if got != tt.want {
-				t.Errorf("applyRewrites() = %q, want %q", got, tt.want)
+				t.Errorf("applyRedirections() = %q, want %q", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestValidateRewrite(t *testing.T) {
+func TestValidateRedirection(t *testing.T) {
 	tests := []struct {
-		name    string
-		rewrite Rewrite
-		wantErr bool
+		name        string
+		redirection Redirection
+		wantErr     bool
 	}{
 		{
-			name:    "valid domain rewrite",
-			rewrite: Rewrite{Type: "domain", Find: "reddit.com", Replace: "old.reddit.com"},
-			wantErr: false,
+			name:        "valid domain redirection",
+			redirection: Redirection{Type: "domain", Find: "reddit.com", Replace: "old.reddit.com"},
+			wantErr:     false,
 		},
 		{
-			name:    "valid domain rewrite default type",
-			rewrite: Rewrite{Find: "twitter.com", Replace: "nitter.net"},
-			wantErr: false,
+			name:        "valid domain redirection default type",
+			redirection: Redirection{Find: "twitter.com", Replace: "nitter.net"},
+			wantErr:     false,
 		},
 		{
-			name:    "valid url rewrite with wildcard",
-			rewrite: Rewrite{Type: "url", Find: "utm_*", Replace: ""},
-			wantErr: false,
+			name:        "valid pattern redirection with wildcard",
+			redirection: Redirection{Type: "pattern", Find: "utm_*", Replace: ""},
+			wantErr:     false,
 		},
 		{
-			name:    "domain rewrite with wildcard invalid",
-			rewrite: Rewrite{Type: "domain", Find: "*.reddit.com", Replace: "old.reddit.com"},
-			wantErr: true,
+			name:        "domain redirection with wildcard invalid",
+			redirection: Redirection{Type: "domain", Find: "*.reddit.com", Replace: "old.reddit.com"},
+			wantErr:     true,
 		},
 		{
-			name:    "empty find pattern",
-			rewrite: Rewrite{Type: "domain", Find: "", Replace: "something"},
-			wantErr: true,
+			name:        "empty find pattern",
+			redirection: Redirection{Type: "domain", Find: "", Replace: "something"},
+			wantErr:     true,
 		},
 		{
-			name:    "empty replace is valid",
-			rewrite: Rewrite{Type: "url", Find: "tracking", Replace: ""},
-			wantErr: false,
+			name:        "empty replace is valid",
+			redirection: Redirection{Type: "pattern", Find: "tracking", Replace: ""},
+			wantErr:     false,
 		},
 		{
-			name:    "invalid rewrite type",
-			rewrite: Rewrite{Type: "invalid", Find: "test", Replace: ""},
-			wantErr: true,
+			name:        "invalid redirection type",
+			redirection: Redirection{Type: "invalid", Find: "test", Replace: ""},
+			wantErr:     true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validateRewrite(tt.rewrite)
+			err := validateRedirection(tt.redirection)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("validateRewrite() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("validateRedirection() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
