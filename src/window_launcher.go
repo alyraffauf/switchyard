@@ -11,7 +11,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/pango"
 )
 
-func showPickerWindow(app *adw.Application, url string, browsers []*Browser, cfg *Config) {
+func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, cfg *Config) {
 
 	// Filter hidden_browsers from the list
 	hiddenSet := make(map[string]bool)
@@ -243,7 +243,7 @@ func showPickerWindow(app *adw.Application, url string, browsers []*Browser, cfg
 	win.AddController(keyController)
 
 	// Set up action handlers
-	actionGroup := setupPickerActions(win, app, filteredBrowsers, url, func() { win.Close() })
+	actionGroup := setupLauncherActions(win, app, filteredBrowsers, url, func() { win.Close() })
 	win.InsertActionGroup("win", actionGroup)
 
 	win.Present()

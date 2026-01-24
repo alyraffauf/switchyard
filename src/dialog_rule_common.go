@@ -124,7 +124,7 @@ func buildRuleDialogContent(
 	actionGroup.SetDescription("Select which browser opens matching URLs")
 
 	alwaysAskRow = adw.NewSwitchRow()
-	alwaysAskRow.SetTitle("Always show picker")
+	alwaysAskRow.SetTitle("Always show launcher")
 	alwaysAskRow.SetSubtitle("Ask which browser to use each time")
 	if initialRule != nil {
 		alwaysAskRow.SetActive(initialRule.AlwaysAsk)

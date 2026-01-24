@@ -33,7 +33,7 @@ func showBrowserActionsMenu(btn *gtk.Button, browser *Browser, url string) {
 func showShortcutsDialog(parent *adw.Window) {
 	dialog := adw.NewAlertDialog(
 		"Keyboard Shortcuts",
-		"Ctrl+1 through Ctrl+9: Select browser 1-9\nEsc: Close picker window",
+		"Ctrl+1 through Ctrl+9: Select browser 1-9\nEsc: Close launcher",
 	)
 
 	dialog.AddResponse("ok", "OK")
@@ -43,7 +43,7 @@ func showShortcutsDialog(parent *adw.Window) {
 	dialog.Present(parent)
 }
 
-func setupPickerActions(win *adw.Window, app *adw.Application, browsers []*Browser, url string, onClose func()) *gio.SimpleActionGroup {
+func setupLauncherActions(win *adw.Window, app *adw.Application, browsers []*Browser, url string, onClose func()) *gio.SimpleActionGroup {
 	actionGroup := gio.NewSimpleActionGroup()
 
 	settingsAction := gio.NewSimpleAction("settings", nil)

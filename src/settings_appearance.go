@@ -23,20 +23,20 @@ func createAppearancePage(win *adw.Window, cfg *Config) gtk.Widgetter {
 
 	content.Append(appearanceGroup)
 
-	// Picker Window section
-	pickerGroup := adw.NewPreferencesGroup()
-	pickerGroup.SetTitle("Picker Window")
+	// Launcher section
+	launcherGroup := adw.NewPreferencesGroup()
+	launcherGroup.SetTitle("Launcher")
 
 	showNamesRow := adw.NewSwitchRow()
 	showNamesRow.SetTitle("Show browser names")
 	showNamesRow.SetSubtitle("Show browser names below icons")
 	showNamesRow.SetActive(cfg.ShowAppNames)
-	pickerGroup.Add(showNamesRow)
+	launcherGroup.Add(showNamesRow)
 
 	// Hidden browsers row
 	hiddenBrowsersRow := adw.NewActionRow()
 	hiddenBrowsersRow.SetTitle("Hidden browsers")
-	hiddenBrowsersRow.SetSubtitle("Choose which browsers to hide from the picker")
+	hiddenBrowsersRow.SetSubtitle("Hide browsers you don't use")
 	hiddenBrowsersRow.SetActivatable(true)
 
 	chevron := gtk.NewImageFromIconName("go-next-symbolic")
@@ -46,9 +46,9 @@ func createAppearancePage(win *adw.Window, cfg *Config) gtk.Widgetter {
 		showHiddenBrowsersDialog(win, cfg, browsers)
 	})
 
-	pickerGroup.Add(hiddenBrowsersRow)
+	launcherGroup.Add(hiddenBrowsersRow)
 
-	content.Append(pickerGroup)
+	content.Append(launcherGroup)
 
 	// Connect change handlers
 	forceDarkRow.Connect("notify::active", func() {

@@ -67,8 +67,8 @@ pattern = "amazon"
 
 ## Settings
 
-- **prompt_on_click**: Show picker when no rule matches (default: true).
-- **favorite_browser**: Favorite browser that always appears first in picker and is used as fallback when picker is disabled.
+- **prompt_on_click**: Show launcher when no rule matches (default: true).
+- **favorite_browser**: Favorite browser that always appears first in launcher and is used as fallback when launcher is disabled.
 - **check_default_browser**: Prompt to set Switchyard as system default browser on startup (default: true).
 
 ## Rules

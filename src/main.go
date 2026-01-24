@@ -117,8 +117,8 @@ func handleSwitchyardURL(app *adw.Application, rawURL string) {
 				return
 			}
 		}
-		// No preferred browser found - show picker
-		showPickerWindow(app, sanitized, browsers, cfg)
+		// No preferred browser found - show launcher
+		showLauncherWindow(app, sanitized, browsers, cfg)
 		return
 	}
 
@@ -135,7 +135,7 @@ func handleURL(app *adw.Application, cfg *Config, urlStr string) {
 	if matched {
 		// Check if rule has AlwaysAsk enabled
 		if alwaysAsk {
-			showPickerWindow(app, urlStr, browsers, cfg)
+			showLauncherWindow(app, urlStr, browsers, cfg)
 			return
 		}
 
@@ -156,6 +156,5 @@ func handleURL(app *adw.Application, cfg *Config, urlStr string) {
 		}
 	}
 
-	// Show picker
-	showPickerWindow(app, urlStr, browsers, cfg)
+	showLauncherWindow(app, urlStr, browsers, cfg)
 }

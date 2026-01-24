@@ -10,7 +10,7 @@ import (
 func showHiddenBrowsersDialog(parent *adw.Window, cfg *Config, browsers []*Browser) {
 	dialog := adw.NewAlertDialog(
 		"Hidden Browsers",
-		"Select browsers to hide from the picker window. Hidden browsers won't appear in the picker, but can still be used in rules and settings.",
+		"You can still use hidden browsers in rules.",
 	)
 
 	// Create a scrolled window for the browser list

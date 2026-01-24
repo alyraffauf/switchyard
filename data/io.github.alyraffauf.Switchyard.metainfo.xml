@@ -64,7 +64,7 @@
             <p>This release comes with the following improvements:</p>
             <ul>
             <li>Added switchyard:// custom URI scheme.</li>
-            <li>Fixed crashes for hamburger menu in browser picker.</li>
+            <li>Fixed crashes for hamburger menu in browser launcher.</li>
             </ul>
         </description>
         </release>

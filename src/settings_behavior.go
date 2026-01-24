@@ -21,7 +21,7 @@ func createBehaviorPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.W
 	behaviorGroup.Add(checkDefaultRow)
 
 	promptRow := adw.NewSwitchRow()
-	promptRow.SetTitle("Show picker when no rule matches")
+	promptRow.SetTitle("Show launcher when no rule matches")
 	promptRow.SetSubtitle("Let you choose a browser for unmatched URLs")
 	promptRow.SetActive(cfg.PromptOnClick)
 	behaviorGroup.Add(promptRow)
@@ -36,7 +36,7 @@ func createBehaviorPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.W
 
 	defaultRow := adw.NewComboRow()
 	defaultRow.SetTitle("Favorite browser")
-	defaultRow.SetSubtitle("Appears first in picker and opens when picker is disabled")
+	defaultRow.SetSubtitle("Shown first in launcher; used for all links when launcher is disabled")
 	defaultRow.SetModel(browserList)
 
 	// Set initial selection
