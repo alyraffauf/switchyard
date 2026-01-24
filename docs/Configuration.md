@@ -79,7 +79,7 @@ Rules define how URLs are routed to browsers. Each rule has conditions that dete
 - **conditions**: Array of conditions to match (see below).
 - **logic**: How to combine conditions: `all` (AND) or `any` (OR). Default: `all`.
 - **browser**: [Desktop file ID](https://specifications.freedesktop.org/desktop-entry-spec/latest/) of the target browser (e.g. `firefox.desktop`, `com.google.Chrome.desktop`).
-- **always_ask**: If true, show browser picker instead of auto-opening (default: false).
+- **always_ask**: If true, show browser launcher instead of auto-opening (default: false).
 
 ## Conditions
 
