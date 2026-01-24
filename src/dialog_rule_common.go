@@ -187,6 +187,22 @@ func createConditionRow(
 	typeDropdown.SetSizeRequest(150, -1) // Fixed width for consistent alignment
 	conditionContainer.Append(typeDropdown)
 
+	// Negate dropdown (is / is not)
+	negateDropdown := gtk.NewDropDown(
+		gtk.NewStringList([]string{"is", "is not"}),
+		nil,
+	)
+	if (*conditions)[condIdx].Negate {
+		negateDropdown.SetSelected(1)
+	} else {
+		negateDropdown.SetSelected(0)
+	}
+	negateDropdown.SetVAlign(gtk.AlignCenter)
+	negateDropdown.Connect("notify::selected", func() {
+		(*conditions)[condIdx].Negate = negateDropdown.Selected() == 1
+	})
+	conditionContainer.Append(negateDropdown)
+
 	// Pattern entry
 	patternEntry := gtk.NewEntry()
 	patternEntry.SetText((*conditions)[condIdx].Pattern)
