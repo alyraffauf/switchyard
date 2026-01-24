@@ -93,10 +93,7 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 
 	toolbarView.AddTopBar(header)
 
-	// Scrolled window for rules list
-	scrolled := gtk.NewScrolledWindow()
-	scrolled.SetVExpand(true)
-	scrolled.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
+	scrolled := createScrolledWindow()
 
 	content := gtk.NewBox(gtk.OrientationVertical, 12)
 	content.SetMarginStart(12)
@@ -114,17 +111,8 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 	infoLabel.SetMarginBottom(6)
 	content.Append(infoLabel)
 
-	// Rules list
-	rulesListBox := gtk.NewListBox()
-	rulesListBox.SetSelectionMode(gtk.SelectionNone)
-	rulesListBox.AddCSSClass("boxed-list")
-
-	// Empty state
-	emptyState := adw.NewStatusPage()
-	emptyState.SetIconName("list-add-symbolic")
-	emptyState.SetTitle("No Browser Rules")
-	emptyState.SetDescription("Add rules to automatically open links in specific browsers")
-	emptyState.SetVExpand(true)
+	rulesListBox := createBoxedListBox()
+	emptyState := createEmptyState("list-add-symbolic", "No Browser Rules", "Add rules to automatically open links in specific browsers")
 
 	// Helper to get browser name from ID
 	getBrowserName := func(id string) string {
@@ -227,14 +215,7 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 	}
 
 	rebuildRulesList = func() {
-		// Remove all children
-		for {
-			child := rulesListBox.FirstChild()
-			if child == nil {
-				break
-			}
-			rulesListBox.Remove(child)
-		}
+		clearListBox(rulesListBox)
 
 		// Show/hide empty state vs rules list
 		if len(cfg.Rules) == 0 {

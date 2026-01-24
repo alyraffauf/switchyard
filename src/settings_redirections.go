@@ -52,10 +52,7 @@ func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 
 	toolbarView.AddTopBar(header)
 
-	// Scrolled window for redirections list
-	scrolled := gtk.NewScrolledWindow()
-	scrolled.SetVExpand(true)
-	scrolled.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
+	scrolled := createScrolledWindow()
 
 	content := gtk.NewBox(gtk.OrientationVertical, 12)
 	content.SetMarginStart(12)
@@ -73,15 +70,8 @@ func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	infoLabel.SetMarginBottom(6)
 	content.Append(infoLabel)
 
-	redirectionsListBox := gtk.NewListBox()
-	redirectionsListBox.SetSelectionMode(gtk.SelectionNone)
-	redirectionsListBox.AddCSSClass("boxed-list")
-
-	emptyState := adw.NewStatusPage()
-	emptyState.SetIconName("edit-find-replace-symbolic")
-	emptyState.SetTitle("No Redirections")
-	emptyState.SetDescription("Change links before they open in a browser")
-	emptyState.SetVExpand(true)
+	redirectionsListBox := createBoxedListBox()
+	emptyState := createEmptyState("edit-find-replace-symbolic", "No Redirections", "Change links before they open in a browser")
 
 	var rebuildRedirectionsList func()
 
@@ -157,13 +147,7 @@ func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	}
 
 	rebuildRedirectionsList = func() {
-		for {
-			child := redirectionsListBox.FirstChild()
-			if child == nil {
-				break
-			}
-			redirectionsListBox.Remove(child)
-		}
+		clearListBox(redirectionsListBox)
 
 		// handle empty state
 		if len(cfg.Redirections) == 0 {

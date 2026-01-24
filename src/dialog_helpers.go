@@ -40,9 +40,7 @@ func dialogWithToolbar(title string, width, height int, header *adw.HeaderBar) (
 	toolbarView := adw.NewToolbarView()
 	toolbarView.AddTopBar(header)
 
-	scrolledWindow := gtk.NewScrolledWindow()
-	scrolledWindow.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
-	scrolledWindow.SetVExpand(true)
+	scrolledWindow := createScrolledWindow()
 
 	content := gtk.NewBox(gtk.OrientationVertical, 18)
 	content.SetMarginStart(18)
