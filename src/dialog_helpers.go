@@ -112,18 +112,6 @@ func indexToConditionType(index uint) string {
 	}
 }
 
-func conditionTypeComboRow(title string, initialType string) *adw.ComboRow {
-	typeRow := adw.NewComboRow()
-	typeRow.SetTitle(title)
-	typeRow.SetModel(gtk.NewStringList([]string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}))
-	typeRow.SetSelected(conditionTypeToIndex(initialType))
-	return typeRow
-}
-
-func getConditionTypeLabels() []string {
-	return []string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}
-}
-
 func redirectionTypeToIndex(rwType string) uint {
 	switch rwType {
 	case "wildcard":
