@@ -40,9 +40,7 @@ func dialogWithToolbar(title string, width, height int, header *adw.HeaderBar) (
 	toolbarView := adw.NewToolbarView()
 	toolbarView.AddTopBar(header)
 
-	scrolledWindow := gtk.NewScrolledWindow()
-	scrolledWindow.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
-	scrolledWindow.SetVExpand(true)
+	scrolledWindow := createScrolledWindow()
 
 	content := gtk.NewBox(gtk.OrientationVertical, 18)
 	content.SetMarginStart(18)
@@ -112,14 +110,28 @@ func indexToConditionType(index uint) string {
 	}
 }
 
-func conditionTypeComboRow(title string, initialType string) *adw.ComboRow {
-	typeRow := adw.NewComboRow()
-	typeRow.SetTitle(title)
-	typeRow.SetModel(gtk.NewStringList([]string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}))
-	typeRow.SetSelected(conditionTypeToIndex(initialType))
-	return typeRow
+func redirectionTypeToIndex(rwType string) uint {
+	switch rwType {
+	case "wildcard":
+		return 1
+	case "regex":
+		return 2
+	default:
+		return 0 // "domain" is default
+	}
 }
 
-func getConditionTypeLabels() []string {
-	return []string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}
+func indexToRedirectionType(index uint) string {
+	switch index {
+	case 1:
+		return "wildcard"
+	case 2:
+		return "regex"
+	default:
+		return "domain"
+	}
+}
+
+func getRedirectionTypeLabels() []string {
+	return []string{"Domain", "Wildcard", "Regex"}
 }

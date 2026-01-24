@@ -117,8 +117,13 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 	behaviorRow.AddPrefix(gtk.NewImageFromIconName("preferences-system-symbolic"))
 	listBox.Append(behaviorRow)
 
+	redirectionsRow := adw.NewActionRow()
+	redirectionsRow.SetTitle("Link Redirections")
+	redirectionsRow.AddPrefix(gtk.NewImageFromIconName("edit-find-replace-symbolic"))
+	listBox.Append(redirectionsRow)
+
 	rulesRow := adw.NewActionRow()
-	rulesRow.SetTitle("Rules")
+	rulesRow.SetTitle("Browser Rules")
 	rulesRow.AddPrefix(gtk.NewImageFromIconName("view-list-symbolic"))
 	listBox.Append(rulesRow)
 
@@ -126,6 +131,12 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 	advancedRow.SetTitle("Advanced")
 	advancedRow.AddPrefix(gtk.NewImageFromIconName("preferences-other-symbolic"))
 	listBox.Append(advancedRow)
+
+	listBox.SetHeaderFunc(func(row, before *gtk.ListBoxRow) {
+		if row.Index() == 2 || row.Index() == 4 {
+			row.SetHeader(gtk.NewSeparator(gtk.OrientationHorizontal))
+		}
+	})
 
 	scrolled.SetChild(listBox)
 	toolbarView.SetContent(scrolled)
@@ -145,9 +156,12 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 			page = createBehaviorPage(win, browsers, cfg)
 			title = "Behavior"
 		case 2:
-			page = createRulesPage(win, browsers, cfg)
-			title = "Rules"
+			page = createRedirectionsPage(win, cfg)
+			title = "Link Redirections"
 		case 3:
+			page = createRulesPage(win, browsers, cfg)
+			title = "Browser Rules"
+		case 4:
 			page = createAdvancedPage(win, cfg)
 			title = "Advanced"
 		}
@@ -193,6 +207,7 @@ func watchConfigFile(cfg *Config, onChange func()) {
 					cfg.ShowAppNames = newCfg.ShowAppNames
 					cfg.ForceDarkMode = newCfg.ForceDarkMode
 					cfg.HiddenBrowsers = newCfg.HiddenBrowsers
+					cfg.Redirections = newCfg.Redirections
 					cfg.Rules = newCfg.Rules
 
 					if onChange != nil {

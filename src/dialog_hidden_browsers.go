@@ -13,16 +13,10 @@ func showHiddenBrowsersDialog(parent *adw.Window, cfg *Config, browsers []*Brows
 		"You can still use hidden browsers in rules.",
 	)
 
-	// Create a scrolled window for the browser list
-	scrolled := gtk.NewScrolledWindow()
-	scrolled.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
-	scrolled.SetVExpand(true)
+	scrolled := createScrolledWindow()
 	scrolled.SetSizeRequest(400, 300)
 
-	// Create a list box for browsers
-	listBox := gtk.NewListBox()
-	listBox.SetSelectionMode(gtk.SelectionNone)
-	listBox.AddCSSClass("boxed-list")
+	listBox := createBoxedListBox()
 
 	// Create a map for quick lookup of hidden browsers
 	hiddenSet := make(map[string]bool)

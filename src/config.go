@@ -13,13 +13,21 @@ import (
 )
 
 type Config struct {
-	PromptOnClick       bool     `toml:"prompt_on_click"`
-	FavoriteBrowser     string   `toml:"favorite_browser"`
-	HiddenBrowsers      []string `toml:"hidden_browsers"`
-	CheckDefaultBrowser bool     `toml:"check_default_browser"`
-	ShowAppNames        bool     `toml:"show_app_names"`
-	ForceDarkMode       bool     `toml:"force_dark_mode"`
-	Rules               []Rule   `toml:"rules"`
+	PromptOnClick       bool          `toml:"prompt_on_click"`
+	FavoriteBrowser     string        `toml:"favorite_browser"`
+	HiddenBrowsers      []string      `toml:"hidden_browsers"`
+	CheckDefaultBrowser bool          `toml:"check_default_browser"`
+	ShowAppNames        bool          `toml:"show_app_names"`
+	ForceDarkMode       bool          `toml:"force_dark_mode"`
+	Redirections        []Redirection `toml:"redirections,omitempty"`
+	Rules               []Rule        `toml:"rules"`
+}
+
+type Redirection struct {
+	Name    string `toml:"name,omitempty"`
+	Type    string `toml:"type,omitempty"` // "domain", "wildcard", or "regex", defaults to "domain"
+	Find    string `toml:"find"`
+	Replace string `toml:"replace"`
 }
 
 type Condition struct {

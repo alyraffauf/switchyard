@@ -56,6 +56,11 @@ func main() {
 			cmd.Start()
 			return
 		}
+
+		if len(cfg.Redirections) > 0 {
+			sanitized = applyRedirections(sanitized, cfg.Redirections)
+		}
+
 		handleURL(app, browsers, cfg, sanitized)
 	})
 
@@ -99,6 +104,10 @@ func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config,
 		cmd := hostCommand("xdg-open", targetURL)
 		cmd.Start()
 		return
+	}
+
+	if len(cfg.Redirections) > 0 {
+		sanitized = applyRedirections(sanitized, cfg.Redirections)
 	}
 
 	// If browser preferences specified, try each in order

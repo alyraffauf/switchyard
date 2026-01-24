@@ -32,10 +32,10 @@
 
   <description>
     <p>
-      Work links in Chrome. Personal links in Firefox. Switchyard automatically routes URLs to the right browser based on your rules.
+      Switchyard puts you in control of where links open and what they open. Work links go to Chrome, personal links to Firefox. You decide the rules.
     </p>
     <p>
-      Match URLs by domain, keyword, or regular expression. No matching rule? Choose your browser with a quick keystroke or mouse click.
+      Create rules using simple domain, keyword, wildcard, or regex matching. Combine conditions for precise control. Strip tracking parameters or redirect to privacy-friendly alternatives before links even open. Set it once and forget it.
     </p>
   </description>
 

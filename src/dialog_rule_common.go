@@ -54,9 +54,7 @@ func buildRuleDialogContent(
 	conditionsGroup.SetTitle("Conditions")
 	conditionsGroup.SetDescription("Define conditions to match URLs")
 
-	conditionsListBox := gtk.NewListBox()
-	conditionsListBox.SetSelectionMode(gtk.SelectionNone)
-	conditionsListBox.AddCSSClass("boxed-list")
+	conditionsListBox := createBoxedListBox()
 
 	// Logic selector row
 	logicRow = adw.NewComboRow()

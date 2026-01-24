@@ -145,3 +145,44 @@ func areAllConditionsValid(conditions []Condition) bool {
 	}
 	return true
 }
+
+func validateRedirection(r Redirection) error {
+	if r.Find == "" {
+		return fmt.Errorf("Find pattern cannot be empty")
+	}
+
+	rwType := r.Type
+	if rwType == "" {
+		rwType = "domain"
+	}
+
+	switch rwType {
+	case "domain":
+		return validateDomainPattern(r.Find)
+	case "wildcard":
+		pattern := wildcardToRegex(r.Find)
+		if _, err := regexp.Compile("(?i)" + pattern); err != nil {
+			return fmt.Errorf("Invalid pattern: %w", err)
+		}
+	case "regex":
+		if _, err := regexp.Compile(r.Find); err != nil {
+			return fmt.Errorf("Invalid regex: %w", err)
+		}
+	default:
+		return fmt.Errorf("Invalid redirection type: %s", rwType)
+	}
+	return nil
+}
+
+func isRedirectionValid(r Redirection) bool {
+	return validateRedirection(r) == nil
+}
+
+func areAllRedirectionsValid(redirections []Redirection) bool {
+	for _, r := range redirections {
+		if !isRedirectionValid(r) {
+			return false
+		}
+	}
+	return true
+}
