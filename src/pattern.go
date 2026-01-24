@@ -21,24 +21,30 @@ func getCompiledRegex(pattern string) (*regexp.Regexp, bool) {
 	return re, true
 }
 
-func matchesPattern(url, pattern, patternType string) bool {
+func matchesPattern(url, pattern, patternType string, negate bool) bool {
+	var result bool
 	switch patternType {
 	case "domain":
 		domain := extractDomain(url)
-		return strings.EqualFold(domain, pattern)
+		result = strings.EqualFold(domain, pattern)
 	case "keyword":
-		return strings.Contains(strings.ToLower(url), strings.ToLower(pattern))
+		result = strings.Contains(strings.ToLower(url), strings.ToLower(pattern))
 	case "regex":
 		re, ok := getCompiledRegex(pattern)
 		if !ok {
 			return false
 		}
-		return re.MatchString(url)
+		result = re.MatchString(url)
 	case "glob":
-		return matchGlob(url, pattern)
+		result = matchGlob(url, pattern)
 	default:
 		return false
 	}
+
+	if negate {
+		return !result
+	}
+	return result
 }
 
 // matchGlob performs glob-style pattern matching against a URL's domain or full URL
