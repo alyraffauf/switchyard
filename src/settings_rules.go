@@ -59,7 +59,7 @@ func getTypeLabel(patternType string) string {
 	}
 }
 
-func createRulesPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.Widgetter {
+func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widgetter {
 	toolbarView := adw.NewToolbarView()
 
 	header := adw.NewHeaderBar()

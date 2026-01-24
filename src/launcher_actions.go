@@ -48,7 +48,7 @@ func setupLauncherActions(win *adw.Window, app *adw.Application, browsers []*Bro
 
 	settingsAction := gio.NewSimpleAction("settings", nil)
 	settingsAction.ConnectActivate(func(p *glib.Variant) {
-		showSettingsWindow(app, loadConfig())
+		showSettingsWindow(app, browsers, loadConfig())
 	})
 	actionGroup.AddAction(settingsAction)
 

@@ -27,15 +27,17 @@ func main() {
 	app.ConnectActivate(func() {
 		cfg := loadConfig()
 		setupApp(cfg)
-		showSettingsWindow(app, cfg)
+		browsers := detectBrowsers()
+		showSettingsWindow(app, browsers, cfg)
 	})
 
 	app.ConnectOpen(func(files []gio.Filer, hint string) {
 		cfg := loadConfig()
 		setupApp(cfg)
+		browsers := detectBrowsers()
 
 		if len(files) == 0 {
-			showSettingsWindow(app, cfg)
+			showSettingsWindow(app, browsers, cfg)
 			return
 		}
 
@@ -43,7 +45,7 @@ func main() {
 
 		// Check if this is a switchyard:// URL
 		if u, err := url.Parse(rawURL); err == nil && u.Scheme == "switchyard" {
-			handleSwitchyardURL(app, rawURL)
+			handleSwitchyardURL(app, browsers, cfg, rawURL)
 			return
 		}
 
@@ -54,7 +56,7 @@ func main() {
 			cmd.Start()
 			return
 		}
-		handleURL(app, cfg, sanitized)
+		handleURL(app, browsers, cfg, sanitized)
 	})
 
 	if code := app.Run(os.Args); code > 0 {
@@ -83,9 +85,7 @@ func setupApp(cfg *Config) {
 }
 
 // handleSwitchyardURL processes switchyard:// URLs with browser preferences
-func handleSwitchyardURL(app *adw.Application, rawURL string) {
-	cfg := loadConfig()
-
+func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config, rawURL string) {
 	targetURL, browserPrefs, err := parseSwitchyardURL(rawURL)
 	if err != nil {
 		// Invalid switchyard URL - ignore
@@ -100,8 +100,6 @@ func handleSwitchyardURL(app *adw.Application, rawURL string) {
 		cmd.Start()
 		return
 	}
-
-	browsers := detectBrowsers()
 
 	// If browser preferences specified, try each in order
 	if len(browserPrefs) > 0 {
@@ -123,13 +121,11 @@ func handleSwitchyardURL(app *adw.Application, rawURL string) {
 	}
 
 	// No browser specified - use standard routing
-	handleURL(app, cfg, sanitized)
+	handleURL(app, browsers, cfg, sanitized)
 }
 
 // handleURL routes a URL to the appropriate browser based on rules
-func handleURL(app *adw.Application, cfg *Config, urlStr string) {
-	browsers := detectBrowsers()
-
+func handleURL(app *adw.Application, browsers []*Browser, cfg *Config, urlStr string) {
 	// Try to match a rule
 	browserID, alwaysAsk, matched := cfg.matchRule(urlStr)
 	if matched {

@@ -7,7 +7,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-func createBehaviorPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.Widgetter {
+func createBehaviorPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widgetter {
 	toolbarView, content, _ := settingsPageLayout("Behavior")
 
 	// General Behavior section

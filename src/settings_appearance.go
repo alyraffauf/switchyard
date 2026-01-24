@@ -7,8 +7,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-func createAppearancePage(win *adw.Window, cfg *Config) gtk.Widgetter {
-	browsers := detectBrowsers()
+func createAppearancePage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widgetter {
 	toolbarView, content, _ := settingsPageLayout("Appearance")
 
 	// General section

@@ -11,15 +11,13 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-func showSettingsWindow(app *adw.Application, cfg *Config) {
+func showSettingsWindow(app *adw.Application, browsers []*Browser, cfg *Config) {
 	win := adw.NewWindow()
 	win.SetTitle("Switchyard")
 	win.SetApplication(&app.Application)
 	win.SetDefaultSize(900, 600)
 	win.SetResizable(true)
 	win.SetSizeRequest(700, 500)
-
-	browsers := detectBrowsers()
 
 	setupAppActions(app, win)
 
@@ -34,7 +32,7 @@ func showSettingsWindow(app *adw.Application, cfg *Config) {
 	splitView.SetSidebar(sidebarPage)
 
 	// Initial content
-	contentPage := adw.NewNavigationPage(createAppearancePage(win, cfg), "Appearance")
+	contentPage := adw.NewNavigationPage(createAppearancePage(win, browsers, cfg), "Appearance")
 	splitView.SetContent(contentPage)
 
 	win.SetContent(splitView)
@@ -141,13 +139,13 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 
 		switch index {
 		case 0:
-			page = createAppearancePage(win, cfg)
+			page = createAppearancePage(win, browsers, cfg)
 			title = "Appearance"
 		case 1:
-			page = createBehaviorPage(win, cfg, browsers)
+			page = createBehaviorPage(win, browsers, cfg)
 			title = "Behavior"
 		case 2:
-			page = createRulesPage(win, cfg, browsers)
+			page = createRulesPage(win, browsers, cfg)
 			title = "Rules"
 		case 3:
 			page = createAdvancedPage(win, cfg)
