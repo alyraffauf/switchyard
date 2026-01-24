@@ -27,7 +27,7 @@ replace = 'old.reddit.com'
 [[redirections]]
 type = 'wildcard'
 find = '?utm_*'
-replace = '' 
+replace = ''
 
 # Browser rule with a single condition
 [[rules]]

@@ -96,6 +96,43 @@ func settingsPageLayout(title string) (*adw.ToolbarView, *gtk.Box, *adw.HeaderBa
 	return toolbarView, content, header
 }
 
+// createScrolledWindow creates a standard scrolled window for list content.
+func createScrolledWindow() *gtk.ScrolledWindow {
+	scrolled := gtk.NewScrolledWindow()
+	scrolled.SetVExpand(true)
+	scrolled.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
+	return scrolled
+}
+
+// createBoxedListBox creates a ListBox with standard boxed-list styling.
+func createBoxedListBox() *gtk.ListBox {
+	listBox := gtk.NewListBox()
+	listBox.SetSelectionMode(gtk.SelectionNone)
+	listBox.AddCSSClass("boxed-list")
+	return listBox
+}
+
+// createEmptyState creates a status page for empty list states.
+func createEmptyState(iconName, title, description string) *adw.StatusPage {
+	emptyState := adw.NewStatusPage()
+	emptyState.SetIconName(iconName)
+	emptyState.SetTitle(title)
+	emptyState.SetDescription(description)
+	emptyState.SetVExpand(true)
+	return emptyState
+}
+
+// clearListBox removes all children from a ListBox.
+func clearListBox(listBox *gtk.ListBox) {
+	for {
+		child := listBox.FirstChild()
+		if child == nil {
+			break
+		}
+		listBox.Remove(child)
+	}
+}
+
 // configFileFilters creates the standard file filter list for config import/export.
 func configFileFilters() *gio.ListStore {
 	tomlFilter := gtk.NewFileFilter()
