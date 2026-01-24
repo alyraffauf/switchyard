@@ -169,6 +169,69 @@ func TestApplyPatternRedirection(t *testing.T) {
 	}
 }
 
+func TestApplyRegexRedirection(t *testing.T) {
+	tests := []struct {
+		name    string
+		url     string
+		find    string
+		replace string
+		want    string
+	}{
+		{
+			name:    "youtube shorts to watch",
+			url:     "https://youtube.com/shorts/abc123xyz",
+			find:    "youtube\\.com/shorts/([^?]+)",
+			replace: "youtube.com/watch?v=$1",
+			want:    "https://youtube.com/watch?v=abc123xyz",
+		},
+		{
+			name:    "capture group replacement",
+			url:     "https://foo.example.com/123",
+			find:    "([a-z]+)\\.example\\.com/([0-9]+)",
+			replace: "new-$1.example.org/id/$2",
+			want:    "https://new-foo.example.org/id/123",
+		},
+		{
+			name:    "remove utm parameters",
+			url:     "https://example.com?utm_source=twitter&utm_medium=social&id=1",
+			find:    "[?&]utm_[a-z_]+=[^&]*",
+			replace: "",
+			want:    "https://example.com&id=1",
+		},
+		{
+			name:    "strip amazon tracking",
+			url:     "https://amazon.com/dp/B001234/ref=sr_1_1?keywords=test",
+			find:    "(amazon\\.[^/]+/dp/[^/]+).*",
+			replace: "$1",
+			want:    "https://amazon.com/dp/B001234",
+		},
+		{
+			name:    "no match returns original",
+			url:     "https://example.com/page",
+			find:    "nomatch",
+			replace: "replaced",
+			want:    "https://example.com/page",
+		},
+		{
+			name:    "empty replace removes match",
+			url:     "https://example.com/tracking/page",
+			find:    "/tracking",
+			replace: "",
+			want:    "https://example.com/page",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := Redirection{Type: "regex", Find: tt.find, Replace: tt.replace}
+			got := applyRedirection(tt.url, r)
+			if got != tt.want {
+				t.Errorf("applyRedirection() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestApplyRedirectionDefaultType(t *testing.T) {
 	// Empty type should default to domain
 	r := Redirection{Find: "reddit.com", Replace: "old.reddit.com"}
@@ -269,6 +332,26 @@ func TestValidateRedirection(t *testing.T) {
 			name:        "invalid redirection type",
 			redirection: Redirection{Type: "invalid", Find: "test", Replace: ""},
 			wantErr:     true,
+		},
+		{
+			name:        "valid regex redirection",
+			redirection: Redirection{Type: "regex", Find: "youtube\\.com/shorts/([^?]+)", Replace: "youtube.com/watch?v=$1"},
+			wantErr:     false,
+		},
+		{
+			name:        "valid regex with capture groups",
+			redirection: Redirection{Type: "regex", Find: "([a-z]+)\\.example\\.com", Replace: "$1.newsite.com"},
+			wantErr:     false,
+		},
+		{
+			name:        "invalid regex syntax",
+			redirection: Redirection{Type: "regex", Find: "[invalid(regex", Replace: ""},
+			wantErr:     true,
+		},
+		{
+			name:        "regex with empty replace is valid",
+			redirection: Redirection{Type: "regex", Find: "[?&]utm_[^&]*", Replace: ""},
+			wantErr:     false,
 		},
 	}
 

@@ -128,6 +128,8 @@ func redirectionTypeToIndex(rwType string) uint {
 	switch rwType {
 	case "pattern":
 		return 1
+	case "regex":
+		return 2
 	default:
 		return 0 // "domain" is default
 	}
@@ -137,11 +139,13 @@ func indexToRedirectionType(index uint) string {
 	switch index {
 	case 1:
 		return "pattern"
+	case 2:
+		return "regex"
 	default:
 		return "domain"
 	}
 }
 
 func getRedirectionTypeLabels() []string {
-	return []string{"Domain", "Pattern"}
+	return []string{"Domain", "Pattern", "Regex"}
 }

@@ -164,6 +164,10 @@ func validateRedirection(r Redirection) error {
 		if _, err := regexp.Compile("(?i)" + pattern); err != nil {
 			return fmt.Errorf("Invalid pattern: %w", err)
 		}
+	case "regex":
+		if _, err := regexp.Compile(r.Find); err != nil {
+			return fmt.Errorf("Invalid regex: %w", err)
+		}
 	default:
 		return fmt.Errorf("Invalid redirection type: %s", rwType)
 	}

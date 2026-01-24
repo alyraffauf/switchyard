@@ -16,10 +16,15 @@ func formatRedirectionSubtitle(r *Redirection) string {
 	}
 
 	var typeLabel string
-	if rwType == "domain" {
+	switch rwType {
+	case "domain":
 		typeLabel = "Domain"
-	} else {
+	case "pattern":
 		typeLabel = "Pattern"
+	case "regex":
+		typeLabel = "Regex"
+	default:
+		typeLabel = "Domain"
 	}
 
 	if r.Replace == "" {

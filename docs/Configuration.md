@@ -11,88 +11,88 @@ Switchyard can be configured through its settings UI or by editing the config fi
 
 ```toml
 prompt_on_click = true
-favorite_browser = ""
+favorite_browser = ''
 check_default_browser = true
 
 # Link redirections (domain type is default)
 [[redirections]]
-find = "x.com"
-replace = "twitter.com"
+find = 'x.com'
+replace = 'twitter.com'
 
 [[redirections]]
-find = "reddit.com"
-replace = "old.reddit.com"
+find = 'reddit.com'
+replace = 'old.reddit.com'
 
 # Pattern redirection to remove query parameters
 [[redirections]]
-type = "pattern"
-find = "?utm_*"
-replace = "" 
+type = 'pattern'
+find = '?utm_*'
+replace = '' 
 
 # Browser rule with a single condition
 [[rules]]
-name = "Work GitHub"
-browser = "firefox.desktop"
+name = 'Work GitHub'
+browser = 'firefox.desktop'
 
 [[rules.conditions]]
-type = "domain"
-pattern = "github.com"
+type = 'domain'
+pattern = 'github.com'
 
 # Multi-condition rule with AND logic
 [[rules]]
-name = "Google Docs"
-logic = "all"  # all conditions must match
-browser = "google-chrome.desktop"
+name = 'Google Docs'
+logic = 'all'  # all conditions must match
+browser = 'google-chrome.desktop'
 
 [[rules.conditions]]
-type = "domain"
-pattern = "docs.google.com"
+type = 'domain'
+pattern = 'docs.google.com'
 
 [[rules.conditions]]
-type = "keyword"
-pattern = "edit"
+type = 'keyword'
+pattern = 'edit'
 
 # Multi-condition rule with OR logic
 [[rules]]
-name = "Video Sites"
-logic = "any"  # any condition can match
-browser = "brave-browser.desktop"
+name = 'Video Sites'
+logic = 'any'  # any condition can match
+browser = 'brave-browser.desktop'
 
 [[rules.conditions]]
-type = "domain"
-pattern = "youtube.com"
+type = 'domain'
+pattern = 'youtube.com'
 
 [[rules.conditions]]
-type = "domain"
-pattern = "vimeo.com"
+type = 'domain'
+pattern = 'vimeo.com'
 
 [[rules.conditions]]
-type = "domain"
-pattern = "twitch.tv"
+type = 'domain'
+pattern = 'twitch.tv'
 
 # Rule with negated condition
 [[rules]]
-name = "GitHub (not Gist)"
-logic = "all"
-browser = "firefox.desktop"
+name = 'GitHub (not Gist)'
+logic = 'all'
+browser = 'firefox.desktop'
 
 [[rules.conditions]]
-type = "glob"
-pattern = "*.github.com"
+type = 'glob'
+pattern = '*.github.com'
 
 [[rules.conditions]]
-type = "domain"
-pattern = "gist.github.com"
+type = 'domain'
+pattern = 'gist.github.com'
 negate = true  # URL must NOT match this pattern
 
 # Rule with always ask
 [[rules]]
-name = "Shopping Sites"
+name = 'Shopping Sites'
 always_ask = true
 
 [[rules.conditions]]
-type = "keyword"
-pattern = "amazon"
+type = 'keyword'
+pattern = 'amazon'
 ```
 
 ## Settings
@@ -135,38 +135,49 @@ Use `all` for precise targeting (e.g., "docs.google.com AND contains 'edit'") an
 
 ## Link Redirections
 
-Link redirections modify URLs before browser rules are evaluated. There are two types:
+Link redirections modify URLs before browser rules are evaluated.
 
-- **type**: `domain` (default) or `pattern`.
+- **type**: `domain` (default), `pattern`, or `regex`.
 - **find**: Pattern to match.
 - **replace**: Text to replace with. Leave empty to remove matches.
 
 ### Redirection Types
 
-**Domain** redirections match the exact hostname. Use this to switch between sites:
+**Domain** redirections match the exact hostname, including the ports (if any). Use this to switch between sites:
 
 ```toml
 [[redirections]]
-find = "reddit.com"
-replace = "old.reddit.com"
+find = 'reddit.com'
+replace = 'old.reddit.com'
 
 [[redirections]]
-find = "x.com"
-replace = "twitter.com"
+find = 'x.com'
+replace = 'twitter.com'
 ```
 
 **Pattern** redirections match anywhere in the URL and support `*` wildcards. Use this to clean up links:
 
 ```toml
 [[redirections]]
-type = "pattern"
-find = "?utm_*"
-replace = ""
+type = 'pattern'
+find = '?utm_*'
+replace = ''
 
 [[redirections]]
-type = "pattern"
-find = "&fbclid=*"
-replace = ""
+type = 'pattern'
+find = '&fbclid=*'
+replace = ''
 ```
 
-Redirections are applied in order, and matching is case-insensitive.
+**Regex** redirections use regular expressions with capture group support (`$1`, `$2`, etc.) for complex transformations:
+
+```toml
+# Clean Amazon URLs - keep only the product ID
+# amazon.com/dp/B0DZD91W4F/?tag=thewire06-20&linkCode=xm2&ascsubtag=... → amazon.com/dp/B0DZD91W4F
+[[redirections]]
+type = 'regex'
+find = '(amazon\.[a-z.]+/dp/[A-Z0-9]+).*'
+replace = '$1'
+```
+
+Redirections are applied in order. Domain and pattern matching is case-insensitive; regex matching is case-sensitive.

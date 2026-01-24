@@ -26,6 +26,8 @@ func applyRedirection(rawURL string, r Redirection) string {
 		return applyDomainRedirection(rawURL, r)
 	case "pattern":
 		return applyPatternRedirection(rawURL, r)
+	case "regex":
+		return applyRegexRedirection(rawURL, r)
 	default:
 		return rawURL
 	}
@@ -48,6 +50,14 @@ func applyDomainRedirection(rawURL string, r Redirection) string {
 func applyPatternRedirection(rawURL string, r Redirection) string {
 	pattern := wildcardToRegex(r.Find)
 	re, ok := getCompiledRegex("(?i)" + pattern) // case-insensitive
+	if !ok {
+		return rawURL
+	}
+	return re.ReplaceAllString(rawURL, r.Replace)
+}
+
+func applyRegexRedirection(rawURL string, r Redirection) string {
+	re, ok := getCompiledRegex(r.Find)
 	if !ok {
 		return rawURL
 	}

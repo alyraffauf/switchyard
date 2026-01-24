@@ -62,10 +62,13 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 	helpLabel.SetMarginTop(12)
 
 	updateHelpText := func() {
-		if typeRow.Selected() == 0 { // Domain
+		switch typeRow.Selected() {
+		case 0: // Domain
 			helpLabel.SetLabel("Matches the exact domain name")
-		} else { // Pattern
+		case 1: // Pattern
 			helpLabel.SetLabel("Use * as a wildcard to match any text")
+		case 2: // Regex
+			helpLabel.SetLabel("Use regular expressions with capture groups ($1, $2, etc.)")
 		}
 	}
 	updateHelpText()
@@ -80,6 +83,12 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 		rwType := indexToRedirectionType(typeRow.Selected())
 		r := Redirection{Type: rwType, Find: find, Replace: replaceRow.Text()}
 		err := validateRedirection(r)
+
+		if find != "" && err != nil {
+			findRow.AddCSSClass("error")
+		} else {
+			findRow.RemoveCSSClass("error")
+		}
 		saveBtn.SetSensitive(err == nil)
 	}
 
