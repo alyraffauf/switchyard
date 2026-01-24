@@ -126,7 +126,7 @@ func getConditionTypeLabels() []string {
 
 func redirectionTypeToIndex(rwType string) uint {
 	switch rwType {
-	case "pattern":
+	case "wildcard":
 		return 1
 	case "regex":
 		return 2
@@ -138,7 +138,7 @@ func redirectionTypeToIndex(rwType string) uint {
 func indexToRedirectionType(index uint) string {
 	switch index {
 	case 1:
-		return "pattern"
+		return "wildcard"
 	case 2:
 		return "regex"
 	default:
@@ -147,5 +147,5 @@ func indexToRedirectionType(index uint) string {
 }
 
 func getRedirectionTypeLabels() []string {
-	return []string{"Domain", "Pattern", "Regex"}
+	return []string{"Domain", "Wildcard", "Regex"}
 }

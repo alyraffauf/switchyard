@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"html"
 
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
@@ -19,8 +20,8 @@ func formatRedirectionSubtitle(r *Redirection) string {
 	switch rwType {
 	case "domain":
 		typeLabel = "Domain"
-	case "pattern":
-		typeLabel = "Pattern"
+	case "wildcard":
+		typeLabel = "Wildcard"
 	case "regex":
 		typeLabel = "Regex"
 	default:
@@ -30,7 +31,7 @@ func formatRedirectionSubtitle(r *Redirection) string {
 	if r.Replace == "" {
 		return fmt.Sprintf("%s · Removes match", typeLabel)
 	}
-	return fmt.Sprintf("%s · Replaces with %s", typeLabel, r.Replace)
+	return fmt.Sprintf("%s · Replaces with %s", typeLabel, html.EscapeString(r.Replace))
 }
 
 func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
@@ -88,8 +89,13 @@ func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 		redirection := &cfg.Redirections[redirectionIndex]
 
 		row := adw.NewActionRow()
-		row.SetTitle(redirection.Find)
-		row.SetSubtitle(formatRedirectionSubtitle(redirection))
+		if redirection.Name != "" {
+			row.SetTitle(redirection.Name)
+			row.SetSubtitle(fmt.Sprintf("%s · %s", html.EscapeString(redirection.Find), formatRedirectionSubtitle(redirection)))
+		} else {
+			row.SetTitle(redirection.Find)
+			row.SetSubtitle(formatRedirectionSubtitle(redirection))
+		}
 		row.SetActivatable(true)
 
 		icon := gtk.NewImageFromIconName("edit-find-replace-symbolic")

@@ -29,9 +29,25 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 
 	var dialog *adw.Dialog
 	header, saveBtn := dialogHeader("Cancel", actionLabel, func() { dialog.Close() }, nil)
-	dialog, content, _ := dialogWithToolbar(title, 450, 350, header)
+	dialog, content, _ := dialogWithToolbar(title, 450, 400, header)
 
+	// Name section
+	nameGroup := adw.NewPreferencesGroup()
+	nameGroup.SetTitle("Name")
+	nameGroup.SetDescription("Give this redirection a descriptive name (optional)")
+
+	nameRow := adw.NewEntryRow()
+	nameRow.SetTitle("Name")
+	if !isNew {
+		nameRow.SetText(redirection.Name)
+	}
+	nameGroup.Add(nameRow)
+	content.Append(nameGroup)
+
+	// Redirection section
 	group := adw.NewPreferencesGroup()
+	group.SetTitle("Redirection")
+	group.SetDescription("Define how links are modified")
 
 	typeRow := adw.NewComboRow()
 	typeRow.SetTitle("Type")
@@ -55,28 +71,7 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 	}
 	group.Add(replaceRow)
 
-	helpLabel := gtk.NewLabel("")
-	helpLabel.SetWrap(true)
-	helpLabel.SetXAlign(0)
-	helpLabel.AddCSSClass("dim-label")
-	helpLabel.SetMarginTop(12)
-
-	updateHelpText := func() {
-		switch typeRow.Selected() {
-		case 0: // Domain
-			helpLabel.SetLabel("Matches the exact domain name")
-		case 1: // Pattern
-			helpLabel.SetLabel("Use * as a wildcard to match any text")
-		case 2: // Regex
-			helpLabel.SetLabel("Use regular expressions with capture groups ($1, $2, etc.)")
-		}
-	}
-	updateHelpText()
-
-	typeRow.Connect("notify::selected", updateHelpText)
-
 	content.Append(group)
-	content.Append(helpLabel)
 
 	validateInputs := func() {
 		find := findRow.Text()
@@ -93,20 +88,24 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 	}
 
 	findRow.Connect("changed", validateInputs)
+	replaceRow.Connect("changed", validateInputs)
 	typeRow.Connect("notify::selected", validateInputs)
 	validateInputs()
 
 	saveBtn.ConnectClicked(func() {
+		name := nameRow.Text()
 		find := findRow.Text()
 		rwType := indexToRedirectionType(typeRow.Selected())
 
 		if isNew {
 			cfg.Redirections = append(cfg.Redirections, Redirection{
+				Name:    name,
 				Type:    rwType,
 				Find:    find,
 				Replace: replaceRow.Text(),
 			})
 		} else {
+			redirection.Name = name
 			redirection.Type = rwType
 			redirection.Find = find
 			redirection.Replace = replaceRow.Text()

@@ -24,8 +24,8 @@ func applyRedirection(rawURL string, r Redirection) string {
 	switch rwType {
 	case "domain":
 		return applyDomainRedirection(rawURL, r)
-	case "pattern":
-		return applyPatternRedirection(rawURL, r)
+	case "wildcard":
+		return applyWildcardRedirection(rawURL, r)
 	case "regex":
 		return applyRegexRedirection(rawURL, r)
 	default:
@@ -47,7 +47,7 @@ func applyDomainRedirection(rawURL string, r Redirection) string {
 	return u.String()
 }
 
-func applyPatternRedirection(rawURL string, r Redirection) string {
+func applyWildcardRedirection(rawURL string, r Redirection) string {
 	pattern := wildcardToRegex(r.Find)
 	re, ok := getCompiledRegex("(?i)" + pattern) // case-insensitive
 	if !ok {

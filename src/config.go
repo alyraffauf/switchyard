@@ -24,7 +24,8 @@ type Config struct {
 }
 
 type Redirection struct {
-	Type    string `toml:"type,omitempty"` // "domain" or "pattern", defaults to "domain"
+	Name    string `toml:"name,omitempty"`
+	Type    string `toml:"type,omitempty"` // "domain", "wildcard", or "regex", defaults to "domain"
 	Find    string `toml:"find"`
 	Replace string `toml:"replace"`
 }

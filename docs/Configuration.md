@@ -25,7 +25,7 @@ replace = 'old.reddit.com'
 
 # Pattern redirection to remove query parameters
 [[redirections]]
-type = 'pattern'
+type = 'wildcard'
 find = '?utm_*'
 replace = '' 
 
@@ -137,7 +137,7 @@ Use `all` for precise targeting (e.g., "docs.google.com AND contains 'edit'") an
 
 Link redirections modify URLs before browser rules are evaluated.
 
-- **type**: `domain` (default), `pattern`, or `regex`.
+- **type**: `domain` (default), `wildcard`, or `regex`.
 - **find**: Pattern to match.
 - **replace**: Text to replace with. Leave empty to remove matches.
 
@@ -155,16 +155,16 @@ find = 'x.com'
 replace = 'twitter.com'
 ```
 
-**Pattern** redirections match anywhere in the URL and support `*` wildcards. Use this to clean up links:
+**Wildcard** redirections match anywhere in the URL and support `*` wildcards. Use this to clean up links:
 
 ```toml
 [[redirections]]
-type = 'pattern'
+type = 'wildcard'
 find = '?utm_*'
 replace = ''
 
 [[redirections]]
-type = 'pattern'
+type = 'wildcard'
 find = '&fbclid=*'
 replace = ''
 ```

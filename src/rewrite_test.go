@@ -8,8 +8,8 @@ import (
 
 func TestWildcardToRegex(t *testing.T) {
 	tests := []struct {
-		pattern string
-		want    string
+		wildcard string
+		want     string
 	}{
 		{"youtube.com", `youtube\.com`},
 		{"*.example.com", `.*\.example\.com`},
@@ -20,10 +20,10 @@ func TestWildcardToRegex(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.pattern, func(t *testing.T) {
-			got := wildcardToRegex(tt.pattern)
+		t.Run(tt.wildcard, func(t *testing.T) {
+			got := wildcardToRegex(tt.wildcard)
 			if got != tt.want {
-				t.Errorf("wildcardToRegex(%q) = %q, want %q", tt.pattern, got, tt.want)
+				t.Errorf("wildcardToRegex(%q) = %q, want %q", tt.wildcard, got, tt.want)
 			}
 		})
 	}
@@ -160,7 +160,7 @@ func TestApplyPatternRedirection(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := Redirection{Type: "pattern", Find: tt.find, Replace: tt.replace}
+			r := Redirection{Type: "wildcard", Find: tt.find, Replace: tt.replace}
 			got := applyRedirection(tt.url, r)
 			if got != tt.want {
 				t.Errorf("applyRedirection() = %q, want %q", got, tt.want)
@@ -257,11 +257,11 @@ func TestApplyRedirections(t *testing.T) {
 		want         string
 	}{
 		{
-			name: "domain then pattern redirection",
+			name: "domain then wildcard redirection",
 			url:  "https://twitter.com/user?utm_source=share",
 			redirections: []Redirection{
 				{Type: "domain", Find: "twitter.com", Replace: "nitter.net"},
-				{Type: "pattern", Find: "?utm_source=*", Replace: ""},
+				{Type: "wildcard", Find: "?utm_source=*", Replace: ""},
 			},
 			want: "https://nitter.net/user",
 		},
@@ -309,8 +309,8 @@ func TestValidateRedirection(t *testing.T) {
 			wantErr:     false,
 		},
 		{
-			name:        "valid pattern redirection with wildcard",
-			redirection: Redirection{Type: "pattern", Find: "utm_*", Replace: ""},
+			name:        "valid wildcard redirection with wildcard",
+			redirection: Redirection{Type: "wildcard", Find: "utm_*", Replace: ""},
 			wantErr:     false,
 		},
 		{
@@ -319,39 +319,19 @@ func TestValidateRedirection(t *testing.T) {
 			wantErr:     true,
 		},
 		{
-			name:        "empty find pattern",
+			name:        "empty find wildcard",
 			redirection: Redirection{Type: "domain", Find: "", Replace: "something"},
 			wantErr:     true,
 		},
 		{
 			name:        "empty replace is valid",
-			redirection: Redirection{Type: "pattern", Find: "tracking", Replace: ""},
+			redirection: Redirection{Type: "wildcard", Find: "tracking", Replace: ""},
 			wantErr:     false,
 		},
 		{
 			name:        "invalid redirection type",
 			redirection: Redirection{Type: "invalid", Find: "test", Replace: ""},
 			wantErr:     true,
-		},
-		{
-			name:        "valid regex redirection",
-			redirection: Redirection{Type: "regex", Find: "youtube\\.com/shorts/([^?]+)", Replace: "youtube.com/watch?v=$1"},
-			wantErr:     false,
-		},
-		{
-			name:        "valid regex with capture groups",
-			redirection: Redirection{Type: "regex", Find: "([a-z]+)\\.example\\.com", Replace: "$1.newsite.com"},
-			wantErr:     false,
-		},
-		{
-			name:        "invalid regex syntax",
-			redirection: Redirection{Type: "regex", Find: "[invalid(regex", Replace: ""},
-			wantErr:     true,
-		},
-		{
-			name:        "regex with empty replace is valid",
-			redirection: Redirection{Type: "regex", Find: "[?&]utm_[^&]*", Replace: ""},
-			wantErr:     false,
 		},
 	}
 

@@ -159,7 +159,7 @@ func validateRedirection(r Redirection) error {
 	switch rwType {
 	case "domain":
 		return validateDomainPattern(r.Find)
-	case "pattern":
+	case "wildcard":
 		pattern := wildcardToRegex(r.Find)
 		if _, err := regexp.Compile("(?i)" + pattern); err != nil {
 			return fmt.Errorf("Invalid pattern: %w", err)
