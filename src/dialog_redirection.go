@@ -87,6 +87,7 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 		saveBtn.SetSensitive(err == nil)
 	}
 
+	nameRow.Connect("changed", validateInputs)
 	findRow.Connect("changed", validateInputs)
 	replaceRow.Connect("changed", validateInputs)
 	typeRow.Connect("notify::selected", validateInputs)
@@ -111,7 +112,7 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 			redirection.Replace = replaceRow.Text()
 		}
 
-		saveConfig(cfg)
+		saveConfigWithFlag(cfg)
 		onSave()
 		dialog.Close()
 	})
