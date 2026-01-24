@@ -29,7 +29,7 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 
 	var dialog *adw.Dialog
 	header, saveBtn := dialogHeader("Cancel", actionLabel, func() { dialog.Close() }, nil)
-	dialog, content, _ := dialogWithToolbar(title, 450, 400, header)
+	dialog, content, _ := dialogWithToolbar(title, 450, 450, header)
 
 	// Name section
 	nameGroup := adw.NewPreferencesGroup()
