@@ -14,6 +14,21 @@ prompt_on_click = true
 favorite_browser = ""
 check_default_browser = true
 
+# URL rewrites (domain type is default)
+[[rewrites]]
+find = "x.com"
+replace = "twitter.com"
+
+[[rewrites]]
+find = "reddit.com"
+replace = "old.reddit.com"
+
+# URL rewrite to remove query parameters
+[[rewrites]]
+type = "url"
+find = "?utm_*"
+replace = "" 
+
 # Simple rule with a single condition
 [[rules]]
 name = "Work GitHub"
@@ -117,3 +132,41 @@ Each condition specifies a pattern to match against the URL.
 - **any** (OR): Any single condition matching triggers the rule.
 
 Use `all` for precise targeting (e.g., "docs.google.com AND contains 'edit'") and `any` for broad matching (e.g., "youtube.com OR vimeo.com OR twitch.tv").
+
+## URL Rewrites
+
+Rewrites modify URLs before routing rules are evaluated. There are two types:
+
+- **type**: `domain` (default) or `url`.
+- **find**: Pattern to match.
+- **replace**: Text to replace with. Leave empty to remove matches.
+
+### Rewrite Types
+
+**Domain** rewrites match the exact hostname. Use this to switch between sites:
+
+```toml
+[[rewrites]]
+find = "reddit.com"
+replace = "old.reddit.com"
+
+[[rewrites]]
+find = "x.com"
+replace = "twitter.com"
+```
+
+**URL** rewrites match anywhere in the URL and support `*` wildcards. Use this to clean up links:
+
+```toml
+[[rewrites]]
+type = "url"
+find = "?utm_*"
+replace = ""
+
+[[rewrites]]
+type = "url"
+find = "&fbclid=*"
+replace = ""
+```
+
+Rewrites are applied in order, and matching is case-insensitive.

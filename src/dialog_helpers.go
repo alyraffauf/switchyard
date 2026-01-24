@@ -123,3 +123,25 @@ func conditionTypeComboRow(title string, initialType string) *adw.ComboRow {
 func getConditionTypeLabels() []string {
 	return []string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}
 }
+
+func rewriteTypeToIndex(rwType string) uint {
+	switch rwType {
+	case "url":
+		return 1
+	default:
+		return 0 // "domain" is default
+	}
+}
+
+func indexToRewriteType(index uint) string {
+	switch index {
+	case 1:
+		return "url"
+	default:
+		return "domain"
+	}
+}
+
+func getRewriteTypeLabels() []string {
+	return []string{"Domain", "URL"}
+}

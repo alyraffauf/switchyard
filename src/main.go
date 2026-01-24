@@ -56,6 +56,11 @@ func main() {
 			cmd.Start()
 			return
 		}
+
+		if len(cfg.Rewrites) > 0 {
+			sanitized = applyRewrites(sanitized, cfg.Rewrites)
+		}
+
 		handleURL(app, browsers, cfg, sanitized)
 	})
 
@@ -99,6 +104,10 @@ func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config,
 		cmd := hostCommand("xdg-open", targetURL)
 		cmd.Start()
 		return
+	}
+
+	if len(cfg.Rewrites) > 0 {
+		sanitized = applyRewrites(sanitized, cfg.Rewrites)
 	}
 
 	// If browser preferences specified, try each in order

@@ -20,6 +20,7 @@
 - **Multi-condition rules**: Combine multiple conditions with AND/OR logic for precise control.
 - **Multiple pattern types**: Exact Domain, URL Contains, Wildcard, and Regex matching.
 - **Negative patterns**: Exclude specific URLs by inverting any condition (e.g., "all GitHub except Gist").
+- **URL rewrites**: Modify URLs before routing (clean up links, switch domains, etc.).
 - **Custom URI scheme**: Create links that specify browser preferences directly with `switchyard://` URLs.
 - **Quick browser launcher**: When no rule matches, quickly select a browser with keyboard or mouse.
 - **Keyboard shortcuts**: Press Ctrl+1-9 to instantly select a browser.

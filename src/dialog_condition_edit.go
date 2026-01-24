@@ -33,8 +33,8 @@ func showEditConditionDialog(parent *adw.Window, cond *Condition, onSave func())
 
 	// Negate row
 	negateRow := adw.NewSwitchRow()
-	negateRow.SetTitle("Invert Match")
-	negateRow.SetSubtitle("URL must NOT match this pattern")
+	negateRow.SetTitle("Exclude")
+	negateRow.SetSubtitle("Match URLs that do not fit this condition")
 	negateRow.SetActive(cond.Negate)
 	group.Add(negateRow)
 
