@@ -25,6 +25,8 @@ github.com/diamondburned/gotk4/pkg/graphene
 github.com/diamondburned/gotk4/pkg/gsk/v4
 github.com/diamondburned/gotk4/pkg/gtk/v4
 github.com/diamondburned/gotk4/pkg/pango
+# github.com/leonelquinteros/gotext v1.7.2
+## explicit; go 1.23.5
 # github.com/pelletier/go-toml/v2 v2.2.4
 ## explicit; go 1.21.0
 github.com/pelletier/go-toml/v2
@@ -35,6 +37,6 @@ github.com/pelletier/go-toml/v2/unstable
 # go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6
 ## explicit; go 1.11
 go4.org/unsafe/assume-no-moving-gc
-# golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-## explicit
+# golang.org/x/sync v0.12.0
+## explicit; go 1.23.0
 golang.org/x/sync/singleflight
