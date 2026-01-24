@@ -29,14 +29,18 @@ func formatRuleSubtitleInternal(rule *Rule, browserName string, includePattern b
 			logicText = "All match"
 		}
 
+		formatSingleCondition := func(cond *Condition) string {
+			return fmt.Sprintf("%s %s", getConditionLabel(cond.Type, cond.Negate), cond.Pattern)
+		}
+
 		if rule.AlwaysAsk {
 			if condCount == 1 && includePattern {
-				return fmt.Sprintf("%s: %s · Always ask", getTypeLabel(rule.Conditions[0].Type), rule.Conditions[0].Pattern)
+				return fmt.Sprintf("%s · Always ask", formatSingleCondition(&rule.Conditions[0]))
 			}
 			return fmt.Sprintf("%d conditions (%s) · Always ask", condCount, logicText)
 		}
 		if condCount == 1 && includePattern {
-			return fmt.Sprintf("%s: %s · Opens in %s", getTypeLabel(rule.Conditions[0].Type), rule.Conditions[0].Pattern, browserName)
+			return fmt.Sprintf("%s · Opens in %s", formatSingleCondition(&rule.Conditions[0]), browserName)
 		}
 		return fmt.Sprintf("%d conditions (%s) · Opens in %s", condCount, logicText, browserName)
 	}
@@ -44,16 +48,28 @@ func formatRuleSubtitleInternal(rule *Rule, browserName string, includePattern b
 	return "No conditions"
 }
 
-func getTypeLabel(patternType string) string {
+func getConditionLabel(patternType string, negate bool) string {
 	switch patternType {
 	case "domain":
-		return "Exact Domain"
+		if negate {
+			return "Domain is not"
+		}
+		return "Domain is"
 	case "keyword":
-		return "URL Contains"
+		if negate {
+			return "URL does not contain"
+		}
+		return "URL contains"
 	case "glob":
-		return "Wildcard"
+		if negate {
+			return "Wildcard is not"
+		}
+		return "Wildcard is"
 	case "regex":
-		return "Regex"
+		if negate {
+			return "Regex does not match"
+		}
+		return "Regex matches"
 	default:
 		return patternType
 	}

@@ -94,6 +94,54 @@ func TestRuleMatchesConditions_AND(t *testing.T) {
 			url:  "https://docs.github.com/api/reference",
 			want: true,
 		},
+		{
+			name: "negated condition excludes match",
+			rule: Rule{
+				Logic: "all",
+				Conditions: []Condition{
+					{Type: "glob", Pattern: "*.github.com"},
+					{Type: "domain", Pattern: "gist.github.com", Negate: true},
+				},
+			},
+			url:  "https://gist.github.com",
+			want: false, // Glob matches, but negated domain also matches so rule fails
+		},
+		{
+			name: "negated condition allows non-match",
+			rule: Rule{
+				Logic: "all",
+				Conditions: []Condition{
+					{Type: "glob", Pattern: "*.github.com"},
+					{Type: "domain", Pattern: "gist.github.com", Negate: true},
+				},
+			},
+			url:  "https://api.github.com",
+			want: true, // Glob matches, negated domain doesn't match (negate returns true)
+		},
+		{
+			name: "all negated conditions",
+			rule: Rule{
+				Logic: "all",
+				Conditions: []Condition{
+					{Type: "domain", Pattern: "example.com", Negate: true},
+					{Type: "keyword", Pattern: "admin", Negate: true},
+				},
+			},
+			url:  "https://other.com/user",
+			want: true, // Neither condition matches, so both negations return true
+		},
+		{
+			name: "negated condition fails when pattern not matched",
+			rule: Rule{
+				Logic: "all",
+				Conditions: []Condition{
+					{Type: "domain", Pattern: "github.com"},
+					{Type: "keyword", Pattern: "secret", Negate: true},
+				},
+			},
+			url:  "https://github.com/user/repo",
+			want: true, // Domain matches, "secret" not in URL so negation returns true
+		},
 	}
 
 	for _, tt := range tests {
@@ -187,6 +235,30 @@ func TestRuleMatchesConditions_OR(t *testing.T) {
 			},
 			url:  "https://github.com/user/repo",
 			want: true,
+		},
+		{
+			name: "OR with negated condition matches",
+			rule: Rule{
+				Logic: "any",
+				Conditions: []Condition{
+					{Type: "domain", Pattern: "github.com", Negate: true},
+					{Type: "domain", Pattern: "gitlab.com"},
+				},
+			},
+			url:  "https://example.com",
+			want: true, // First condition: github.com doesn't match, negated = true
+		},
+		{
+			name: "OR with all negated conditions none match",
+			rule: Rule{
+				Logic: "any",
+				Conditions: []Condition{
+					{Type: "domain", Pattern: "github.com", Negate: true},
+					{Type: "domain", Pattern: "gitlab.com", Negate: true},
+				},
+			},
+			url:  "https://github.com",
+			want: true, // github.com matches, negated = false; gitlab.com doesn't match, negated = true
 		},
 	}
 

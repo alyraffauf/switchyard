@@ -25,6 +25,7 @@ type Config struct {
 type Condition struct {
 	Type    string `toml:"type"` // "domain", "keyword", "glob", "regex"
 	Pattern string `toml:"pattern"`
+	Negate  bool   `toml:"negate,omitempty"`
 }
 
 type Rule struct {
@@ -109,7 +110,7 @@ func (r *Rule) matchesConditions(url string) bool {
 	if logic == "all" {
 		// AND: All conditions must match
 		for _, cond := range r.Conditions {
-			if !matchesPattern(url, cond.Pattern, cond.Type) {
+			if !matchesPattern(url, cond.Pattern, cond.Type, cond.Negate) {
 				return false
 			}
 		}
@@ -117,7 +118,7 @@ func (r *Rule) matchesConditions(url string) bool {
 	} else {
 		// OR: Any condition must match
 		for _, cond := range r.Conditions {
-			if matchesPattern(url, cond.Pattern, cond.Type) {
+			if matchesPattern(url, cond.Pattern, cond.Type, cond.Negate) {
 				return true
 			}
 		}

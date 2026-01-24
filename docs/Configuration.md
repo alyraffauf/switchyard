@@ -55,6 +55,21 @@ pattern = "vimeo.com"
 type = "domain"
 pattern = "twitch.tv"
 
+# Rule with negated condition
+[[rules]]
+name = "GitHub (not Gist)"
+logic = "all"
+browser = "firefox.desktop"
+
+[[rules.conditions]]
+type = "glob"
+pattern = "*.github.com"
+
+[[rules.conditions]]
+type = "domain"
+pattern = "gist.github.com"
+negate = true  # URL must NOT match this pattern
+
 # Rule with always ask
 [[rules]]
 name = "Shopping Sites"
@@ -87,6 +102,7 @@ Each condition specifies a pattern to match against the URL.
 
 - **type**: Match type (see below).
 - **pattern**: The pattern to match against.
+- **negate**: If true, the condition is inverted (URL must NOT match). Default: false.
 
 ## Condition Types
 

@@ -31,6 +31,13 @@ func showEditConditionDialog(parent *adw.Window, cond *Condition, onSave func())
 	patternRow.SetText(cond.Pattern)
 	group.Add(patternRow)
 
+	// Negate row
+	negateRow := adw.NewSwitchRow()
+	negateRow.SetTitle("Invert Match")
+	negateRow.SetSubtitle("URL must NOT match this pattern")
+	negateRow.SetActive(cond.Negate)
+	group.Add(negateRow)
+
 	// Error label for validation
 	errorLabel := gtk.NewLabel("")
 	errorLabel.SetWrap(true)
@@ -86,6 +93,7 @@ func showEditConditionDialog(parent *adw.Window, cond *Condition, onSave func())
 
 		cond.Type = indexToConditionType(selectedType)
 		cond.Pattern = pattern
+		cond.Negate = negateRow.Active()
 
 		onSave()
 		dialog.Close()
