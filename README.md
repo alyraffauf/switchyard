@@ -7,7 +7,7 @@
 </div>
 
 <p align="center">
-  <img src="docs/images/switchyard-picker.png" alt="Switchyard Launcher" width="600">
+  <img src="data/screenshots/launcher.png" alt="Switchyard Launcher" width="600">
 </p>
 
 <p align="center">

@@ -124,19 +124,24 @@
 
   <screenshots>
     <screenshot type="default">
-      <caption>The Switchyard browser launcher.</caption>
+      <caption>Select a browser from the launcher.</caption>
       <image
-            >https://raw.githubusercontent.com/alyraffauf/switchyard/master/docs/images/switchyard-picker.png</image>
+            >https://raw.githubusercontent.com/alyraffauf/switchyard/master/data/screenshots/launcher.png</image>
     </screenshot>
     <screenshot>
-      <caption>The Switchyard settings panel.</caption>
+      <caption>Bypass the launcher with simple rules.</caption>
       <image
-            >https://raw.githubusercontent.com/alyraffauf/switchyard/master/docs/images/switchyard.png</image>
+            >https://raw.githubusercontent.com/alyraffauf/switchyard/master/data/screenshots/browser-rules.png</image>
     </screenshot>
     <screenshot>
-      <caption>The Switchyard rule editor.</caption>
+      <caption>Define powerful conditions for each rule.</caption>
       <image
-            >https://raw.githubusercontent.com/alyraffauf/switchyard/master/docs/images/switchyard-rulesedit.png</image>
+            >https://raw.githubusercontent.com/alyraffauf/switchyard/master/data/screenshots/edit-rules.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Modify links before they open.</caption>
+      <image
+            >https://raw.githubusercontent.com/alyraffauf/switchyard/master/data/screenshots/link-redirections.png</image>
     </screenshot>
   </screenshots>
 </component>

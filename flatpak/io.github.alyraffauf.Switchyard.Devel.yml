@@ -52,7 +52,7 @@ modules:
         mkdir -p "$GOCACHE"
         go build -mod=vendor -trimpath -o switchyard-bin ./src
       - install -Dm755 switchyard-bin /app/bin/switchyard-bin
-      - install -Dm755 data/switchyard-wrapper.sh /app/bin/switchyard
+      - install -Dm755 flatpak/switchyard-wrapper.sh /app/bin/switchyard
       # Install desktop file and update app-id to .Devel
       - install -Dm644 data/io.github.alyraffauf.Switchyard.desktop /app/share/applications/io.github.alyraffauf.Switchyard.Devel.desktop
       - sed -i 's/io.github.alyraffauf.Switchyard/io.github.alyraffauf.Switchyard.Devel/g' /app/share/applications/io.github.alyraffauf.Switchyard.Devel.desktop
