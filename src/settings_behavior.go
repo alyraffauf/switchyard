@@ -22,7 +22,7 @@ func createBehaviorPage(win *adw.Window, cfg *Config, browsers []*Browser) gtk.W
 
 	promptRow := adw.NewSwitchRow()
 	promptRow.SetTitle("Show launcher when no rule matches")
-	promptRow.SetSubtitle("Let you choose a browser for unmatched URLs")
+	promptRow.SetSubtitle("Choose a browser for URLs without a matching rule")
 	promptRow.SetActive(cfg.PromptOnClick)
 	behaviorGroup.Add(promptRow)
 

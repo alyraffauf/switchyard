@@ -85,7 +85,7 @@ func createAdvancedPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 				return
 			}
 
-			warnDialog := adw.NewAlertDialog("Import Configuration?", "This will replace all your current settings and rules with the imported configuration.")
+			warnDialog := adw.NewAlertDialog("Import Configuration?", "This will replace your current settings and rules.")
 			warnDialog.AddResponse("cancel", "Cancel")
 			warnDialog.AddResponse("import", "Import")
 			warnDialog.SetResponseAppearance("import", adw.ResponseDestructive)

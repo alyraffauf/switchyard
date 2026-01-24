@@ -17,7 +17,7 @@ func createAppearancePage(win *adw.Window, cfg *Config) gtk.Widgetter {
 
 	forceDarkRow := adw.NewSwitchRow()
 	forceDarkRow.SetTitle("Force dark mode")
-	forceDarkRow.SetSubtitle("Always use dark mode")
+	forceDarkRow.SetSubtitle("Override system color scheme")
 	forceDarkRow.SetActive(cfg.ForceDarkMode)
 	appearanceGroup.Add(forceDarkRow)
 
@@ -29,7 +29,7 @@ func createAppearancePage(win *adw.Window, cfg *Config) gtk.Widgetter {
 
 	showNamesRow := adw.NewSwitchRow()
 	showNamesRow.SetTitle("Show browser names")
-	showNamesRow.SetSubtitle("Show browser names below icons")
+	showNamesRow.SetSubtitle("Display names under browser icons")
 	showNamesRow.SetActive(cfg.ShowAppNames)
 	launcherGroup.Add(showNamesRow)
 
