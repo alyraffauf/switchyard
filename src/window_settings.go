@@ -132,6 +132,12 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 	advancedRow.AddPrefix(gtk.NewImageFromIconName("preferences-other-symbolic"))
 	listBox.Append(advancedRow)
 
+	listBox.SetHeaderFunc(func(row, before *gtk.ListBoxRow) {
+		if row.Index() == 2 || row.Index() == 4 {
+			row.SetHeader(gtk.NewSeparator(gtk.OrientationHorizontal))
+		}
+	})
+
 	scrolled.SetChild(listBox)
 	toolbarView.SetContent(scrolled)
 
