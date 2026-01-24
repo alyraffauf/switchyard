@@ -16,15 +16,10 @@
 
 ## Features
 
-- **Browser rules**: Automatically open URLs in specific browsers based on powerful patterns.
-- **Multi-condition rules**: Combine multiple conditions with AND/OR logic for precise control.
-- **Multiple pattern types**: Exact Domain, URL Contains, Wildcard, and Regex matching.
-- **Negative patterns**: Exclude specific URLs by inverting any condition (e.g., "all GitHub except Gist").
-- **Link redirections**: Modify URLs before routing (clean up links, switch domains, etc.).
-- **Custom URI scheme**: Create links that specify browser preferences directly with `switchyard://` URLs.
-- **Quick browser launcher**: When no rule matches, quickly select a browser with keyboard or mouse.
-- **Keyboard shortcuts**: Press Ctrl+1-9 to instantly select a browser.
-- **Lightweight**: Runs only when needed, no background processes.
+- **Browser rules**: Automatically open links in specific browsers based on conditions you define.
+- **Link redirections**: Clean up links before they open—remove tracking parameters, swap domains, and more.
+- **Quick launcher**: When no rule matches, choose a browser with a click or keyboard shortcut.
+- **Lightweight**: Runs only when you click a link. No background processes.
 - **GTK4 + libadwaita**: Native GNOME look and feel.
 
 ## Installation
