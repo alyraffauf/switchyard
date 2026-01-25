@@ -162,6 +162,21 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 		flowBox.SelectChild(first)
 	}
 
+	urlEntry.ConnectActivate(func() {
+		selected := flowBox.SelectedChildren()
+		if len(selected) > 0 {
+			idx := selected[0].Index()
+			if idx >= 0 && idx < len(filteredBrowsers) {
+				launchBrowser(filteredBrowsers[idx], urlEntry.Text())
+				win.Close()
+			}
+		} else if len(filteredBrowsers) > 0 {
+			// No selection, use first browser
+			launchBrowser(filteredBrowsers[0], urlEntry.Text())
+			win.Close()
+		}
+	})
+
 	contentBox.Append(flowBox)
 	mainBox.Append(contentBox)
 
