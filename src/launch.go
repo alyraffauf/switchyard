@@ -14,6 +14,11 @@ import (
 // launchCommand executes a desktop file command line with URL substitution
 // and proper activation token handling for window raising on Wayland.
 func launchCommand(cmdline, url string, appInfo *gio.AppInfo) error {
+	hasFieldCode := strings.Contains(cmdline, "%u") ||
+		strings.Contains(cmdline, "%U") ||
+		strings.Contains(cmdline, "%f") ||
+		strings.Contains(cmdline, "%F")
+
 	// Replace %u, %U, %f, %F with URL
 	cmdline = strings.ReplaceAll(cmdline, "%u", url)
 	cmdline = strings.ReplaceAll(cmdline, "%U", url)
@@ -27,6 +32,11 @@ func launchCommand(cmdline, url string, appInfo *gio.AppInfo) error {
 
 	// Parse the command line
 	parts := strings.Fields(cmdline)
+
+	// Chromium-based desktop files are essentially broken, they include no logic for a URL to pass using typical means. In this case, we work aorund by appending our URL.
+	if !hasFieldCode && url != "" && len(parts) > 0 {
+		parts = append(parts, url)
+	}
 	if len(parts) == 0 {
 		return nil
 	}
