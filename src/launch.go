@@ -30,14 +30,12 @@ func launchCommand(cmdline, url string, appInfo *gio.AppInfo) error {
 		cmdline = strings.ReplaceAll(cmdline, code, "")
 	}
 
-	// Parse the command line
-	parts := strings.Fields(cmdline)
-
-	// Chromium-based desktop files are essentially broken, they include no logic for a URL to pass using typical means. In this case, we work aorund by appending our URL.
-	if !hasFieldCode && url != "" && len(parts) > 0 {
-		parts = append(parts, url)
+	// Chromium-based desktop files are essentially broken, they include no logic for a URL to pass using typical means. In this case, we work around by appending our URL.
+	if !hasFieldCode && url != "" {
+		cmdline = cmdline + " " + url
 	}
-	if len(parts) == 0 {
+
+	if strings.TrimSpace(cmdline) == "" {
 		return nil
 	}
 
@@ -47,17 +45,19 @@ func launchCommand(cmdline, url string, appInfo *gio.AppInfo) error {
 		activationToken = display.AppLaunchContext().StartupNotifyID(appInfo, nil)
 	}
 
+	var cmd *exec.Cmd
 	// When running in Flatpak, wrap with flatpak-spawn --host
 	// and pass activation token via --env flag
-	if os.Getenv("FLATPAK_ID") != "" && !strings.HasPrefix(parts[0], "flatpak-spawn") {
-		parts = append([]string{"flatpak-spawn", "--host", "--env=XDG_ACTIVATION_TOKEN=" + activationToken}, parts...)
+	if os.Getenv("FLATPAK_ID") != "" && !strings.HasPrefix(cmdline, "flatpak-spawn") {
+		cmd = exec.Command("flatpak-spawn", "--host", "--env=XDG_ACTIVATION_TOKEN="+activationToken, "sh", "-c", cmdline)
 		activationToken = "" // Already handled via flatpak-spawn
-	}
-
-	// Execute the command
-	cmd := exec.Command(parts[0], parts[1:]...)
-	if activationToken != "" {
-		cmd.Env = append(os.Environ(), "XDG_ACTIVATION_TOKEN="+activationToken)
+	} else {
+		// let the shell handle quote parsing
+		// https://github.com/alyraffauf/switchyard/issues/27
+		cmd = exec.Command("sh", "-c", cmdline)
+		if activationToken != "" {
+			cmd.Env = append(os.Environ(), "XDG_ACTIVATION_TOKEN="+activationToken)
+		}
 	}
 
 	if err := cmd.Start(); err != nil {
