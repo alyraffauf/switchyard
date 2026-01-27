@@ -44,6 +44,17 @@
     >io.github.alyraffauf.Switchyard.desktop</launchable>
 
     <releases>
+    <release version="0.11.2" date="2026-01-27">
+    <url
+                type="details"
+            >https://github.com/alyraffauf/switchyard/releases/tag/v0.11.2</url>
+    <description translate="no">
+        <p>This release comes with the following improvements:</p>
+        <ul>
+        <li>Added wrapping to escape browser arguments.</li>
+        </ul>
+    </description>
+    </release>
         <release version="0.11.1" date="2026-01-25">
         <url
                 type="details"
@@ -68,7 +79,7 @@
                     >Added link redirections, allowing users to automatically modify links before they open.</li>
             <li>Added inverse "...is not..." conditions.</li>
             <li
-                    >Improve language to adhere to GNOME Human Interface Guidelines.</li>
+                    >Improved language to adhere to GNOME Human Interface Guidelines.</li>
             <li>Fixed minor bugs slowing down application startup.</li>
             </ul>
         </description>
