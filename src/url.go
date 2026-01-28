@@ -21,6 +21,9 @@ func extractDomain(rawURL string) string {
 }
 
 func sanitizeURL(rawURL string) string {
+	// Remove newlines and carriage returns (common when URLs are copied from formatted text)
+	rawURL = strings.ReplaceAll(rawURL, "\n", "")
+	rawURL = strings.ReplaceAll(rawURL, "\r", "")
 	rawURL = strings.TrimSpace(rawURL)
 	if rawURL == "" {
 		return ""
@@ -49,6 +52,12 @@ func sanitizeURL(rawURL string) string {
 	default:
 		return ""
 	}
+}
+
+// shellQuoteURL returns a shell-safe quoted version of the URL.
+// This prevents shell metacharacters like & from being interpreted.
+func shellQuoteURL(s string) string {
+	return "'" + strings.ReplaceAll(s, "'", "'\"'\"'") + "'"
 }
 
 func parseSwitchyardURL(rawURL string) (targetURL string, browserPrefs []string, err error) {

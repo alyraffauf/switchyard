@@ -19,11 +19,13 @@ func launchCommand(cmdline, url string, appInfo *gio.AppInfo) error {
 		strings.Contains(cmdline, "%f") ||
 		strings.Contains(cmdline, "%F")
 
-	// Replace %u, %U, %f, %F with URL
-	cmdline = strings.ReplaceAll(cmdline, "%u", url)
-	cmdline = strings.ReplaceAll(cmdline, "%U", url)
-	cmdline = strings.ReplaceAll(cmdline, "%f", url)
-	cmdline = strings.ReplaceAll(cmdline, "%F", url)
+	quotedURL := shellQuoteURL(url)
+
+	// Replace %u, %U, %f, %F with quoted URL
+	cmdline = strings.ReplaceAll(cmdline, "%u", quotedURL)
+	cmdline = strings.ReplaceAll(cmdline, "%U", quotedURL)
+	cmdline = strings.ReplaceAll(cmdline, "%f", quotedURL)
+	cmdline = strings.ReplaceAll(cmdline, "%F", quotedURL)
 
 	// Remove other field codes
 	for _, code := range []string{"%i", "%c", "%k"} {
@@ -32,7 +34,7 @@ func launchCommand(cmdline, url string, appInfo *gio.AppInfo) error {
 
 	// Chromium-based desktop files are essentially broken, they include no logic for a URL to pass using typical means. In this case, we work around by appending our URL.
 	if !hasFieldCode && url != "" {
-		cmdline = cmdline + " " + url
+		cmdline = cmdline + " " + quotedURL
 	}
 
 	if strings.TrimSpace(cmdline) == "" {
