@@ -14,6 +14,7 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 	win := adw.NewWindow()
 	win.SetTitle("Switchyard")
 	win.SetApplication(&app.Application)
+	win.SetResizable(false)
 
 	// Main layout
 	mainBox := gtk.NewBox(gtk.OrientationVertical, 0)
