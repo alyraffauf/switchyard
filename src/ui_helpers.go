@@ -4,10 +4,49 @@ package main
 
 import (
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
+	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
+	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
+	"github.com/diamondburned/gotk4/pkg/pango"
 )
+
+type launcherMetricsType struct {
+	IconSize       int
+	IconPadding    int
+	ButtonSpacing  int
+	ContentMarginH int
+	ContentMarginT int
+	ContentMarginB int
+	BarMargin      int
+	MaxColumns     uint
+	MinColumns     uint
+	MediumBreak    float64
+	NarrowBreak    float64
+	MediumColumns  uint
+	NarrowColumns  uint
+}
+
+func (m launcherMetricsType) ButtonSize() int {
+	return m.IconSize + m.IconPadding
+}
+
+var launcherMetrics = launcherMetricsType{
+	IconSize:       128,
+	IconPadding:    6,
+	ButtonSpacing:  16,
+	ContentMarginH: 12,
+	ContentMarginT: 24,
+	ContentMarginB: 8,
+	BarMargin:      8,
+	MaxColumns:     6,
+	MinColumns:     2,
+	MediumBreak:    600,
+	NarrowBreak:    400,
+	MediumColumns:  3,
+	NarrowColumns:  2,
+}
 
 // loadBrowserIcon loads a browser icon using GIcon for best quality.
 // Using GIcon allows GTK to select the optimal icon size from the theme,
@@ -31,6 +70,179 @@ func loadBrowserIcon(browser *Browser, size int) *gtk.Image {
 	image := gtk.NewImageFromIconName(iconName)
 	image.SetPixelSize(size)
 	return image
+}
+
+// hold the callback functions for browser button interactions.
+type BrowserButtonCallbacks struct {
+	OnClick      func(browser *Browser)
+	OnRightClick func(btn *gtk.Button, browser *Browser)
+}
+
+func createBrowserButton(browser *Browser, showLabel bool, callbacks BrowserButtonCallbacks) *gtk.Button {
+	btn := gtk.NewButton()
+	btn.AddCSSClass("flat")
+	btn.SetSizeRequest(launcherMetrics.ButtonSize(), launcherMetrics.ButtonSize())
+
+	// Container inside button - icon above, optional name below
+	btnBox := gtk.NewBox(gtk.OrientationVertical, 8)
+	btnBox.SetHAlign(gtk.AlignCenter)
+	btnBox.SetVAlign(gtk.AlignCenter)
+
+	// Fixed-size container for icon to ensure uniform sizing
+	iconBox := gtk.NewBox(gtk.OrientationVertical, 0)
+	iconBox.SetSizeRequest(launcherMetrics.IconSize, launcherMetrics.IconSize)
+	iconBox.SetHAlign(gtk.AlignCenter)
+	iconBox.SetVAlign(gtk.AlignCenter)
+
+	// Browser icon
+	icon := loadBrowserIcon(browser, launcherMetrics.IconSize)
+	icon.SetHAlign(gtk.AlignCenter)
+	icon.SetVAlign(gtk.AlignCenter)
+	iconBox.Append(icon)
+
+	btnBox.Append(iconBox)
+
+	// Set accessible label for screen readers (always, regardless of visual label)
+	labelValue := coreglib.NewValue(browser.Name)
+	btn.UpdateProperty([]gtk.AccessibleProperty{gtk.AccessiblePropertyLabel}, []coreglib.Value{*labelValue})
+
+	// Show browser name based on config
+	if showLabel {
+		label := gtk.NewLabel(browser.Name)
+		label.SetEllipsize(pango.EllipsizeEnd)
+		label.SetMaxWidthChars(18)
+		label.SetJustify(gtk.JustifyCenter)
+		label.SetLines(1)
+		label.SetMarginTop(6)
+		btnBox.Append(label)
+	} else {
+		btn.SetTooltipText(browser.Name)
+	}
+
+	btn.SetChild(btnBox)
+
+	if callbacks.OnClick != nil {
+		b := browser
+		btn.ConnectClicked(func() {
+			callbacks.OnClick(b)
+		})
+	}
+
+	if callbacks.OnRightClick != nil {
+		b := browser
+		gesture := gtk.NewGestureClick()
+		gesture.SetButton(gdk.BUTTON_SECONDARY)
+		gesture.ConnectPressed(func(nPress int, x, y float64) {
+			callbacks.OnRightClick(btn, b)
+		})
+		btn.AddController(gesture)
+	}
+
+	return btn
+}
+
+// wrap a FlowBox with its breakpoints for the launcher
+type LauncherFlowBox struct {
+	FlowBox          *gtk.FlowBox
+	NarrowBreakpoint *adw.Breakpoint
+	MediumBreakpoint *adw.Breakpoint
+}
+
+// Returns the flow box and breakpoints that should be added to the window.
+func createLauncherFlowBox() *LauncherFlowBox {
+	flowBox := gtk.NewFlowBox()
+	flowBox.SetSelectionMode(gtk.SelectionSingle)
+	flowBox.SetActivateOnSingleClick(false)
+	flowBox.SetColumnSpacing(uint(launcherMetrics.ButtonSpacing))
+	flowBox.SetRowSpacing(uint(launcherMetrics.ButtonSpacing))
+	flowBox.SetMaxChildrenPerLine(launcherMetrics.MaxColumns)
+	flowBox.SetMinChildrenPerLine(launcherMetrics.MinColumns)
+	flowBox.SetHAlign(gtk.AlignCenter)
+	flowBox.SetVAlign(gtk.AlignStart)
+
+	// Breakpoint for narrow windows (mobile/small screens)
+	narrowBreakpoint := adw.NewBreakpoint(adw.NewBreakpointConditionLength(
+		adw.BreakpointConditionMaxWidth, launcherMetrics.NarrowBreak, adw.LengthUnitPx))
+	narrowBreakpoint.AddSetter(flowBox, "max-children-per-line", launcherMetrics.NarrowColumns)
+
+	// Breakpoint for medium windows
+	mediumBreakpoint := adw.NewBreakpoint(adw.NewBreakpointConditionLength(
+		adw.BreakpointConditionMaxWidth, launcherMetrics.MediumBreak, adw.LengthUnitPx))
+	mediumBreakpoint.AddSetter(flowBox, "max-children-per-line", launcherMetrics.MediumColumns)
+
+	return &LauncherFlowBox{
+		FlowBox:          flowBox,
+		NarrowBreakpoint: narrowBreakpoint,
+		MediumBreakpoint: mediumBreakpoint,
+	}
+}
+
+func createLauncherContentBox() *gtk.Box {
+	contentBox := gtk.NewBox(gtk.OrientationVertical, 0)
+	contentBox.SetMarginStart(launcherMetrics.ContentMarginH)
+	contentBox.SetMarginEnd(launcherMetrics.ContentMarginH)
+	contentBox.SetMarginTop(launcherMetrics.ContentMarginT)
+	contentBox.SetMarginBottom(launcherMetrics.ContentMarginB)
+	return contentBox
+}
+
+func createLauncherBottomBar(urlEntry *gtk.Entry, onClose func()) *gtk.Box {
+	bottomBar := gtk.NewBox(gtk.OrientationHorizontal, 12)
+	bottomBar.SetMarginStart(launcherMetrics.BarMargin)
+	bottomBar.SetMarginEnd(launcherMetrics.BarMargin)
+	bottomBar.SetMarginTop(launcherMetrics.BarMargin)
+	bottomBar.SetMarginBottom(launcherMetrics.BarMargin)
+
+	menuBtn := gtk.NewMenuButton()
+	menuBtn.SetIconName("open-menu-symbolic")
+	menuBtn.SetTooltipText("Main menu")
+	menuBtn.AddCSSClass("flat")
+
+	menu := gio.NewMenu()
+	menu.Append("Settings", "win.settings")
+
+	aboutSection := gio.NewMenu()
+	aboutSection.Append("Donate ❤️", "win.donate")
+	aboutSection.Append("About", "win.about")
+	aboutSection.Append("Keyboard Shortcuts", "win.shortcuts")
+	menu.AppendSection("", aboutSection)
+
+	quitSection := gio.NewMenu()
+	quitSection.Append("Quit", "win.quit")
+	menu.AppendSection("", quitSection)
+
+	menuBtn.SetMenuModel(menu)
+	bottomBar.Append(menuBtn)
+
+	leftSpacer := gtk.NewBox(gtk.OrientationHorizontal, 0)
+	leftSpacer.SetHExpand(true)
+	bottomBar.Append(leftSpacer)
+
+	bottomBar.Append(urlEntry)
+
+	rightSpacer := gtk.NewBox(gtk.OrientationHorizontal, 0)
+	rightSpacer.SetHExpand(true)
+	bottomBar.Append(rightSpacer)
+
+	closeBtn := gtk.NewButton()
+	closeBtn.SetIconName("window-close-symbolic")
+	closeBtn.SetTooltipText("Close")
+	closeBtn.AddCSSClass("circular")
+	closeBtn.ConnectClicked(onClose)
+	bottomBar.Append(closeBtn)
+
+	return bottomBar
+}
+
+func createURLEntry(url string) *gtk.Entry {
+	urlEntry := gtk.NewEntry()
+	urlEntry.SetText(url)
+	urlEntry.SetEditable(true)
+	urlEntry.SetCanFocus(true)
+	urlEntry.SetAlignment(0.5)
+	urlEntry.SetMaxWidthChars(50)
+	urlEntry.SetWidthChars(40)
+	return urlEntry
 }
 
 // getLogicFromComboRow extracts the logic string from a combo row selection
