@@ -14,7 +14,7 @@ import (
 
 type launcherMetricsType struct {
 	IconSize       int
-	ButtonSize     int
+	IconPadding    int
 	ButtonSpacing  int
 	ContentMarginH int
 	ContentMarginT int
@@ -28,9 +28,13 @@ type launcherMetricsType struct {
 	NarrowColumns  uint
 }
 
+func (m launcherMetricsType) ButtonSize() int {
+	return m.IconSize + m.IconPadding
+}
+
 var launcherMetrics = launcherMetricsType{
 	IconSize:       128,
-	ButtonSize:     134,
+	IconPadding:    6,
 	ButtonSpacing:  16,
 	ContentMarginH: 12,
 	ContentMarginT: 24,
@@ -77,7 +81,7 @@ type BrowserButtonCallbacks struct {
 func createBrowserButton(browser *Browser, showLabel bool, callbacks BrowserButtonCallbacks) *gtk.Button {
 	btn := gtk.NewButton()
 	btn.AddCSSClass("flat")
-	btn.SetSizeRequest(launcherMetrics.ButtonSize, launcherMetrics.ButtonSize)
+	btn.SetSizeRequest(launcherMetrics.ButtonSize(), launcherMetrics.ButtonSize())
 
 	// Container inside button - icon above, optional name below
 	btnBox := gtk.NewBox(gtk.OrientationVertical, 8)
