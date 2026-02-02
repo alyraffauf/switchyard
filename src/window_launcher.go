@@ -4,146 +4,45 @@ package main
 
 import (
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
-	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
-	"github.com/diamondburned/gotk4/pkg/pango"
 )
 
 func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, cfg *Config) {
-
-	// Filter hidden_browsers from the list
-	hiddenSet := make(map[string]bool)
-	for _, id := range cfg.HiddenBrowsers {
-		hiddenSet[id] = true
-	}
-
-	filteredBrowsers := make([]*Browser, 0, len(browsers))
-	for _, browser := range browsers {
-		if !hiddenSet[browser.ID] {
-			filteredBrowsers = append(filteredBrowsers, browser)
-		}
-	}
-
-	// Move favorite to front
-	if cfg.FavoriteBrowser != "" {
-		for i, browser := range filteredBrowsers {
-			if browser.ID == cfg.FavoriteBrowser {
-				favorite := browser
-				filteredBrowsers = append([]*Browser{favorite}, append(filteredBrowsers[:i], filteredBrowsers[i+1:]...)...)
-				break
-			}
-		}
-	}
+	filteredBrowsers := filterAndSortBrowsers(browsers, cfg)
 
 	win := adw.NewWindow()
 	win.SetTitle("Switchyard")
 	win.SetApplication(&app.Application)
 
-	// Main layout - simple vertical box without title bar
+	// Main layout
 	mainBox := gtk.NewBox(gtk.OrientationVertical, 0)
 
-	// Create URL entry early so it can be referenced in button handlers
-	urlEntry := gtk.NewEntry()
-	urlEntry.SetText(url)
-	urlEntry.SetEditable(true)
-	urlEntry.SetCanFocus(true)
-	urlEntry.SetAlignment(0.5)
-	urlEntry.SetMaxWidthChars(50)
-	urlEntry.SetWidthChars(40)
+	// create early so button handlers can reference it
+	urlEntry := createURLEntry(url)
 
-	// Content box with margins
-	contentBox := gtk.NewBox(gtk.OrientationVertical, 0)
-	contentBox.SetMarginStart(12)
-	contentBox.SetMarginEnd(12)
-	contentBox.SetMarginTop(24)
-	contentBox.SetMarginBottom(8)
+	// Content area with browser buttons
+	contentBox := createLauncherContentBox()
+	launcherFlow := createLauncherFlowBox()
+	flowBox := launcherFlow.FlowBox
 
-	// FlowBox for browser buttons - wraps to multiple rows
-	flowBox := gtk.NewFlowBox()
-	flowBox.SetSelectionMode(gtk.SelectionSingle)
-	flowBox.SetActivateOnSingleClick(false)
-	flowBox.SetColumnSpacing(16)
-	flowBox.SetRowSpacing(16)
-	flowBox.SetMaxChildrenPerLine(6)
-	flowBox.SetMinChildrenPerLine(2)
-	flowBox.SetHAlign(gtk.AlignCenter)
-	flowBox.SetVAlign(gtk.AlignStart)
+	// Add responsive breakpoints to window
+	win.AddBreakpoint(launcherFlow.NarrowBreakpoint)
+	win.AddBreakpoint(launcherFlow.MediumBreakpoint)
 
-	// Add breakpoint for narrow windows (mobile/small screens)
-	narrowBreakpoint := adw.NewBreakpoint(adw.NewBreakpointConditionLength(adw.BreakpointConditionMaxWidth, 400, adw.LengthUnitPx))
-	narrowBreakpoint.AddSetter(flowBox, "max-children-per-line", uint(2))
-	win.AddBreakpoint(narrowBreakpoint)
-
-	// Add breakpoint for medium windows
-	mediumBreakpoint := adw.NewBreakpoint(adw.NewBreakpointConditionLength(adw.BreakpointConditionMaxWidth, 600, adw.LengthUnitPx))
-	mediumBreakpoint.AddSetter(flowBox, "max-children-per-line", uint(3))
-	win.AddBreakpoint(mediumBreakpoint)
+	// Create browser buttons
+	callbacks := BrowserButtonCallbacks{
+		OnClick: func(browser *Browser) {
+			launchBrowser(browser, urlEntry.Text())
+			win.Close()
+		},
+		OnRightClick: func(btn *gtk.Button, browser *Browser) {
+			showBrowserActionsMenu(btn, browser, urlEntry.Text())
+		},
+	}
 
 	for _, browser := range filteredBrowsers {
-		b := browser // capture
-
-		// Button for each browser
-		btn := gtk.NewButton()
-		btn.AddCSSClass("flat")
-		btn.SetSizeRequest(134, 134)
-
-		// Container inside button - icon above, name and shortcut below
-		btnBox := gtk.NewBox(gtk.OrientationVertical, 8)
-		btnBox.SetHAlign(gtk.AlignCenter)
-		btnBox.SetVAlign(gtk.AlignCenter)
-
-		// Fixed-size container for icon to ensure uniform sizing
-		iconBox := gtk.NewBox(gtk.OrientationVertical, 0)
-		iconBox.SetSizeRequest(128, 128)
-		iconBox.SetHAlign(gtk.AlignCenter)
-		iconBox.SetVAlign(gtk.AlignCenter)
-
-		// Large browser icon - use helper to load with fallback
-		icon := loadBrowserIcon(b, 128)
-		icon.SetHAlign(gtk.AlignCenter)
-		icon.SetVAlign(gtk.AlignCenter)
-		iconBox.Append(icon)
-
-		btnBox.Append(iconBox)
-
-		// Set accessible label for screen readers (always, regardless of visual label)
-		labelValue := coreglib.NewValue(b.Name)
-		btn.UpdateProperty([]gtk.AccessibleProperty{gtk.AccessiblePropertyLabel}, []coreglib.Value{*labelValue})
-
-		// Show browser name based on config
-		if cfg.ShowAppNames {
-			// Show as visible label
-			label := gtk.NewLabel(b.Name)
-			label.SetEllipsize(pango.EllipsizeEnd)
-			label.SetMaxWidthChars(18)
-			label.SetJustify(gtk.JustifyCenter)
-			label.SetLines(1)
-			label.SetMarginTop(6)
-			btnBox.Append(label)
-		} else {
-			// Show as tooltip on hover
-			btn.SetTooltipText(b.Name)
-		}
-
-		btn.SetChild(btnBox)
-
-		btn.ConnectClicked(func() {
-			currentURL := urlEntry.Text()
-			launchBrowser(b, currentURL)
-			win.Close()
-		})
-
-		// Add right-click handler for desktop file actions
-		gesture := gtk.NewGestureClick()
-		gesture.SetButton(gdk.BUTTON_SECONDARY)
-		gesture.ConnectPressed(func(nPress int, x, y float64) {
-			currentURL := urlEntry.Text()
-			showBrowserActionsMenu(btn, b, currentURL)
-		})
-		btn.AddController(gesture)
-
+		btn := createBrowserButton(browser, cfg.ShowAppNames, callbacks)
 		flowBox.Insert(btn, -1)
 	}
 
@@ -151,8 +50,7 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 	flowBox.ConnectChildActivated(func(child *gtk.FlowBoxChild) {
 		idx := child.Index()
 		if idx >= 0 && idx < len(filteredBrowsers) {
-			currentURL := urlEntry.Text()
-			launchBrowser(filteredBrowsers[idx], currentURL)
+			launchBrowser(filteredBrowsers[idx], urlEntry.Text())
 			win.Close()
 		}
 	})
@@ -162,6 +60,7 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 		flowBox.SelectChild(first)
 	}
 
+	// URL entry activation launches selected browser
 	urlEntry.ConnectActivate(func() {
 		selected := flowBox.SelectedChildren()
 		if len(selected) > 0 {
@@ -171,7 +70,6 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 				win.Close()
 			}
 		} else if len(filteredBrowsers) > 0 {
-			// No selection, use first browser
 			launchBrowser(filteredBrowsers[0], urlEntry.Text())
 			win.Close()
 		}
@@ -180,59 +78,10 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 	contentBox.Append(flowBox)
 	mainBox.Append(contentBox)
 
-	// Bottom bar with hamburger menu, URL, and close button
-	bottomBar := gtk.NewBox(gtk.OrientationHorizontal, 12)
-	bottomBar.SetMarginStart(8)
-	bottomBar.SetMarginEnd(8)
-	bottomBar.SetMarginTop(8)
-	bottomBar.SetMarginBottom(8)
-
-	// Hamburger menu button (left)
-	menuBtn := gtk.NewMenuButton()
-	menuBtn.SetIconName("open-menu-symbolic")
-	menuBtn.SetTooltipText("Main menu")
-	menuBtn.AddCSSClass("flat")
-
-	menu := gio.NewMenu()
-	menu.Append("Settings", "win.settings")
-
-	aboutSection := gio.NewMenu()
-	aboutSection.Append("Donate ❤️", "win.donate")
-	aboutSection.Append("About", "win.about")
-	aboutSection.Append("Keyboard Shortcuts", "win.shortcuts")
-	menu.AppendSection("", aboutSection)
-
-	quitSection := gio.NewMenu()
-	quitSection.Append("Quit", "win.quit")
-	menu.AppendSection("", quitSection)
-
-	menuBtn.SetMenuModel(menu)
-	bottomBar.Append(menuBtn)
-
-	// Spacer before URL (to center it)
-	leftSpacer := gtk.NewBox(gtk.OrientationHorizontal, 0)
-	leftSpacer.SetHExpand(true)
-	bottomBar.Append(leftSpacer)
-
-	// Append the URL entry we created earlier
-	bottomBar.Append(urlEntry)
-
-	// Spacer after URL (to center it)
-	rightSpacer := gtk.NewBox(gtk.OrientationHorizontal, 0)
-	rightSpacer.SetHExpand(true)
-	bottomBar.Append(rightSpacer)
-
-	// Close button (right, circular like standard GTK close button)
-	closeBtn := gtk.NewButton()
-	closeBtn.SetIconName("window-close-symbolic")
-	closeBtn.SetTooltipText("Close")
-	closeBtn.AddCSSClass("circular")
-	closeBtn.ConnectClicked(func() {
-		win.Close()
-	})
-	bottomBar.Append(closeBtn)
-
+	// Bottom bar
+	bottomBar := createLauncherBottomBar(urlEntry, func() { win.Close() })
 	mainBox.Append(bottomBar)
+
 	win.SetContent(mainBox)
 
 	// Keyboard shortcuts
@@ -242,8 +91,7 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 		if keyval >= gdk.KEY_1 && keyval <= gdk.KEY_9 && state&gdk.ControlMask != 0 {
 			idx := int(keyval - gdk.KEY_1)
 			if idx < len(filteredBrowsers) {
-				currentURL := urlEntry.Text()
-				launchBrowser(filteredBrowsers[idx], currentURL)
+				launchBrowser(filteredBrowsers[idx], urlEntry.Text())
 				win.Close()
 				return true
 			}
@@ -262,4 +110,33 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 	win.InsertActionGroup("win", actionGroup)
 
 	win.Present()
+}
+
+// filter hidden browsers and moves favorite to front.
+func filterAndSortBrowsers(browsers []*Browser, cfg *Config) []*Browser {
+	// Filter hidden browsers
+	hiddenSet := make(map[string]bool)
+	for _, id := range cfg.HiddenBrowsers {
+		hiddenSet[id] = true
+	}
+
+	filtered := make([]*Browser, 0, len(browsers))
+	for _, browser := range browsers {
+		if !hiddenSet[browser.ID] {
+			filtered = append(filtered, browser)
+		}
+	}
+
+	// Move favorite to front
+	if cfg.FavoriteBrowser != "" {
+		for i, browser := range filtered {
+			if browser.ID == cfg.FavoriteBrowser {
+				favorite := browser
+				filtered = append([]*Browser{favorite}, append(filtered[:i], filtered[i+1:]...)...)
+				break
+			}
+		}
+	}
+
+	return filtered
 }
