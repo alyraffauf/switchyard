@@ -44,6 +44,17 @@
     >io.github.alyraffauf.Switchyard.desktop</launchable>
 
     <releases>
+    <release version="0.11.4" date="2026-02-04">
+    <url
+                type="details"
+            >https://github.com/alyraffauf/switchyard/releases/tag/v0.11.4</url>
+    <description translate="no">
+        <p>This release comes with the following improvements:</p>
+        <ul>
+        <li>Improved launcher spacing consistency.</li>
+        </ul>
+    </description>
+    </release>
     <release version="0.11.3" date="2026-01-28">
     <url
                 type="details"
@@ -51,7 +62,7 @@
     <description translate="no">
         <p>This release comes with the following improvements:</p>
         <ul>
-        <li>Properly escape URLs before launching browsers.</li>
+        <li>Added proper escaping for URLs before launching browsers.</li>
         </ul>
     </description>
     </release>
