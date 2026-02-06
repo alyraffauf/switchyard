@@ -206,6 +206,7 @@ func watchConfigFile(cfg *Config, onChange func()) {
 					cfg.CheckDefaultBrowser = newCfg.CheckDefaultBrowser
 					cfg.ShowAppNames = newCfg.ShowAppNames
 					cfg.ForceDarkMode = newCfg.ForceDarkMode
+					cfg.StayAlive = newCfg.StayAlive
 					cfg.HiddenBrowsers = newCfg.HiddenBrowsers
 					cfg.Redirections = newCfg.Redirections
 					cfg.Rules = newCfg.Rules

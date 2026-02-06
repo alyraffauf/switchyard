@@ -50,6 +50,13 @@ func createBehaviorPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.W
 	defaultRow.SetSelected(selectedIndex)
 
 	behaviorGroup.Add(defaultRow)
+
+	stayAliveRow := adw.NewSwitchRow()
+	stayAliveRow.SetTitle("Keep running in background")
+	stayAliveRow.SetSubtitle("Faster startup when opening links")
+	stayAliveRow.SetActive(cfg.StayAlive)
+	behaviorGroup.Add(stayAliveRow)
+
 	content.Append(behaviorGroup)
 
 	// Connect change handlers
@@ -70,6 +77,11 @@ func createBehaviorPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.W
 		} else if idx > 0 && int(idx) <= len(browsers) {
 			cfg.FavoriteBrowser = browsers[idx-1].ID
 		}
+		saveConfigWithFlag(cfg)
+	})
+
+	stayAliveRow.Connect("notify::active", func() {
+		cfg.StayAlive = stayAliveRow.Active()
 		saveConfigWithFlag(cfg)
 	})
 

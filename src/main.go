@@ -26,6 +26,9 @@ func main() {
 
 	app.ConnectActivate(func() {
 		cfg := loadConfig()
+		if cfg.StayAlive {
+			app.Hold()
+		}
 		setupApp(cfg)
 		browsers := detectBrowsers()
 		showSettingsWindow(app, browsers, cfg)
@@ -33,6 +36,9 @@ func main() {
 
 	app.ConnectOpen(func(files []gio.Filer, hint string) {
 		cfg := loadConfig()
+		if cfg.StayAlive {
+			app.Hold()
+		}
 		setupApp(cfg)
 		browsers := detectBrowsers()
 
@@ -120,7 +126,6 @@ func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config,
 			}
 			if browser := findBrowserByID(browsers, id); browser != nil {
 				launchBrowser(browser, sanitized)
-				app.Quit()
 				return
 			}
 		}
@@ -147,7 +152,6 @@ func handleURL(app *adw.Application, browsers []*Browser, cfg *Config, urlStr st
 		// Find the browser and launch it
 		if browser := findBrowserByID(browsers, browserID); browser != nil {
 			launchBrowser(browser, urlStr)
-			app.Quit()
 			return
 		}
 	}
@@ -156,7 +160,6 @@ func handleURL(app *adw.Application, browsers []*Browser, cfg *Config, urlStr st
 	if !cfg.PromptOnClick && cfg.FavoriteBrowser != "" {
 		if browser := findBrowserByID(browsers, cfg.FavoriteBrowser); browser != nil {
 			launchBrowser(browser, urlStr)
-			app.Quit()
 			return
 		}
 	}
