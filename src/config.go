@@ -19,6 +19,7 @@ type Config struct {
 	CheckDefaultBrowser bool          `toml:"check_default_browser"`
 	ShowAppNames        bool          `toml:"show_app_names"`
 	ForceDarkMode       bool          `toml:"force_dark_mode"`
+	StayAlive           bool          `toml:"stay_alive"`
 	Redirections        []Redirection `toml:"redirections,omitempty"`
 	Rules               []Rule        `toml:"rules"`
 }
