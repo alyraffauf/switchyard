@@ -37,12 +37,6 @@
 
           install -Dm644 data/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg \
             $out/share/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg
-          install -Dm644 data/icons/hicolor/symbolic/apps/io.github.alyraffauf.Switchyard-symbolic.svg \
-            $out/share/icons/hicolor/symbolic/apps/io.github.alyraffauf.Switchyard-symbolic.svg
-          install -Dm644 data/icons/hicolor/128x128/apps/io.github.alyraffauf.Switchyard.png \
-            $out/share/icons/hicolor/128x128/apps/io.github.alyraffauf.Switchyard.png
-          install -Dm644 data/icons/hicolor/64x64/apps/io.github.alyraffauf.Switchyard.png \
-            $out/share/icons/hicolor/64x64/apps/io.github.alyraffauf.Switchyard.png
         '';
 
         meta = with pkgs.lib; {
