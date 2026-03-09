@@ -60,3 +60,17 @@ just flatpak # Build and install
 - [Configuration](docs/Configuration.md) - Config file format, rules, and settings.
 - [URI Scheme](docs/URI%20Scheme.md) - Custom `switchyard://` URLs for specifying browser preferences.
 - [Prior Art](docs/Prior%20Art.md) - Similar tools that inspired Switchyard.
+
+## Notes
+
+### Flaktpak on NixOS: host browsers are not detected
+
+On NixOS, browser desktop files live in `/run/current-system/sw/share/applications`, which is not visible inside Flatpak by default.
+
+To expose them to Switchyard, add the path to the XDG application search path:
+
+```bash
+flatpak override --user io.github.alyraffauf.Switchyard \
+  --filesystem=/run/current-system/sw/share:ro \
+  --env=XDG_DATA_DIRS=/app/share:/usr/share:/run/current-system/sw/share
+```
