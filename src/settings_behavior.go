@@ -26,6 +26,12 @@ func createBehaviorPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.W
 	promptRow.SetActive(cfg.PromptOnClick)
 	behaviorGroup.Add(promptRow)
 
+	sanitizeRow := adw.NewSwitchRow()
+	sanitizeRow.SetTitle("Sanitize links")
+	sanitizeRow.SetSubtitle("Automatically remove tracking parameters from URLs using AdGuard filters")
+	sanitizeRow.SetActive(cfg.SanitizeLinks)
+	behaviorGroup.Add(sanitizeRow)
+
 	// Favorite browser dropdown
 	browserNames := make([]string, len(browsers)+1)
 	browserNames[0] = "None"
@@ -83,6 +89,16 @@ func createBehaviorPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.W
 	stayAliveRow.Connect("notify::active", func() {
 		cfg.StayAlive = stayAliveRow.Active()
 		saveConfigWithFlag(cfg)
+	})
+
+	sanitizeRow.Connect("notify::active", func() {
+		cfg.SanitizeLinks = sanitizeRow.Active()
+		saveConfigWithFlag(cfg)
+		
+		// If toggled on, we should initialize it immediately
+		if cfg.SanitizeLinks {
+			InitSanitizer(cfg)
+		}
 	})
 
 	return toolbarView

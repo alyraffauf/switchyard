@@ -185,13 +185,17 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 	return toolbarView
 }
 
+var (
+	configMonitor *gio.FileMonitor
+)
+
 func watchConfigFile(cfg *Config, onChange func()) {
 	configFile := gio.NewFileForPath(configPath())
 	monitorIface, err := configFile.Monitor(context.Background(), gio.FileMonitorNone)
 	if err == nil && monitorIface != nil {
-		monitor := gio.BaseFileMonitor(monitorIface)
-		if monitor != nil {
-			monitor.ConnectChanged(func(file, otherFile gio.Filer, eventType gio.FileMonitorEvent) {
+		configMonitor = gio.BaseFileMonitor(monitorIface)
+		if configMonitor != nil {
+			configMonitor.ConnectChanged(func(file, otherFile gio.Filer, eventType gio.FileMonitorEvent) {
 				if eventType == gio.FileMonitorEventChanged || eventType == gio.FileMonitorEventCreated {
 					savingMux.Lock()
 					saving := isSaving
@@ -207,6 +211,7 @@ func watchConfigFile(cfg *Config, onChange func()) {
 					cfg.ShowAppNames = newCfg.ShowAppNames
 					cfg.ForceDarkMode = newCfg.ForceDarkMode
 					cfg.StayAlive = newCfg.StayAlive
+					cfg.SanitizeLinks = newCfg.SanitizeLinks
 					cfg.HiddenBrowsers = newCfg.HiddenBrowsers
 					cfg.Redirections = newCfg.Redirections
 					cfg.Rules = newCfg.Rules

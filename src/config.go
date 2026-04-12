@@ -20,6 +20,7 @@ type Config struct {
 	ShowAppNames        bool          `toml:"show_app_names"`
 	ForceDarkMode       bool          `toml:"force_dark_mode"`
 	StayAlive           bool          `toml:"stay_alive"`
+	SanitizeLinks       bool          `toml:"sanitize_links"`
 	Redirections        []Redirection `toml:"redirections,omitempty"`
 	Rules               []Rule        `toml:"rules"`
 }
@@ -63,6 +64,7 @@ func loadConfig() *Config {
 		CheckDefaultBrowser: true,
 		ShowAppNames:        false, // Default: hide app names, show tooltips
 		ForceDarkMode:       true,  // Default: force dark mode
+		SanitizeLinks:       false,
 		Rules:               []Rule{},
 	}
 
