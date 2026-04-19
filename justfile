@@ -65,3 +65,53 @@ test-coverage:
 # Build and install Flatpak (development version)
 flatpak:
     flatpak-builder --user --install --force-clean build-dir flatpak/{{APPID}}.Devel.yml
+
+# Cut a new release: bump version, commit, tag, and push master + tag
+release version:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    version="{{version}}"
+    tag="v${version}"
+    metainfo="data/{{APPID}}.metainfo.xml"
+
+    if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+        echo "error: '$version' is not valid semver (expected X.Y.Z)" >&2
+        exit 1
+    fi
+
+    branch="$(git symbolic-ref --short HEAD)"
+    if [ "$branch" != "master" ]; then
+        echo "error: must be on master (currently on $branch)" >&2
+        exit 1
+    fi
+
+    # Allow src/app.go and the metainfo file to be dirty; nothing else.
+    dirty="$(git status --porcelain -- ':!src/app.go' ":!${metainfo}")"
+    if [ -n "$dirty" ]; then
+        echo "error: working tree has changes outside src/app.go and ${metainfo}:" >&2
+        echo "$dirty" >&2
+        exit 1
+    fi
+
+    if git rev-parse --verify --quiet "refs/tags/${tag}" >/dev/null; then
+        echo "error: tag ${tag} already exists" >&2
+        exit 1
+    fi
+
+    if ! grep -q "<release version=\"${version}\"" "${metainfo}"; then
+        echo "error: ${metainfo} has no <release version=\"${version}\"> entry" >&2
+        echo "       add a release entry with notes before running 'just release'" >&2
+        exit 1
+    fi
+
+    sed -i -E "s/^(\s*Version\s*=\s*)\"[^\"]+\"/\1\"${version}\"/" src/app.go
+    if ! grep -qE "Version\s*=\s*\"${version}\"" src/app.go; then
+        echo "error: failed to update Version in src/app.go" >&2
+        exit 1
+    fi
+
+    git add src/app.go "${metainfo}"
+    git commit -m "update for ${tag}"
+    git tag -a "${tag}" -m "${tag}"
+    git push origin master
+    git push origin "${tag}"
