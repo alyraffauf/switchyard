@@ -26,7 +26,6 @@ func main() {
 
 	app.ConnectActivate(func() {
 		cfg := loadConfig()
-		InitSanitizer(cfg)
 		if cfg.StayAlive {
 			app.Hold()
 		}
@@ -37,7 +36,6 @@ func main() {
 
 	app.ConnectOpen(func(files []gio.Filer, hint string) {
 		cfg := loadConfig()
-		InitSanitizer(cfg)
 		if cfg.StayAlive {
 			app.Hold()
 		}
@@ -65,8 +63,8 @@ func main() {
 			return
 		}
 
-		if cfg.SanitizeLinks {
-			sanitized = applyTrackingProtection(sanitized)
+		if cfg.RemoveTrackingParameters {
+			sanitized = removeTrackingParameters(sanitized)
 		}
 
 		if len(cfg.Redirections) > 0 {
@@ -118,8 +116,8 @@ func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config,
 		return
 	}
 
-	if cfg.SanitizeLinks {
-		sanitized = applyTrackingProtection(sanitized)
+	if cfg.RemoveTrackingParameters {
+		sanitized = removeTrackingParameters(sanitized)
 	}
 
 	if len(cfg.Redirections) > 0 {
