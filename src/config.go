@@ -13,16 +13,16 @@ import (
 )
 
 type Config struct {
-	PromptOnClick       bool          `toml:"prompt_on_click"`
-	FavoriteBrowser     string        `toml:"favorite_browser"`
-	HiddenBrowsers      []string      `toml:"hidden_browsers"`
-	CheckDefaultBrowser bool          `toml:"check_default_browser"`
-	ShowAppNames        bool          `toml:"show_app_names"`
-	ForceDarkMode       bool          `toml:"force_dark_mode"`
-	StayAlive           bool          `toml:"stay_alive"`
-	SanitizeLinks       bool          `toml:"sanitize_links"`
-	Redirections        []Redirection `toml:"redirections,omitempty"`
-	Rules               []Rule        `toml:"rules"`
+	PromptOnClick            bool          `toml:"prompt_on_click"`
+	FavoriteBrowser          string        `toml:"favorite_browser"`
+	HiddenBrowsers           []string      `toml:"hidden_browsers"`
+	CheckDefaultBrowser      bool          `toml:"check_default_browser"`
+	ShowAppNames             bool          `toml:"show_app_names"`
+	ForceDarkMode            bool          `toml:"force_dark_mode"`
+	StayAlive                bool          `toml:"stay_alive"`
+	RemoveTrackingParameters bool          `toml:"remove_tracking_parameters"`
+	Redirections             []Redirection `toml:"redirections,omitempty"`
+	Rules                    []Rule        `toml:"rules"`
 }
 
 type Redirection struct {
@@ -60,12 +60,12 @@ func configPath() string {
 
 func loadConfig() *Config {
 	cfg := &Config{
-		PromptOnClick:       true,
-		CheckDefaultBrowser: true,
-		ShowAppNames:        false, // Default: hide app names, show tooltips
-		ForceDarkMode:       true,  // Default: force dark mode
-		SanitizeLinks:       false,
-		Rules:               []Rule{},
+		PromptOnClick:            true,
+		CheckDefaultBrowser:      true,
+		ShowAppNames:             false, // Default: hide app names, show tooltips
+		ForceDarkMode:            true,  // Default: force dark mode
+		RemoveTrackingParameters: false,
+		Rules:                    []Rule{},
 	}
 
 	data, err := os.ReadFile(configPath())
@@ -82,6 +82,20 @@ func loadConfig() *Config {
 			Rules:               []Rule{},
 		}
 	}
+
+	var compat struct {
+		RemoveTrackingParameters *bool `toml:"remove_tracking_parameters"`
+		SanitizeLinks            *bool `toml:"sanitize_links"`
+	}
+	if err := toml.Unmarshal(data, &compat); err == nil {
+		switch {
+		case compat.RemoveTrackingParameters != nil:
+			cfg.RemoveTrackingParameters = *compat.RemoveTrackingParameters
+		case compat.SanitizeLinks != nil:
+			cfg.RemoveTrackingParameters = *compat.SanitizeLinks
+		}
+	}
+
 	return cfg
 }
 

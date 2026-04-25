@@ -4,22 +4,22 @@ package main
 
 import (
 	"bufio"
-	"net/http"
+	_ "embed"
+	"io"
 	"net/url"
-	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
-	"time"
 )
 
-const adguardURL = "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_17_TrackParam/filter.txt"
+// Bundled snapshot of AdGuard's tracking-parameter filter list.
+//
+//go:embed embedded/adguard_filter.txt
+var bundledAdGuardFilter string
 
 var (
-	sanitizerRules []adGuardRule
-	ruleMutex      sync.RWMutex
-	initOnce       sync.Once
+	trackingParameterRules []adGuardRule
+	loadTrackingRulesOnce  sync.Once
 )
 
 type adGuardRule struct {
@@ -29,39 +29,24 @@ type adGuardRule struct {
 	paramName   string         // Literal parameter name if not regex
 }
 
-func InitSanitizer(cfg *Config) {
-	if !cfg.SanitizeLinks {
-		return
-	}
-	initOnce.Do(func() {
-		go func() {
-			path := filepath.Join(configDir(), "adguard_filter.txt")
-			if info, err := os.Stat(path); err != nil || time.Since(info.ModTime()) > 24*time.Hour {
-				if resp, err := http.Get(adguardURL); err == nil && resp.StatusCode == 200 {
-					defer resp.Body.Close()
-					os.MkdirAll(filepath.Dir(path), 0755)
-					if out, err := os.Create(path); err == nil {
-						defer out.Close()
-						_, _ = out.ReadFrom(resp.Body)
-					}
-				}
-			}
-
-			if file, err := os.Open(path); err == nil {
-				defer file.Close()
-				var rules []adGuardRule
-				scanner := bufio.NewScanner(file)
-				for scanner.Scan() {
-					if rule, ok := parseRule(scanner.Text()); ok {
-						rules = append(rules, rule)
-					}
-				}
-				ruleMutex.Lock()
-				sanitizerRules = rules
-				ruleMutex.Unlock()
-			}
-		}()
+func getTrackingParameterRules() []adGuardRule {
+	loadTrackingRulesOnce.Do(func() {
+		trackingParameterRules = parseRules(strings.NewReader(bundledAdGuardFilter))
 	})
+	return trackingParameterRules
+}
+
+func parseRules(reader io.Reader) []adGuardRule {
+	var rules []adGuardRule
+
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		if rule, ok := parseRule(scanner.Text()); ok {
+			rules = append(rules, rule)
+		}
+	}
+
+	return rules
 }
 
 func parseRule(line string) (adGuardRule, bool) {
@@ -78,11 +63,11 @@ func parseRule(line string) (adGuardRule, bool) {
 
 	parts := strings.Split(line, "$")
 	urlPattern := parts[0]
-	
+
 	// Convert AdGuard URL pattern to Regex
 	if urlPattern != "" {
 		pattern := regexp.QuoteMeta(urlPattern)
-		pattern = strings.ReplaceAll(pattern, `\|\|`, `(^|\.)`) // AdGuard || 
+		pattern = strings.ReplaceAll(pattern, `\|\|`, `(^|\.)`)             // AdGuard ||
 		pattern = strings.ReplaceAll(pattern, `\^`, `([^a-zA-Z0-9.\-%]|$)`) // AdGuard ^
 		pattern = strings.ReplaceAll(pattern, `\*`, `.*`)
 		if re, err := regexp.Compile("(?i)" + pattern); err == nil {
@@ -113,16 +98,16 @@ func parseRule(line string) (adGuardRule, bool) {
 	return adGuardRule{}, false
 }
 
-func applyTrackingProtection(rawURL string) string {
+func removeTrackingParameters(rawURL string) string {
 	u, err := url.Parse(rawURL)
 	if err != nil || u.RawQuery == "" {
 		return rawURL
 	}
 
-	ruleMutex.RLock()
-	rules := sanitizerRules
-	ruleMutex.RUnlock()
+	return removeTrackingParametersWithRules(rawURL, u, getTrackingParameterRules())
+}
 
+func removeTrackingParametersWithRules(rawURL string, u *url.URL, rules []adGuardRule) string {
 	q := u.Query()
 	changed := false
 
@@ -147,10 +132,9 @@ func applyTrackingProtection(rawURL string) string {
 			if matchesParam {
 				if rule.isException {
 					isWhitelisted = true
-					break // If whitelisted, we stop checking for this param
-				} else {
-					shouldRemove = true
+					break
 				}
+				shouldRemove = true
 			}
 		}
 
@@ -160,9 +144,10 @@ func applyTrackingProtection(rawURL string) string {
 		}
 	}
 
-	if changed {
-		u.RawQuery = q.Encode()
-		return u.String()
+	if !changed {
+		return rawURL
 	}
-	return rawURL
+
+	u.RawQuery = q.Encode()
+	return u.String()
 }
