@@ -14,7 +14,7 @@ install-deps:
 
 # Install Flatpak dependencies
 install-flatpak-deps:
-    flatpak install flathub org.gnome.Platform//49 org.gnome.Sdk//49 org.freedesktop.Sdk.Extension.golang//25.08
+    flatpak install flathub org.gnome.Platform//50 org.gnome.Sdk//50 org.freedesktop.Sdk.Extension.golang//25.08
 
 # Build the application
 build:
@@ -64,7 +64,7 @@ test-coverage:
 
 # Build and install Flatpak (development version)
 flatpak:
-    flatpak-builder --user --install --force-clean build-dir flatpak/{{APPID}}.Devel.yml
+    flatpak run org.flatpak.Builder --user --install --force-clean --repo=build-repo build-dir flatpak/{{APPID}}.Devel.yml
 
 # Cut a new release: bump version, commit, tag, and push master + tag
 release version:
