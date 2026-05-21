@@ -47,6 +47,9 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 		flowBox.Insert(btn, -1)
 	}
 
+	// Correct max column items. This helps getting rid of empty item spacing.
+	flowBox.SetMaxChildrenPerLine(min(flowBox.MaxChildrenPerLine(), uint(len(filteredBrowsers))))
+
 	// Handle Enter/Space activation on selected FlowBox child
 	flowBox.ConnectChildActivated(func(child *gtk.FlowBoxChild) {
 		idx := child.Index()
