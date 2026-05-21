@@ -44,6 +44,18 @@
     >io.github.alyraffauf.Switchyard.desktop</launchable>
 
     <releases>
+        <release version="0.14.0" date="2026-05-21">
+    <url
+                type="details"
+            >https://github.com/alyraffauf/switchyard/releases/tag/v0.14.0</url>
+    <description translate="no">
+        <p>This release comes with the following improvements:</p>
+        <ul>
+        <li>Added AdGuard tracking parameter removal.</li>
+        <li>Improved margins for launcher.</li>
+        </ul>
+    </description>
+    </release>
     <release version="0.13.0" date="2026-04-19">
     <url
                 type="details"
