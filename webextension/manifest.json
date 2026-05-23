@@ -1,0 +1,26 @@
+{
+    "manifest_version": 3,
+    "name": "Open in Switchyard",
+    "version": "0.14.0",
+    "description": "Open the current page in Switchyard for browser selection",
+    "homepage_url": "https://github.com/alyraffauf/Switchyard",
+    "permissions": [
+        "activeTab"
+    ],
+    "action": {
+        "default_title": "Open in Switchyard",
+        "default_icon": {
+            "16": "icons/switchyard-16.png",
+            "48": "icons/switchyard-48.png",
+            "128": "icons/switchyard-128.png"
+        }
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "switchyard@alyraffauf.github.io"
+        }
+    }
+}

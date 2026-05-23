@@ -12,3 +12,4 @@ build/
 coverage.out
 repo/
 switchyard
+switchyard-webextension.zip

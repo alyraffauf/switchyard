@@ -66,6 +66,17 @@ test-coverage:
 flatpak:
     flatpak run org.flatpak.Builder --user --install --force-clean --repo=build-repo build-dir flatpak/{{APPID}}.Devel.yml
 
+# Bundle the browser extension into a zip archive
+bundle-extension:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    root="{{justfile_directory()}}"
+    extdir="${root}/webextension"
+    outfile="${root}/switchyard-webextension.zip"
+    rm -f "${outfile}"
+    cd "${extdir}" && zip -r "${outfile}" . -x '.git*'
+    echo "Extension bundled: switchyard-webextension.zip"
+
 # Cut a new release: bump version, commit, tag, and push master + tag
 release version:
     #!/usr/bin/env bash
@@ -73,6 +84,7 @@ release version:
     version="{{version}}"
     tag="v${version}"
     metainfo="data/{{APPID}}.metainfo.xml"
+    manifest="webextension/manifest.json"
 
     if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
         echo "error: '$version' is not valid semver (expected X.Y.Z)" >&2
@@ -85,10 +97,10 @@ release version:
         exit 1
     fi
 
-    # Allow src/app.go and the metainfo file to be dirty; nothing else.
-    dirty="$(git status --porcelain -- ':!src/app.go' ":!${metainfo}")"
+    # Allow src/app.go, metainfo, and extension manifest to be dirty; nothing else.
+    dirty="$(git status --porcelain -- ':!src/app.go' ":!${metainfo}" ":!${manifest}")"
     if [ -n "$dirty" ]; then
-        echo "error: working tree has changes outside src/app.go and ${metainfo}:" >&2
+        echo "error: working tree has changes outside src/app.go, ${metainfo}, ${manifest}:" >&2
         echo "$dirty" >&2
         exit 1
     fi
@@ -110,7 +122,13 @@ release version:
         exit 1
     fi
 
-    git add src/app.go "${metainfo}"
+    sed -i -E 's/^(\s*"version"\s*:\s*)"[^"]+"/\1"'"${version}"'"/' "${manifest}"
+    if ! grep -qE '"version"\s*:\s*"'"${version}"'"' "${manifest}"; then
+        echo "error: failed to update version in ${manifest}" >&2
+        exit 1
+    fi
+
+    git add src/app.go "${metainfo}" "${manifest}"
     git commit -m "update for ${tag}"
     git tag -a "${tag}" -m "${tag}"
     git push origin master

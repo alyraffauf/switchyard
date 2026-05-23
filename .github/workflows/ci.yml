@@ -26,6 +26,13 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
           go tool cover -func=coverage.out >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+      - name: Bundle browser extension
+        run: just bundle-extension
+      - name: Upload extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: switchyard-webextension
+          path: switchyard-webextension.zip
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
         with:
@@ -57,7 +64,7 @@ jobs:
   release:
     name: "Create Release"
     if: startsWith(github.ref, 'refs/tags/')
-    needs: flatpak
+    needs: [flatpak, test]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -67,12 +74,17 @@ jobs:
         with:
           pattern: io.github.alyraffauf.Switchyard.Devel-${{ github.sha }}-*.flatpak
           merge-multiple: true
+      - name: Download extension artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: switchyard-webextension
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             *.flatpak
+            switchyard-webextension.zip
           draft: false
           prerelease: false
           generate_release_notes: true
