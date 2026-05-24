@@ -4,7 +4,6 @@
 package main
 
 import (
-	"fmt"
 	"net/url"
 	"os"
 	"strings"
@@ -19,30 +18,12 @@ import (
 func main() {
 	app := adw.NewApplication(getAppID(), gio.ApplicationHandlesOpen)
 
-	app.AddMainOption("install-native-host", 0, glib.OptionFlagNone, glib.OptionArgNone,
-		"Install browser native-messaging host manifests", "")
-	app.AddMainOption("uninstall-native-host", 0, glib.OptionFlagNone, glib.OptionArgNone,
-		"Remove browser native-messaging host manifests", "")
 	app.AddMainOption("native-host", 0, glib.OptionFlagNone, glib.OptionArgNone,
 		"Run as native-messaging host (invoked by browsers)", "")
 
 	app.ConnectHandleLocalOptions(func(options *glib.VariantDict) int {
 		if options.Contains("native-host") {
 			runNativeMessagingHost()
-			return 0
-		}
-		if options.Contains("install-native-host") {
-			if err := installNativeHost(); err != nil {
-				fmt.Fprintln(os.Stderr, "error:", err)
-				return 1
-			}
-			return 0
-		}
-		if options.Contains("uninstall-native-host") {
-			if err := uninstallNativeHost(); err != nil {
-				fmt.Fprintln(os.Stderr, "error:", err)
-				return 1
-			}
 			return 0
 		}
 		return -1
