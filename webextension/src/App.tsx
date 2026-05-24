@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserIcon } from "./icons";
 
 interface Browser {
   id: string;
@@ -23,12 +24,10 @@ function getCachedBrowsers(): Browser[] {
   }
 }
 
-function cacheBrowsers(browsers: Browser[]) {
+function cacheLocal(browsers: Browser[]) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(browsers));
-  } catch {
-    /* quota exceeded — ignore */
-  }
+  } catch {}
 }
 
 function launch(url: string, tabId: number, browser?: string) {
@@ -41,7 +40,9 @@ function launch(url: string, tabId: number, browser?: string) {
 function App() {
   const [tab, setTab] = useState<chrome.tabs.Tab | null>(null);
   const [browsers, setBrowsers] = useState<Browser[]>(getCachedBrowsers);
-  const [nativeHostMissing, setNativeHostMissing] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  const fetching = useRef(false);
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([t]) =>
@@ -50,24 +51,22 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!tab?.url || !ROUTABLE.test(tab.url)) return;
+    if (!tab?.url || !ROUTABLE.test(tab.url) || fetching.current) return;
+    fetching.current = true;
 
     chrome.runtime.sendNativeMessage(
       HOST,
       { action: "listBrowsers" },
       (resp) => {
+        fetching.current = false;
         if (chrome.runtime.lastError) {
-          console.error(
-            "Switchyard native host error:",
-            chrome.runtime.lastError.message,
-          );
-          setNativeHostMissing(true);
+          setLoaded(true);
           return;
         }
-        setNativeHostMissing(false);
         const list = (resp as BrowserList)?.browsers ?? [];
-        cacheBrowsers(list);
+        cacheLocal(list);
         setBrowsers(list);
+        setLoaded(true);
       },
     );
   }, [tab]);
@@ -84,12 +83,19 @@ function App() {
   return (
     <>
       <button className="row primary" onClick={() => launch(url, tabId)}>
+        <img
+          src="icons/switchyard.svg"
+          width="16"
+          height="16"
+          style={{ flexShrink: 0, marginRight: 8 }}
+          alt=""
+        />
         Open in Switchyard
       </button>
-      {(nativeHostMissing || browsers.length > 0) && (
+      {((loaded && browsers.length === 0) || browsers.length > 0) && (
         <div className="separator" />
       )}
-      {nativeHostMissing && (
+      {loaded && browsers.length === 0 && (
         <div className="hint">Install the native host to list browsers</div>
       )}
       {browsers.map((b) => (
@@ -99,6 +105,7 @@ function App() {
           title={b.id}
           onClick={() => launch(url, tabId, b.id)}
         >
+          <BrowserIcon browserId={b.id} />
           {b.name}
         </button>
       ))}
