@@ -94,7 +94,16 @@ function App() {
         <div className="separator" />
       )}
       {loaded && browsers.length === 0 && (
-        <div className="hint">Install the native host to list browsers</div>
+        <div className="hint">
+          <a
+            href="https://github.com/alyraffauf/Switchyard/blob/master/docs/WebExtension.md#desktop-integration"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Set up desktop integration
+          </a>{" "}
+          to list browsers
+        </div>
       )}
       {browsers.map((b) => (
         <button

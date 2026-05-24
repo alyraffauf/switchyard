@@ -6,14 +6,14 @@ The extension lives in the `webextension/` directory and ships as a standard Web
 
 The intent is to add deeper integration with the desktop app. Eventually, it will be submitted to the Chrome Web Store and Mozilla.
 
-## Native Messaging Support
+## Desktop Integration
 
 The Switchyard extension can also show your installed browsers directly in the popup, letting you send the current tab to a specific browser in one click. This requires installing a native messaging host on your system.
 
-Please read [`scripts/install-native-host.sh`](../scripts/install-native-host.sh) before running this command:
+Please read [`scripts/install-desktop-integration.sh`](../scripts/install-desktop-integration.sh) before running this command:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/alyraffauf/Switchyard/master/scripts/install-native-host.sh | bash
+curl -fsSL https://raw.githubusercontent.com/alyraffauf/Switchyard/master/scripts/install-desktop-integration.sh | bash
 ```
 
 After installation, restart your browser(s). The extension popup will list your installed browsers.
@@ -21,7 +21,7 @@ After installation, restart your browser(s). The extension popup will list your 
 ### Uninstall
 
 ```bash
-bash install-native-host.sh --uninstall
+bash install-desktop-integration.sh --uninstall
 ```
 
 This removes all manifests and wrappers, but the `flatpak override` permissions granted during install are left in place. It's up to the user to decide what to do with them.
