@@ -25,3 +25,7 @@ bash install-desktop-integration.sh --uninstall
 ```
 
 This removes all manifests and wrappers, but the `flatpak override` permissions granted during install are left in place. It's up to the user to decide what to do with them.
+
+## Privacy Policy
+
+Switchyard does not collect, store, or transmit any user data. The browser extension reads the current tab's URL solely to pass it to the local Switchyard desktop app. No data leaves your device.
