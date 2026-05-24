@@ -44,7 +44,18 @@
     >io.github.alyraffauf.Switchyard.desktop</launchable>
 
     <releases>
-        <release version="0.14.0" date="2026-05-21">
+    <release version="0.15.0" date="2026-05-24">
+    <url
+                type="details"
+            >https://github.com/alyraffauf/switchyard/releases/tag/v0.15.0</url>
+    <description translate="no">
+        <p>This release comes with the following improvements:</p>
+        <ul>
+        <li>Preliminary support for the Switchyard browser extension.</li>
+        </ul>
+    </description>
+    </release>
+    <release version="0.14.0" date="2026-05-21">
     <url
                 type="details"
             >https://github.com/alyraffauf/switchyard/releases/tag/v0.14.0</url>
