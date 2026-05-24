@@ -4,25 +4,49 @@
 package main
 
 import (
+	"fmt"
 	"net/url"
 	"os"
 	"strings"
-	"sync"
 
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
+	"github.com/diamondburned/gotk4/pkg/glib/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
-)
-
-// Global flag to track if we're currently saving config to avoid file watcher race conditions
-var (
-	isSaving  bool
-	savingMux sync.Mutex
 )
 
 func main() {
 	app := adw.NewApplication(getAppID(), gio.ApplicationHandlesOpen)
+
+	app.AddMainOption("install-native-host", 0, glib.OptionFlagNone, glib.OptionArgNone,
+		"Install browser native-messaging host manifests", "")
+	app.AddMainOption("uninstall-native-host", 0, glib.OptionFlagNone, glib.OptionArgNone,
+		"Remove browser native-messaging host manifests", "")
+	app.AddMainOption("native-host", 0, glib.OptionFlagNone, glib.OptionArgNone,
+		"Run as native-messaging host (invoked by browsers)", "")
+
+	app.ConnectHandleLocalOptions(func(options *glib.VariantDict) int {
+		if options.Contains("native-host") {
+			runNativeMessagingHost()
+			return 0
+		}
+		if options.Contains("install-native-host") {
+			if err := installNativeHost(); err != nil {
+				fmt.Fprintln(os.Stderr, "error:", err)
+				return 1
+			}
+			return 0
+		}
+		if options.Contains("uninstall-native-host") {
+			if err := uninstallNativeHost(); err != nil {
+				fmt.Fprintln(os.Stderr, "error:", err)
+				return 1
+			}
+			return 0
+		}
+		return -1
+	})
 
 	app.ConnectActivate(func() {
 		cfg := loadConfig()

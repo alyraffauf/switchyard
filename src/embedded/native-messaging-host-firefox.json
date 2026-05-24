@@ -1,0 +1,7 @@
+{
+  "name": "io.github.alyraffauf.switchyard",
+  "description": "Switchyard browser selector",
+  "path": "@SWITCHYARD_NM@",
+  "type": "stdio",
+  "allowed_extensions": ["switchyard@alyraffauf.github.io"]
+}

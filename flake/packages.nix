@@ -14,6 +14,12 @@
         vendorHash = null;
         subPackages = ["src"];
 
+        buildPhase = ''
+          runHook preBuild
+          go build -mod=vendor -trimpath -ldflags="-s -w" -o switchyard ./src
+          runHook postBuild
+        '';
+
         postBuild = ''
           mv $GOPATH/bin/src $GOPATH/bin/switchyard || true
         '';

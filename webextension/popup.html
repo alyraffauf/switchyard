@@ -1,0 +1,82 @@
+<!doctype html>
+<meta charset="utf-8" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #fff;
+    --fg: #1f1f1f;
+    --muted: #6b6b6b;
+    --hover: rgba(0, 0, 0, 0.08);
+    --active: rgba(0, 0, 0, 0.14);
+    --sep: rgba(0, 0, 0, 0.1);
+    --accent: #3584e4;
+  }
+  :root.dark {
+    --bg: #242424;
+    --fg: #ececec;
+    --muted: #a0a0a0;
+    --hover: rgba(255, 255, 255, 0.1);
+    --active: rgba(255, 255, 255, 0.18);
+    --sep: rgba(255, 255, 255, 0.12);
+    --accent: #62a0ea;
+  }
+  body {
+    margin: 0;
+    min-width: 240px;
+    background: var(--bg);
+    color: var(--fg);
+    font:
+      13px system-ui,
+      sans-serif;
+  }
+  .header {
+    padding: 10px 12px 8px;
+    border-bottom: 1px solid var(--sep);
+    color: var(--muted);
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #root {
+    padding: 4px 0;
+  }
+  .row {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .row:hover {
+    background: var(--hover);
+  }
+  .row:active {
+    background: var(--active);
+  }
+  .row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+  .row.primary {
+    font-weight: 600;
+  }
+  .separator {
+    height: 1px;
+    margin: 4px 8px;
+    background: var(--sep);
+  }
+  .hint {
+    padding: 10px 12px;
+    color: var(--muted);
+    font-size: 11px;
+    text-align: center;
+  }
+</style>
+<div id="header" class="header" hidden></div>
+<div id="root"></div>
+<script src="popup.js"></script>

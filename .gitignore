@@ -8,6 +8,7 @@
 .pre-commit-config.yaml
 .vscode/
 build-dir/
+build-repo/
 build/
 coverage.out
 repo/
