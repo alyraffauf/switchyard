@@ -9,6 +9,7 @@ const ctx = await esbuild.context({
   target: "es2022",
   sourcemap: watch ? "inline" : false,
   minify: !watch,
+  define: watch ? {} : { "process.env.NODE_ENV": '"production"' },
 });
 
 if (watch) {

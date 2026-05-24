@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "simple-icons": "^16.21.0"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.30",
