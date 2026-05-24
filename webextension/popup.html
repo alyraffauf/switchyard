@@ -11,14 +11,16 @@
     --sep: rgba(0, 0, 0, 0.1);
     --accent: #3584e4;
   }
-  :root.dark {
-    --bg: #242424;
-    --fg: #ececec;
-    --muted: #a0a0a0;
-    --hover: rgba(255, 255, 255, 0.1);
-    --active: rgba(255, 255, 255, 0.18);
-    --sep: rgba(255, 255, 255, 0.12);
-    --accent: #62a0ea;
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #242424;
+      --fg: #ececec;
+      --muted: #a0a0a0;
+      --hover: rgba(255, 255, 255, 0.1);
+      --active: rgba(255, 255, 255, 0.18);
+      --sep: rgba(255, 255, 255, 0.12);
+      --accent: #62a0ea;
+    }
   }
   body {
     margin: 0;
@@ -77,6 +79,5 @@
     text-align: center;
   }
 </style>
-<div id="header" class="header" hidden></div>
 <div id="root"></div>
-<script src="popup.js"></script>
+<script src="build/App.js"></script>

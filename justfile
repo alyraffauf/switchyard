@@ -67,15 +67,21 @@ flatpak:
     [ -f build-repo/config ] || rm -rf build-repo
     flatpak run org.flatpak.Builder --user --install --force-clean --repo=build-repo build-dir flatpak/{{APPID}}.Devel.yml
 
+# Build the browser extension (TypeScript + React)
+build-extension:
+    cd webextension && npm ci && npm run build
+
 # Bundle the browser extension into a zip archive
-bundle-extension:
+bundle-extension: build-extension
     #!/usr/bin/env bash
     set -euo pipefail
     root="{{justfile_directory()}}"
     extdir="${root}/webextension"
     outfile="${root}/switchyard-webextension.zip"
     rm -f "${outfile}"
-    cd "${extdir}" && zip -r "${outfile}" . -x '.git*'
+    cd "${extdir}" && zip -r "${outfile}" . \
+        -x '.git*' 'node_modules/*' 'src/*' \
+        -x 'package.json' 'package-lock.json' 'tsconfig.json' 'esbuild.config.mjs'
     echo "Extension bundled: switchyard-webextension.zip"
 
 # Cut a new release: bump version, commit, tag, and push master + tag
