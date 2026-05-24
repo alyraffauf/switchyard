@@ -64,6 +64,7 @@ test-coverage:
 
 # Build and install Flatpak (development version)
 flatpak:
+    [ -f build-repo/config ] || rm -rf build-repo
     flatpak run org.flatpak.Builder --user --install --force-clean --repo=build-repo build-dir flatpak/{{APPID}}.Devel.yml
 
 # Bundle the browser extension into a zip archive
