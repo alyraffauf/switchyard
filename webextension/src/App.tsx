@@ -7,8 +7,6 @@ interface Browser {
   name: string;
 }
 
-type BrowserList = { browsers: Browser[] };
-
 const HOST = "io.github.alyraffauf.switchyard";
 const ROUTABLE = /^(https?|ftp|file):/;
 const CACHE_KEY = "browsers_v2";
@@ -63,7 +61,7 @@ function App() {
           setLoaded(true);
           return;
         }
-        const list = (resp as BrowserList)?.browsers ?? [];
+        const list = (resp as { browsers: Browser[] })?.browsers ?? [];
         cacheLocal(list);
         setBrowsers(list);
         setLoaded(true);
@@ -90,7 +88,7 @@ function App() {
           style={{ flexShrink: 0, marginRight: 8 }}
           alt=""
         />
-        Open in Switchyard
+        Switchyard
       </button>
       {((loaded && browsers.length === 0) || browsers.length > 0) && (
         <div className="separator" />
