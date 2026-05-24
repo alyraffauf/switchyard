@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Switchyard native messaging host installer — https://github.com/alyraffauf/Switchyard
+# Switchyard desktop integration installer — https://github.com/alyraffauf/Switchyard
 #
-# Installs manifests that let the browser extension list your installed browsers.
+# Installs the desktop integration that lets the browser extension list your installed browsers.
 #
 # For Flatpak browsers this grants --talk-name=org.freedesktop.Flatpak, which
 # lets code inside the browser sandbox run arbitrary host commands via
