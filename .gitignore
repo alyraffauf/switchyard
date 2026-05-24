@@ -10,6 +10,8 @@
 build-dir/
 build-repo/
 build/
+node_modules/
+webextension/build/
 coverage.out
 repo/
 switchyard

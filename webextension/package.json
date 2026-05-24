@@ -1,0 +1,21 @@
+{
+  "name": "switchyard-webextension",
+  "version": "0.14.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node esbuild.config.mjs",
+    "dev": "node esbuild.config.mjs --watch"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.30",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.5",
+    "esbuild": "^0.25.4",
+    "typescript": "^5.8.3"
+  }
+}
