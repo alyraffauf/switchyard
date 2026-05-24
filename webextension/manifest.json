@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Open in Switchyard",
+  "name": "Switchyard",
   "description": "Open the current page in Switchyard for browser selection",
   "version": "0.14.0",
   "homepage_url": "https://github.com/alyraffauf/Switchyard",

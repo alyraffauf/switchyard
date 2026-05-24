@@ -80,7 +80,7 @@ bundle-extension: build-extension
     outfile="${root}/switchyard-webextension.zip"
     rm -f "${outfile}"
     cd "${extdir}" && zip -r "${outfile}" . \
-        -x '.git*' 'node_modules/*' 'src/*' \
+        -x '.git*' 'node_modules/*' 'src/*' 'web-ext-artifacts/*' \
         -x 'package.json' 'package-lock.json' 'tsconfig.json' 'esbuild.config.mjs'
     echo "Extension bundled: switchyard-webextension.zip"
 
