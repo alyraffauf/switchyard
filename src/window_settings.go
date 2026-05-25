@@ -32,7 +32,7 @@ func showSettingsWindow(app *adw.Application, browsers []*Browser, cfg *Config) 
 	splitView.SetSidebar(sidebarPage)
 
 	// Initial content
-	contentPage := adw.NewNavigationPage(createAppearancePage(win, browsers, cfg), "Appearance")
+	contentPage := adw.NewNavigationPage(createRulesPage(win, browsers, cfg), "Browser Rules")
 	splitView.SetContent(contentPage)
 
 	win.SetContent(splitView)
@@ -141,9 +141,8 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 	scrolled.SetChild(listBox)
 	toolbarView.SetContent(scrolled)
 
-	listBox.SelectRow(listBox.RowAtIndex(0))
+	listBox.SelectRow(listBox.RowAtIndex(3))
 
-	// Navigation handler
 	navigateToPage := func(index int) {
 		var page gtk.Widgetter
 		var title string
