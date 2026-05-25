@@ -9,7 +9,7 @@
 # flatpak-spawn --host. This weakens the Flatpak sandbox for those browsers.
 # Read and understand this before running it.
 #
-# Usage:  bash install-native-host.sh [--uninstall]
+# Usage:  bash install-desktop-integration.sh [--uninstall]
 
 set -euo pipefail
 
@@ -34,7 +34,7 @@ fi
 
 NAME="io.github.alyraffauf.switchyard"
 WRAPPER="$HOME/.local/share/switchyard/native-host-wrapper.sh"
-CHROME_ORIGIN="chrome-extension://gmdmmjfmpfbmddgphjbkbbmdolkifloi/"
+CHROME_ORIGIN="chrome-extension://ncehhpikkabfdcceimdhjjjodogflokc/"
 FF_EXT="switchyard@alyraffauf.github.io"
 
 NATIVE_CHROMIUM=(net.imput.helium google-chrome chromium BraveSoftware/Brave-Browser microsoft-edge vivaldi)
