@@ -26,6 +26,12 @@ bash install-desktop-integration.sh --uninstall
 
 This removes all manifests and wrappers, but the `flatpak override` permissions granted during install are left in place. It's up to the user to decide what to do with them.
 
+## How It Works
+
+The browser extension stays simple by making use of our [URI Scheme](./URI%20Scheme.md). When you click a browser button or "Switchyard", it redirects the current tab to a `switchyard://open?url=...` URL. The operating system sees the registered `switchyard://` scheme and launches the Switchyard desktop app, which parses the URL and forwards your page to the right browser.
+
+With [desktop integration](#desktop-integration) enabled, the extension can also ask Switchyard for your installed browsers and display them directly in the popup for one-click launching.
+
 ## Privacy Policy
 
 Switchyard does not collect, store, or transmit any user data. The browser extension reads the current tab's URL solely to pass it to the local Switchyard desktop app. No data leaves your device.
