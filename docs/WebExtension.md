@@ -14,7 +14,7 @@ With [desktop integration](#desktop-integration) enabled, the extension can also
 
 The Switchyard extension can also show your installed browsers directly in the popup, letting you send the current tab to a specific browser in one click. This requires installing a native messaging host on your system.
 
-Please read [`scripts/install-desktop-integration.sh`](../scripts/install-desktop-integration.sh) before running this command:
+Please read [`scripts/install-desktop-integration.sh`](../scripts/install-desktop-integration.py) before running this command:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/alyraffauf/Switchyard/master/scripts/install-desktop-integration.sh | bash
