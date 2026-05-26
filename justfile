@@ -67,6 +67,10 @@ flatpak:
     [ -f build-repo/config ] || rm -rf build-repo
     flatpak run org.flatpak.Builder --user --install --force-clean --repo=build-repo build-dir flatpak/{{APPID}}.Devel.yml
 
+# Build Flatpak and export a .flatpak bundle for distribution
+flatpak-bundle: flatpak
+    flatpak build-bundle build-repo switchyard.flatpak {{APPID}}.Devel
+
 # Build the browser extension (TypeScript + React)
 build-extension:
     cd webextension && npm ci && npm run build
