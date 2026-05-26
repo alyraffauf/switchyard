@@ -112,7 +112,7 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 	content.Append(infoLabel)
 
 	rulesListBox := createBoxedListBox()
-	emptyState := createEmptyState("list-add-symbolic", "No Browser Rules", "Add rules to automatically open links in specific browsers")
+	emptyState := createEmptyState("view-list-symbolic", "No Browser Rules", "Add rules to automatically open links in specific browsers")
 
 	// Helper to get browser name from ID
 	getBrowserName := func(id string) string {
