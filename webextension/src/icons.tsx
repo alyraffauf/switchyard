@@ -11,6 +11,7 @@ import {
   siArc,
   siZenbrowser,
   siMullvad,
+  siHeliumbrowser,
 } from "simple-icons";
 
 const ICON_MAP: Record<string, typeof siFirefox> = {
@@ -26,6 +27,7 @@ const ICON_MAP: Record<string, typeof siFirefox> = {
   arc: siArc,
   zen: siZenbrowser,
   mullvad: siMullvad,
+  helium: siHeliumbrowser,
   safari: siSafari,
 };
 
