@@ -79,16 +79,9 @@ jobs:
       - name: Build extension
         working-directory: webextension
         run: npm ci && npm run build
-      - name: Sign for self-distribution (unlisted)
+      - name: Submit to AMO
         working-directory: webextension
-        run: npx web-ext sign --channel=unlisted --api-key=${{ secrets.AMO_JWT_ISSUER }} --api-secret=${{ secrets.AMO_JWT_SECRET }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: switchyard-webextension-xpi
-          path: webextension/web-ext-artifacts/*.xpi
-      - name: Submit to AMO (listed)
-        working-directory: webextension
-        run: npx web-ext sign --channel=listed --api-key=${{ secrets.AMO_JWT_ISSUER }} --api-secret=${{ secrets.AMO_JWT_SECRET }}
+        run: npx web-ext sign --channel=listed --approval-timeout=0 --api-key=${{ secrets.AMO_JWT_ISSUER }} --api-secret=${{ secrets.AMO_JWT_SECRET }}
 
   publish-github:
     name: "Publish GitHub Release"
@@ -103,17 +96,11 @@ jobs:
         with:
           pattern: io.github.alyraffauf.Switchyard.Devel-${{ github.sha }}-*.flatpak
           merge-multiple: true
-      - name: Download signed XPI
-        uses: actions/download-artifact@v4
-        with:
-          name: switchyard-webextension-xpi
-
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             *.flatpak
-            *.xpi
           draft: false
           prerelease: false
           generate_release_notes: true
