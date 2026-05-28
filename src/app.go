@@ -15,9 +15,10 @@ const (
 	Version       = "0.15.0"
 
 	// Links
-	WebsiteURL = "https://switchyard.aly.codes/"
-	IssueURL   = "https://github.com/alyraffauf/switchyard/issues"
-	DonateURL  = "https://ko-fi.com/alyraffauf"
+	WebsiteURL          = "https://switchyard.aly.codes/"
+	IssueURL            = "https://github.com/alyraffauf/switchyard/issues"
+	DonateURL           = "https://ko-fi.com/alyraffauf"
+	FirefoxExtensionURL = "https://addons.mozilla.org/firefox/addon/switchyard/"
 )
 
 type Contributor struct {

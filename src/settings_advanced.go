@@ -106,5 +106,21 @@ func createAdvancedPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 
 	content.Append(configGroup)
 
+	extensionGroup := adw.NewPreferencesGroup()
+	extensionGroup.SetTitle("Browser Extension")
+
+	extensionRow := adw.NewActionRow()
+	extensionRow.SetTitle("Firefox Extension")
+	extensionRow.SetSubtitle("Open links in Switchyard directly from Firefox")
+	extensionRow.SetActivatable(true)
+	extensionRow.AddSuffix(gtk.NewImageFromIconName("adw-external-link-symbolic"))
+	extensionRow.ConnectActivated(func() {
+		launcher := gtk.NewURILauncher(FirefoxExtensionURL)
+		launcher.Launch(context.Background(), &win.Window, nil)
+	})
+	extensionGroup.Add(extensionRow)
+
+	content.Append(extensionGroup)
+
 	return toolbarView
 }
