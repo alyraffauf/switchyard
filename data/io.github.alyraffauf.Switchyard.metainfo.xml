@@ -37,6 +37,9 @@
     <p>
       Create rules using simple domain, keyword, wildcard, or regex matching. Combine conditions for precise control. Strip tracking parameters or redirect to privacy-friendly alternatives before links even open. Set it once and forget it.
     </p>
+    <p>
+      Browser extensions for Firefox and Chrome let you send the current page to any of your installed browsers.
+    </p>
   </description>
 
   <launchable
@@ -44,6 +47,17 @@
     >io.github.alyraffauf.Switchyard.desktop</launchable>
 
     <releases>
+    <release version="0.15.1" date="2026-05-28">
+    <url
+                type="details"
+            >https://github.com/alyraffauf/switchyard/releases/tag/v0.15.1</url>
+    <description translate="no">
+        <p>This release comes with the following improvements:</p>
+        <ul>
+        <li>Full support for the Switchyard Firefox extension.</li>
+        </ul>
+    </description>
+    </release>
     <release version="0.15.0" date="2026-05-24">
     <url
                 type="details"
