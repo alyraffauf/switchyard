@@ -8,7 +8,7 @@ on:
 name: CI
 jobs:
   test:
-    name: "Unit Tests"
+    name: "Test"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,24 +32,20 @@ jobs:
           name: coverage-report
           path: coverage.out
 
-  webextension:
-    name: "WebExtension"
+  build-webextension:
+    name: "Build WebExtension"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
-      - uses: extractions/setup-just@v2
-      - name: Bundle extension
-        run: just bundle-extension
-      - uses: actions/upload-artifact@v4
-        with:
-          name: switchyard-webextension
-          path: switchyard-webextension.zip
+      - name: Build extension
+        working-directory: webextension
+        run: npm ci && npm run build
 
-  flatpak:
-    name: "Flatpak (${{ matrix.variant.arch }})"
+  build-flatpak:
+    name: "Build Flatpak (${{ matrix.variant.arch }})"
     runs-on: ${{ matrix.variant.runner }}
     strategy:
       matrix:
@@ -70,30 +66,54 @@ jobs:
           cache-key: flatpak-builder
           arch: ${{ matrix.variant.arch }}
 
-  release:
-    name: "Create Release"
+  publish-amo:
+    name: "Publish to AMO"
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [flatpak, test, webextension]
+    needs: [build-webextension]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+      - name: Build extension
+        working-directory: webextension
+        run: npm ci && npm run build
+      - name: Sign for self-distribution (unlisted)
+        working-directory: webextension
+        run: npx web-ext sign --channel=unlisted --api-key=${{ secrets.AMO_JWT_ISSUER }} --api-secret=${{ secrets.AMO_JWT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: switchyard-webextension-xpi
+          path: webextension/web-ext-artifacts/*.xpi
+      - name: Submit to AMO (listed)
+        working-directory: webextension
+        run: npx web-ext sign --channel=listed --api-key=${{ secrets.AMO_JWT_ISSUER }} --api-secret=${{ secrets.AMO_JWT_SECRET }}
+
+  publish-github:
+    name: "Publish GitHub Release"
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build-flatpak, test, publish-amo]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Download all Flatpak artifacts
+      - name: Download Flatpak bundles
         uses: actions/download-artifact@v4
         with:
           pattern: io.github.alyraffauf.Switchyard.Devel-${{ github.sha }}-*.flatpak
           merge-multiple: true
-      - name: Download extension artifact
+      - name: Download signed XPI
         uses: actions/download-artifact@v4
         with:
-          name: switchyard-webextension
+          name: switchyard-webextension-xpi
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             *.flatpak
-            switchyard-webextension.zip
+            *.xpi
           draft: false
           prerelease: false
           generate_release_notes: true
