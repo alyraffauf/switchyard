@@ -1,4 +1,4 @@
-[![CI](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml/badge.svg)](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0) [![Ko-fi](https://img.shields.io/badge/Donate-Ko--fi-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/alyraffauf)
+[![CI](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml/badge.svg)](https://github.com/alyraffauf/switchyard/actions/workflows/ci.yml) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0) [![Ko-fi](https://img.shields.io/badge/Donate-Ko--fi-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/alyraffauf) [![Mozilla Add-on](https://img.shields.io/amo/v/switchyard?logo=firefox-browser&logoColor=white&label=Firefox%20Add-on)](https://addons.mozilla.org/firefox/addon/switchyard/)
 
 <div align="center">
   <img width="128" height="128" src="data/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg" alt="Switchyard Icon">
@@ -12,6 +12,9 @@
 
 <p align="center">
   <a href="https://flathub.org/apps/io.github.alyraffauf.Switchyard"><img src="https://flathub.org/api/badge?locale=en&style=flat" alt="Get it on Flathub"></a>
+</p>
+<p align="center">
+  <a href="https://addons.mozilla.org/firefox/addon/switchyard/"><img src="https://shieldcn.dev/amo/v/switchyard.svg?variant=branded" alt="Get the Firefox Add-on"></a>
 </p>
 
 ## Features
@@ -59,6 +62,7 @@ just flatpak # Build and install
 - [Using](docs/Using.md) - Set as default browser, usage examples.
 - [Configuration](docs/Configuration.md) - Config file format, rules, and settings.
 - [URI Scheme](docs/URI%20Scheme.md) - Custom `switchyard://` URLs for specifying browser preferences.
+- [Bowser Extension](docs/WebExtension.md) - Extensions for Firefox and Chrome.
 - [Prior Art](docs/Prior%20Art.md) - Similar tools that inspired Switchyard.
 
 ## Notes
