@@ -16,12 +16,8 @@
 
         buildPhase = ''
           runHook preBuild
-          go build -mod=vendor -trimpath -ldflags="-s -w" -o switchyard ./src
+          go build -mod=vendor -trimpath -ldflags="-s -w" -o $GOPATH/bin/switchyard ./src
           runHook postBuild
-        '';
-
-        postBuild = ''
-          mv $GOPATH/bin/src $GOPATH/bin/switchyard || true
         '';
 
         nativeBuildInputs = with pkgs; [
