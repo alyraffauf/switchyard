@@ -5,7 +5,7 @@
 # Usage:  curl -fsSL <url> | bash -s -- [--install | --uninstall]
 #
 # This is a thin entrypoint that downloads and runs the Python installer.
-# Arguments are forwarded directly to install-desktop-integration.py.
+# Arguments are forwarded directly to browser-setup/main.py.
 
 set -euo pipefail
 
@@ -14,6 +14,6 @@ if ! command -v python3 &>/dev/null; then
   exit 1
 fi
 
-PY_URL="https://raw.githubusercontent.com/alyraffauf/Switchyard/refs/heads/master/scripts/install-desktop-integration.py"
+PY_URL="https://raw.githubusercontent.com/alyraffauf/Switchyard/refs/heads/master/browser-setup/main.py"
 
 curl -fsSL "$PY_URL" | python3 - "$@"
