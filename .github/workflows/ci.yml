@@ -83,10 +83,34 @@ jobs:
         working-directory: webextension
         run: npx web-ext sign --channel=listed --approval-timeout=0 --api-key=${{ secrets.AMO_JWT_ISSUER }} --api-secret=${{ secrets.AMO_JWT_SECRET }}
 
+  publish-cws:
+    name: "Publish to Chrome Web Store"
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build-webextension]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+      - name: Build extension
+        working-directory: webextension
+        run: npm ci && npm run build
+      - name: Package extension
+        working-directory: webextension
+        run: zip -r ../switchyard-webextension.zip manifest.json popup.html build icons
+      - name: Submit to Chrome Web Store
+        run: npx chrome-webstore-upload-cli@3 upload --source switchyard-webextension.zip --auto-publish
+        env:
+          EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
+          CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+          REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
+
   publish-github:
     name: "Publish GitHub Release"
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [build-flatpak, test, publish-amo]
+    needs: [build-flatpak, test, publish-amo, publish-cws]
     runs-on: ubuntu-latest
     permissions:
       contents: write
