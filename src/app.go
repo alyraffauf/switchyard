@@ -18,6 +18,7 @@ const (
 	WebsiteURL          = "https://switchyard.aly.codes/"
 	IssueURL            = "https://github.com/alyraffauf/switchyard/issues"
 	DonateURL           = "https://ko-fi.com/alyraffauf"
+	ChromeExtensionURL  = "https://chromewebstore.google.com/detail/switchyard/ncehhpikkabfdcceimdhjjjodogflokc"
 	FirefoxExtensionURL = "https://addons.mozilla.org/firefox/addon/switchyard/"
 )
 

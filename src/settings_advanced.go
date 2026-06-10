@@ -109,16 +109,27 @@ func createAdvancedPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	extensionGroup := adw.NewPreferencesGroup()
 	extensionGroup.SetTitle("Browser Extension")
 
-	extensionRow := adw.NewActionRow()
-	extensionRow.SetTitle("Firefox Extension")
-	extensionRow.SetSubtitle("Open links in Switchyard directly from Firefox")
-	extensionRow.SetActivatable(true)
-	extensionRow.AddSuffix(gtk.NewImageFromIconName("adw-external-link-symbolic"))
-	extensionRow.ConnectActivated(func() {
+	firefoxRow := adw.NewActionRow()
+	firefoxRow.SetTitle("Firefox Extension")
+	firefoxRow.SetSubtitle("Open links in Switchyard directly from Firefox")
+	firefoxRow.SetActivatable(true)
+	firefoxRow.AddSuffix(gtk.NewImageFromIconName("adw-external-link-symbolic"))
+	firefoxRow.ConnectActivated(func() {
 		launcher := gtk.NewURILauncher(FirefoxExtensionURL)
 		launcher.Launch(context.Background(), &win.Window, nil)
 	})
-	extensionGroup.Add(extensionRow)
+	extensionGroup.Add(firefoxRow)
+
+	chromeRow := adw.NewActionRow()
+	chromeRow.SetTitle("Chrome Extension")
+	chromeRow.SetSubtitle("Open links in Switchyard directly from Chrome")
+	chromeRow.SetActivatable(true)
+	chromeRow.AddSuffix(gtk.NewImageFromIconName("adw-external-link-symbolic"))
+	chromeRow.ConnectActivated(func() {
+		launcher := gtk.NewURILauncher(ChromeExtensionURL)
+		launcher.Launch(context.Background(), &win.Window, nil)
+	})
+	extensionGroup.Add(chromeRow)
 
 	content.Append(extensionGroup)
 
