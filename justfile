@@ -10,7 +10,7 @@ default:
 
 # Install development dependencies
 install-deps:
-    sudo dnf install gtk4-devel glib2-devel gobject-introspection-devel libadwaita-devel just
+    sudo dnf install golang gtk4-devel glib2-devel gobject-introspection-devel libadwaita-devel just
 
 # Install Flatpak dependencies
 install-flatpak-deps:
@@ -18,7 +18,7 @@ install-flatpak-deps:
 
 # Build the application
 build:
-    go build -mod=vendor -trimpath -ldflags="-s -w" -o switchyard ./src
+    go build -mod=mod -trimpath -ldflags="-s -w" -o switchyard ./src
 
 # Install to system
 install: build
@@ -44,10 +44,10 @@ set-default:
     xdg-mime default {{APPID}}.desktop x-scheme-handler/https
     @echo "Switchyard is now your default browser"
 
-# Update dependencies
-vendor:
+# Update Go dependencies
+update-go-deps:
     go mod tidy
-    go mod vendor
+    scripts/generate-flatpak-go-modules.py
 
 # Run unit tests
 test:

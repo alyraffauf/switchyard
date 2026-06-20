@@ -10,6 +10,7 @@ _: {
         (with pkgs; [
           glib
           gobject-introspection
+          go
           gtk4
           just
           libadwaita

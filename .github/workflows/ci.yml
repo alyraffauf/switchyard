@@ -17,6 +17,10 @@ jobs:
         with:
           go-version: "1.24"
       - uses: extractions/setup-just@v2
+      - name: Check generated Flatpak Go module sources
+        run: |
+          scripts/generate-flatpak-go-modules.py
+          git diff --exit-code -- flatpak/go-modules.json
       - name: Run tests
         run: just test
       - name: Generate coverage report

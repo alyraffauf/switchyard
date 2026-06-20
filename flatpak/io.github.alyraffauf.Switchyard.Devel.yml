@@ -44,13 +44,16 @@ modules:
         GOROOT: /usr/lib/sdk/golang
         # Use flatpak-builder's cache directory for Go cache
         GOPATH: /run/build/switchyard/go
+        GOMODCACHE: /run/build/switchyard/go/pkg/mod
         GOCACHE: /run/ccache/go-build-cache
+        GOPROXY: "off"
+        GOSUMDB: "off"
         CGO_ENABLED: "1"
     build-commands:
       - |
         . /usr/lib/sdk/golang/enable.sh
         mkdir -p "$GOCACHE"
-        go build -mod=vendor -trimpath -o switchyard-bin ./src
+        go build -mod=mod -trimpath -o switchyard-bin ./src
       - install -Dm755 switchyard-bin /app/bin/switchyard-bin
       - install -Dm755 flatpak/switchyard-wrapper.sh /app/bin/switchyard
       # Install desktop file and update app-id to .Devel
@@ -61,5 +64,6 @@ modules:
       - sed -i 's/io.github.alyraffauf.Switchyard/io.github.alyraffauf.Switchyard.Devel/g' /app/share/metainfo/io.github.alyraffauf.Switchyard.Devel.metainfo.xml
       - install -Dm644 data/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.svg /app/share/icons/hicolor/scalable/apps/io.github.alyraffauf.Switchyard.Devel.svg
     sources:
+      - go-modules.json
       - type: dir
         path: ..

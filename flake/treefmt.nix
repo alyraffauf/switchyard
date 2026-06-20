@@ -1,8 +1,6 @@
 _: {
   perSystem = _: {
     treefmt.config = {
-      settings.global.excludes = ["vendor/*"];
-
       programs = {
         alejandra.enable = true;
         deadnix.enable = true;
