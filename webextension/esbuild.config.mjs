@@ -2,7 +2,7 @@ import * as esbuild from "esbuild";
 
 const watch = process.argv.includes("--watch");
 const ctx = await esbuild.context({
-  entryPoints: ["src/App.tsx"],
+  entryPoints: ["src/App.tsx", "src/background.ts"],
   bundle: true,
   outdir: "build",
   format: "esm",

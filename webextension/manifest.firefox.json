@@ -6,9 +6,8 @@
   "homepage_url": "https://github.com/alyraffauf/Switchyard",
   "permissions": ["activeTab", "contextMenus", "nativeMessaging"],
   "background": {
-    "service_worker": "build/background.js"
+    "scripts": ["build/background.js"]
   },
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmV3D3go08Nhd2PfSt7t5IbK2dT8n01umhIEbExICCWhkO6qZx4E/TW+OXH9CyOIDaUnItt+ZV3VWD1TkLvHNLij5RQLxym6VSzNA4WPplVJvY/E1x3qiBVE+3KZK8tF3bWQ0d7VBFn8sUd4JkyKCs69rn+K8fuej30RCXwqtnFSP2H+nD69vsbGoy2YQ8v8RRN1TlIcSEJEfmcMXT20H7gVH1j/egULrzpey/blrCMRjxFAwbb1eNKa4OwVe4i/g72moo6RvOl1gbxem8RqoXhzWxIBfhpetf0fNqsgS3ZwKgVLr+teyX4MNELA5En1TItjeyYYFNn++1Y4QB90OpwIDAQAB",
   "icons": {
     "16": "icons/switchyard-16.png",
     "48": "icons/switchyard-48.png",

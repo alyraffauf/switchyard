@@ -45,9 +45,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "lts/*"
-      - name: Build extension
-        working-directory: webextension
-        run: npm ci && npm run build
+      - uses: extractions/setup-just@v2
+      - name: Bundle Firefox extension
+        run: just bundle-extension
+      - name: Validate Firefox manifest
+        run: |
+          unzip -p switchyard-webextension.zip manifest.json > /tmp/manifest.json
+          jq -e '.background.scripts == ["build/background.js"] and (.background.service_worker | not)' /tmp/manifest.json
 
   build-flatpak:
     name: "Build Flatpak (${{ matrix.variant.arch }})"
@@ -85,8 +89,12 @@ jobs:
         working-directory: webextension
         run: npm ci && npm run build
       - name: Submit to AMO
-        working-directory: webextension
-        run: npx web-ext sign --channel=listed --approval-timeout=0 --api-key=${{ secrets.AMO_JWT_ISSUER }} --api-secret=${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          staging="$(mktemp -d)"
+          cp -R webextension/build webextension/icons webextension/popup.html "${staging}/"
+          rm -f "${staging}/build/manifest.firefox.json"
+          cp webextension/manifest.firefox.json "${staging}/manifest.json"
+          npx web-ext sign --source-dir="${staging}" --channel=listed --approval-timeout=0 --api-key=${{ secrets.AMO_JWT_ISSUER }} --api-secret=${{ secrets.AMO_JWT_SECRET }}
 
   publish-cws:
     name: "Publish to Chrome Web Store"

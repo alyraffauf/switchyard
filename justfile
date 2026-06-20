@@ -82,10 +82,14 @@ bundle-extension: build-extension
     root="{{justfile_directory()}}"
     extdir="${root}/webextension"
     outfile="${root}/switchyard-webextension.zip"
+    staging="$(mktemp -d)"
+    trap 'rm -rf "${staging}"' EXIT
+
     rm -f "${outfile}"
-    cd "${extdir}" && zip -r "${outfile}" . \
-        -x '.git*' 'node_modules/*' 'src/*' 'web-ext-artifacts/*' \
-        -x 'package.json' 'package-lock.json' 'tsconfig.json' 'esbuild.config.mjs'
+    cp -R "${extdir}/build" "${extdir}/icons" "${extdir}/popup.html" "${staging}/"
+    rm -f "${staging}/build/manifest.firefox.json"
+    cp "${extdir}/manifest.firefox.json" "${staging}/manifest.json"
+    cd "${staging}" && zip -r "${outfile}" .
     echo "Extension bundled: switchyard-webextension.zip"
 
 # Cut a new release: bump version, commit, tag, and push master + tag
@@ -96,6 +100,7 @@ release version:
     tag="v${version}"
     metainfo="data/{{APPID}}.metainfo.xml"
     manifest="webextension/manifest.json"
+    firefox_manifest="webextension/manifest.firefox.json"
     pkgjson="webextension/package.json"
 
     if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
@@ -109,10 +114,10 @@ release version:
         exit 1
     fi
 
-    # Allow src/app.go, metainfo, extension manifest, and package.json to be dirty; nothing else.
-    dirty="$(git status --porcelain -- ':!src/app.go' ":!${metainfo}" ":!${manifest}" ":!${pkgjson}")"
+    # Allow src/app.go, metainfo, extension manifests, and package.json to be dirty; nothing else.
+    dirty="$(git status --porcelain -- ':!src/app.go' ":!${metainfo}" ":!${manifest}" ":!${firefox_manifest}" ":!${pkgjson}")"
     if [ -n "$dirty" ]; then
-        echo "error: working tree has changes outside src/app.go, ${metainfo}, ${manifest}:" >&2
+        echo "error: working tree has changes outside src/app.go, ${metainfo}, ${manifest}, ${firefox_manifest}:" >&2
         echo "$dirty" >&2
         exit 1
     fi
@@ -140,13 +145,19 @@ release version:
         exit 1
     fi
 
+    sed -i -E 's/^(\s*"version"\s*:\s*)"[^"]+"/\1"'"${version}"'"/' "${firefox_manifest}"
+    if ! grep -qE '"version"\s*:\s*"'"${version}"'"' "${firefox_manifest}"; then
+        echo "error: failed to update version in ${firefox_manifest}" >&2
+        exit 1
+    fi
+
     sed -i -E 's/^(\s*"version"\s*:\s*)"[^"]+"/\1"'"${version}"'"/' "${pkgjson}"
     if ! grep -qE '"version"\s*:\s*"'"${version}"'"' "${pkgjson}"; then
         echo "error: failed to update version in ${pkgjson}" >&2
         exit 1
     fi
 
-    git add src/app.go "${metainfo}" "${manifest}" "${pkgjson}"
+    git add src/app.go "${metainfo}" "${manifest}" "${firefox_manifest}" "${pkgjson}"
     git commit -m "update for ${tag}"
     git tag -a "${tag}" -m "${tag}"
     git push origin master
