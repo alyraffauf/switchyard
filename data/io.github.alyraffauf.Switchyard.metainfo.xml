@@ -47,14 +47,25 @@
     >io.github.alyraffauf.Switchyard.desktop</launchable>
 
     <releases>
-    <release version="0.16.1" date="2026-06-10">
+    <release version="0.16.2" date="2026-06-20">
+    <url
+                type="details"
+            >https://github.com/alyraffauf/switchyard/releases/tag/v0.16.2</url>
+    <description translate="no">
+        <p>This release comes with the following improvements:</p>
+        <ul>
+        <li>Added context menus for browser extension.</li>
+        </ul>
+    </description>
+    </release>
+    <release version="0.16.1" date="2026-06-20">
     <url
                 type="details"
             >https://github.com/alyraffauf/switchyard/releases/tag/v0.16.1</url>
     <description translate="no">
         <p>This release comes with the following improvements:</p>
         <ul>
-        <li>Improved Chrome Web Extension</li>
+        <li>Improved chrome Web extension.</li>
         </ul>
     </description>
     </release>
@@ -65,7 +76,7 @@
     <description translate="no">
         <p>This release comes with the following improvements:</p>
         <ul>
-        <li>Added Chrome Web Extension</li>
+        <li>Added Chrome web extension.</li>
         </ul>
     </description>
     </release>
