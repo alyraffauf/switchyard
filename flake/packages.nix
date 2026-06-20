@@ -19,12 +19,12 @@
         pname = "switchyard";
         version = "dev";
         src = inputs.self;
-        vendorHash = null;
+        vendorHash = "sha256-1rEtf5QJA5xaeL0LRp13dwtPCH+DM5Wp4kJXBBqNtEg=";
         subPackages = ["src"];
 
         buildPhase = ''
           runHook preBuild
-          go build -mod=vendor -trimpath -ldflags="-s -w" -o $GOPATH/bin/switchyard ./src
+          go build -trimpath -ldflags="-s -w" -o $GOPATH/bin/switchyard ./src
           runHook postBuild
         '';
 

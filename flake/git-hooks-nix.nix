@@ -1,8 +1,6 @@
 _: {
   perSystem = _: {
     pre-commit.settings = {
-      excludes = ["^vendor/"];
-
       hooks = {
         alejandra.enable = true;
         deadnix.enable = true;
