@@ -4,7 +4,9 @@ description: Allow the Flatpak build of Switchyard to find host browser desktop 
 order: 25
 ---
 
-On NixOS, browser desktop files live in `/run/current-system/sw/share/applications`. That path is not visible inside Flatpak by default, so Switchyard may not detect host browsers.
+NixOS users should consider using the Nix package and/or the [home-manager module](/docs/home-manager/). If you do use the Flatpak, Switchyard may not be able to accurately discover your installed browsers.
+
+On NixOS, browser desktop files live in `/run/current-system/sw/share/applications`. That path is not visible inside Flatpak by default.
 
 To expose them to Switchyard, add the path to the Flatpak sandbox and include it in the XDG application search path:
 

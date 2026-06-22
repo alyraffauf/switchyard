@@ -1,4 +1,6 @@
 {inputs, ...}: {
+  flake.homeManagerModules.switchyard = import ./hm-module.nix inputs.self;
+
   perSystem = {
     pkgs,
     self',
