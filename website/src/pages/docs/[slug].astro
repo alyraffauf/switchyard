@@ -1,0 +1,24 @@
+---
+import { getCollection, render } from "astro:content";
+import DocsLayout from "../../layouts/DocsLayout.astro";
+import "../../styles/index.css";
+
+export async function getStaticPaths() {
+  const docs = (await getCollection("docs")).sort(
+    (a, b) =>
+      a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
+  );
+
+  return docs.map((doc) => ({
+    params: { slug: doc.id },
+    props: { doc, docs },
+  }));
+}
+
+const { doc, docs } = Astro.props;
+const { Content } = await render(doc);
+---
+
+<DocsLayout doc={doc} docs={docs}>
+  <Content />
+</DocsLayout>

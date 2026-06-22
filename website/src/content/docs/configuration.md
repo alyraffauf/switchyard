@@ -1,4 +1,8 @@
-# Configuration
+---
+title: Configuration
+description: Configure browser rules, conditions, and link redirections.
+order: 20
+---
 
 Switchyard can be configured through its settings UI or by editing the config file directly.
 

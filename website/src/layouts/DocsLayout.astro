@@ -1,0 +1,111 @@
+---
+import type { CollectionEntry } from "astro:content";
+import SiteFooter from "../components/SiteFooter.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import { DEV_URL } from "../site";
+
+type DocsEntry = CollectionEntry<"docs">;
+
+interface Props {
+  doc: DocsEntry;
+  docs: DocsEntry[];
+}
+
+const { doc, docs } = Astro.props;
+const hrefFor = (entry: DocsEntry) => `/docs/${entry.id}/`;
+const pageTitle = `${doc.data.title} - Switchyard Docs`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pageTitle}</title>
+    {
+      doc.data.description && (
+        <meta name="description" content={doc.data.description} />
+      )
+    }
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <meta name="theme-color" content="#4f895d" />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <SiteHeader
+      items={[
+        { href: DEV_URL, label: "Aly Raffauf", icon: "rose" },
+        { href: "/", label: "Switchyard", switchyardIcon: true },
+        { href: "/docs/", label: "Docs", current: true },
+      ]}
+    />
+
+    <main
+      class="w-full max-w-[1200px] mx-auto px-4 md:px-8 py-8 md:py-12 grid grid-cols-1 md:grid-cols-[260px_minmax(0,1fr)] gap-8 md:gap-12 flex-1"
+    >
+      <aside
+        class="md:sticky md:top-16 md:self-start border-b md:border-b-0 md:border-r border-border pb-6 md:pb-0 md:pr-6"
+      >
+        <a
+          href="/docs/"
+          class="flex items-center gap-2.5 text-text hover:text-primary transition-colors"
+        >
+          <img src="/icon.svg" alt="" class="w-7 h-7" />
+          <span class="text-lg font-bold tracking-tight">Switchyard Docs</span>
+        </a>
+        <p class="mt-3 mb-5 text-sm leading-relaxed text-text-muted">
+          Guides for browser rules, URL redirections, custom URI links, and the
+          browser extension.
+        </p>
+
+        <label for="docs-page" class="sr-only">Docs page</label>
+        <select
+          id="docs-page"
+          class="block md:hidden w-full min-w-0 rounded-lg border border-border bg-bg px-3 py-2.5 text-sm font-medium text-text shadow-sm focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+        >
+          {
+            docs.map((entry) => (
+              <option value={hrefFor(entry)} selected={entry.id === doc.id}>
+                {entry.data.title}
+              </option>
+            ))
+          }
+        </select>
+
+        <nav
+          class="hidden md:flex md:flex-col gap-1 border-t border-border pt-4"
+          aria-label="Docs"
+        >
+          {
+            docs.map((entry) => (
+              <a
+                href={hrefFor(entry)}
+                aria-current={entry.id === doc.id ? "page" : undefined}
+                class:list={[
+                  "shrink-0 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-bg-alt hover:text-text",
+                  entry.id === doc.id
+                    ? "bg-bg-alt text-primary font-semibold"
+                    : "text-text-muted",
+                ]}
+              >
+                {entry.data.title}
+              </a>
+            ))
+          }
+        </nav>
+      </aside>
+
+      <article class="docs-content min-w-0">
+        <h1>{doc.data.title}</h1>
+        <slot />
+      </article>
+    </main>
+    <SiteFooter variant="docs" />
+    <script is:inline>
+      document.getElementById("docs-page")?.addEventListener("change", (e) => {
+        const target = e.currentTarget;
+        if (!(target instanceof HTMLSelectElement)) return;
+        window.location.href = target.value;
+      });
+    </script>
+  </body>
+</html>

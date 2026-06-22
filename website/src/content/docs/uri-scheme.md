@@ -1,4 +1,8 @@
-# Switchyard URI Scheme
+---
+title: URI Scheme
+description: Use switchyard:// links to open URLs with browser preferences.
+order: 30
+---
 
 Switchyard registers a custom URI scheme that allows links to specify browser preferences directly. This is useful for situations where you want to create links that always open in a specific browser, but don't want a permanent rule. Example use cases include note-taking, to-do apps, etc.
 

@@ -1,4 +1,8 @@
-# Prior Art
+---
+title: Prior Art
+description: Related URL routers and browser pickers for Linux, macOS, and Windows.
+order: 50
+---
 
 Switchyard draws inspiration from other excellent URL routers and browser pickers.
 

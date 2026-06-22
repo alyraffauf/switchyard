@@ -1,0 +1,55 @@
+---
+import Icon from "./Icon.astro";
+import type { IconName } from "../icons";
+
+interface BreadcrumbItem {
+  href: string;
+  label: string;
+  icon?: IconName;
+  switchyardIcon?: boolean;
+  current?: boolean;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<header class="sticky top-0 z-50 bg-bg/95 backdrop-blur-sm border-b border-border">
+  <nav
+    class="max-w-[1200px] mx-auto px-4 md:px-8 py-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
+    aria-label="Breadcrumb"
+  >
+    {
+      items.map((item, index) => (
+        <>
+          {index > 0 && <span class="text-text-muted/40">›</span>}
+          <a
+            href={item.href}
+            aria-current={item.current ? "page" : undefined}
+            class:list={[
+              "flex items-center gap-1.5 transition-colors whitespace-nowrap",
+              item.current
+                ? "text-text hover:text-primary"
+                : "text-text-muted hover:text-text",
+            ]}
+          >
+            {item.icon && (
+              <Icon
+                name={item.icon}
+                class="w-4 h-4 shrink-0 text-rose-700"
+                aria-hidden="true"
+              />
+            )}
+            {item.switchyardIcon && (
+              <img src="/icon.svg" alt="" class="w-4 h-4" />
+            )}
+            {item.label}
+          </a>
+        </>
+      ))
+    }
+  </nav>
+</header>

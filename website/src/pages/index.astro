@@ -1,15 +1,13 @@
 ---
 import "../styles/index.css";
 import Icon from "../components/Icon.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import SiteHeader from "../components/SiteHeader.astro";
 import { Image } from "astro:assets";
 import imgLauncher from "../assets/screenshots/launcher.png";
 import imgBrowserRules from "../assets/screenshots/browser-rules.png";
 import imgLinkRedirections from "../assets/screenshots/link-redirections.png";
-
-const REPO_URL = "https://github.com/alyraffauf/switchyard";
-const DONATE_URL = "https://ko-fi.com/alyraffauf";
-const FLATHUB_URL = "https://flathub.org/apps/io.github.alyraffauf.Switchyard";
-const DEV_URL = "https://aly.codes";
+import { DEV_URL, DONATE_URL, FLATHUB_URL, REPO_URL } from "../site";
 
 const screenshots = [
   { src: imgLauncher, alt: "Browser launcher" },
@@ -19,7 +17,7 @@ const screenshots = [
 
 const heroButtons = [
   { href: FLATHUB_URL, label: "Flathub", icon: "flatpak", primary: true },
-  { href: REPO_URL, label: "GitHub", icon: "github", primary: true },
+  { href: "/docs/", label: "Docs", icon: "book" },
   { href: DONATE_URL, label: "Donate", icon: "heart" },
 ] as const;
 
@@ -111,20 +109,13 @@ const installOptions = [
   {
     icon: "github",
     title: "Build from Source",
-    description: "Requires Go 1.24+ and GTK4",
+    description: "Requires Go 1.25+ and GTK4",
     link: REPO_URL,
     linkText: "View on GitHub",
   },
 ] as const;
 
-const footerLinks = [
-  { href: REPO_URL, label: "GitHub" },
-  { href: `${REPO_URL}/issues`, label: "Issues" },
-  { href: DONATE_URL, label: "Donate" },
-] as const;
-
 const installBg = "bg-bg";
-const footerBg = "bg-bg-alt";
 ---
 
 <!doctype html>
@@ -178,31 +169,17 @@ const footerBg = "bg-bg-alt";
     />
   </head>
   <body>
-    <!-- Breadcrumb nav -->
-    <header
-      class="sticky top-0 z-50 bg-bg/95 backdrop-blur-sm border-b border-border"
-    >
-      <div
-        class="max-w-[1200px] mx-auto px-4 md:px-8 py-2.5 flex items-center gap-2 text-sm"
-      >
-        <a
-          href={DEV_URL}
-          class="flex items-center gap-1.5 text-text-muted hover:text-text transition-colors"
-        >
-          <Icon
-            name="rose"
-            class="w-4 h-4 shrink-0 text-rose-700"
-            aria-hidden="true"
-          />
-          Aly Raffauf
-        </a>
-        <span class="text-text-muted/40">›</span>
-        <span class="text-text flex items-center gap-1.5">
-          <img src="/icon.svg" alt="" class="w-4 h-4" />
-          Switchyard
-        </span>
-      </div>
-    </header>
+    <SiteHeader
+      items={[
+        { href: DEV_URL, label: "Aly Raffauf", icon: "rose" },
+        {
+          href: "/",
+          label: "Switchyard",
+          switchyardIcon: true,
+          current: true,
+        },
+      ]}
+    />
 
     <!-- Hero -->
     <section
@@ -239,7 +216,7 @@ const footerBg = "bg-bg-alt";
           <p
             class="text-base md:text-lg text-text-muted leading-relaxed mb-4 max-w-[480px] mx-auto md:mx-0 order-4"
           >
-            Work links in Chrome. Personal links in Firefox.
+            Route, rewrite, and choose where each link opens.
           </p>
           <div
             class="inline-block px-3 py-2 md:px-4 md:py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-4 md:mb-8 order-5"
@@ -393,44 +370,7 @@ const footerBg = "bg-bg-alt";
       </div>
     </section>
 
-    <!-- Footer -->
-    <footer class={`py-8 md:py-12 ${footerBg}`}>
-      <div
-        class="max-w-[1100px] mx-auto px-4 md:px-8 flex flex-col items-center gap-5"
-      >
-        <div class="flex items-center gap-3 font-semibold text-lg">
-          <img
-            src="/icon.svg"
-            alt="Switchyard"
-            class="w-8 h-8"
-            loading="lazy"
-          />
-          <span>Switchyard</span>
-        </div>
-        <nav class="flex gap-6 md:gap-8">
-          {
-            footerLinks.map((link) => (
-              <a
-                href={link.href}
-                class="text-text-muted text-sm hover:text-primary"
-              >
-                {link.label}
-              </a>
-            ))
-          }
-        </nav>
-        <p class="text-text-light text-sm">
-          Made by{" "}
-          <a
-            href={DEV_URL}
-            class="text-text-muted hover:text-primary transition-colors"
-          >
-            Aly Raffauf
-          </a>{" "}
-          &middot; GPL-3.0-or-later
-        </p>
-      </div>
-    </footer>
+    <SiteFooter />
 
     <script is:inline>
       function closeLightbox() {

@@ -1,0 +1,61 @@
+---
+import { DEV_URL, footerLinks } from "../site";
+
+interface Props {
+  variant?: "marketing" | "docs";
+}
+
+const { variant = "marketing" } = Astro.props;
+const isDocs = variant === "docs";
+---
+
+<footer
+  class:list={[
+    isDocs
+      ? "border-t border-border bg-bg py-5"
+      : "py-8 md:py-12 bg-bg-alt",
+  ]}
+>
+  <div
+    class:list={[
+      "mx-auto px-4 md:px-8 flex gap-5",
+      isDocs
+        ? "max-w-[1200px] flex-col md:flex-row md:items-center md:justify-between"
+        : "max-w-[1100px] flex-col items-center",
+    ]}
+  >
+    <div
+      class:list={[
+        "flex items-center gap-3 font-semibold",
+        isDocs ? "text-sm" : "text-lg",
+      ]}
+    >
+      <img
+        src="/icon.svg"
+        alt="Switchyard"
+        class:list={[isDocs ? "w-5 h-5" : "w-8 h-8"]}
+        loading="lazy"
+      />
+      <span>Switchyard</span>
+    </div>
+    <nav class="flex flex-wrap gap-5 md:gap-8" aria-label="Footer">
+      {
+        footerLinks.map((link) => (
+          <a href={link.href} class="text-text-muted text-sm hover:text-primary">
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+    <p class="text-text-light text-sm">
+      Made by{" "}
+      <a
+        href={DEV_URL}
+        class="text-text-muted hover:text-primary transition-colors"
+      >
+        Aly Raffauf
+      </a>{" "}
+      &middot; GPL-3.0-or-later
+    </p>
+  </div>
+</footer>
