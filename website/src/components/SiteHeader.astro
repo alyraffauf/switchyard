@@ -1,5 +1,6 @@
 ---
 import { Icon } from "astro-icon/components";
+import Logo from "./Logo.astro";
 
 interface BreadcrumbItem {
   href: string;
@@ -44,9 +45,7 @@ const { items } = Astro.props;
                 aria-hidden="true"
               />
             )}
-            {item.switchyardIcon && (
-              <img src="/icon.svg" alt="" class="w-4 h-4" />
-            )}
+            {item.switchyardIcon && <Logo class="w-4 h-4 shrink-0" />}
             {item.label}
           </a>
         </>

@@ -3,6 +3,7 @@ import "../styles/index.css";
 import { Icon } from "astro-icon/components";
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteHeader from "../components/SiteHeader.astro";
+import Logo from "../components/Logo.astro";
 import { Image } from "astro:assets";
 import imgLauncher from "../assets/screenshots/launcher.png";
 import imgBrowserRules from "../assets/screenshots/browser-rules.png";
@@ -24,7 +25,12 @@ const screenshots = [
 ] as const;
 
 const heroButtons = [
-  { href: FLATHUB_URL, label: "Flathub", icon: "simple-icons:flatpak", primary: true },
+  {
+    href: FLATHUB_URL,
+    label: "Flathub",
+    icon: "simple-icons:flatpak",
+    primary: true,
+  },
   { href: "/docs/", label: "Docs", icon: "lucide:book-open" },
   { href: DONATE_URL, label: "Donate", icon: "lucide:heart" },
 ] as const;
@@ -223,11 +229,7 @@ const installBg = "bg-bg";
           <div
             class="flex items-center gap-3 md:gap-4 justify-center md:justify-start mb-4 order-1"
           >
-            <img
-              src="/icon.svg"
-              alt=""
-              class="w-14 h-14 md:w-[72px] md:h-[72px] shrink-0"
-            />
+            <Logo class="w-14 h-14 md:w-[72px] md:h-[72px] shrink-0" />
             <h1
               class="text-3xl md:text-[3.5rem] font-bold leading-tight tracking-tight bg-gradient-to-br from-text to-text-muted bg-clip-text text-transparent"
             >

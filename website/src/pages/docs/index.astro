@@ -1,3 +1,72 @@
 ---
-return Astro.redirect("/docs/using/");
+import "../../styles/index.css";
+import { getCollection } from "astro:content";
+import SiteFooter from "../../components/SiteFooter.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import Logo from "../../components/Logo.astro";
+import { DEV_URL } from "../../site";
+
+const docs = (await getCollection("docs")).sort(
+  (a, b) =>
+    a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
+);
 ---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Switchyard Docs</title>
+    <meta
+      name="description"
+      content="Guides for browser rules, URL redirections, custom URI links, the browser extension, and more."
+    />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <meta name="theme-color" content="#4f895d" />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <SiteHeader
+      items={[
+        { href: DEV_URL, label: "Aly Raffauf", icon: "lucide:rose" },
+        { href: "/", label: "Switchyard", switchyardIcon: true },
+        { href: "/docs/", label: "Docs", current: true },
+      ]}
+    />
+
+    <main
+      class="w-full max-w-[900px] mx-auto px-4 md:px-8 py-10 md:py-16 flex-1"
+    >
+      <div class="flex items-center gap-3 mb-3">
+        <Logo class="w-10 h-10" />
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight">
+          Switchyard Docs
+        </h1>
+      </div>
+      <p class="text-text-muted text-base mb-8 md:mb-10 max-w-[560px]">
+        Guides for browser rules, URL redirections, custom URI links, the
+        browser extension, and more.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+        {
+          docs.map((doc) => (
+            <a
+              href={`/docs/${doc.id}/`}
+              class="group block bg-bg p-5 md:p-6 rounded-2xl border border-border transition-all duration-300 hover:shadow-default hover:-translate-y-0.5 hover:border-primary/40"
+            >
+              <h2 class="text-base md:text-lg font-bold mb-1 group-hover:text-primary transition-colors">
+                {doc.data.title}
+              </h2>
+              <p class="text-text-muted text-sm leading-relaxed">
+                {doc.data.description}
+              </p>
+            </a>
+          ))
+        }
+      </div>
+    </main>
+
+    <SiteFooter variant="docs" />
+  </body>
+</html>

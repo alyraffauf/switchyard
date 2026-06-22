@@ -1,5 +1,6 @@
 ---
 import { DEV_URL, footerLinks } from "../site";
+import Logo from "./Logo.astro";
 
 interface Props {
   variant?: "marketing" | "docs";
@@ -28,12 +29,7 @@ const isDocs = variant === "docs";
         isDocs ? "text-sm" : "text-lg",
       ]}
     >
-      <img
-        src="/icon.svg"
-        alt="Switchyard"
-        class:list={[isDocs ? "w-5 h-5" : "w-8 h-8"]}
-        loading="lazy"
-      />
+      <Logo class:list={[isDocs ? "w-5 h-5" : "w-8 h-8"]} />
       <span>Switchyard</span>
     </div>
     <nav class="flex flex-wrap gap-5 md:gap-8" aria-label="Footer">

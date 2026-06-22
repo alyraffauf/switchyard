@@ -5,10 +5,7 @@ import icon from "astro-icon";
 
 export default defineConfig({
   site: "https://switchyard.aly.codes",
-  integrations: [
-    sitemap(),
-    icon(),
-  ],
+  integrations: [sitemap(), icon()],
   vite: {
     plugins: [tailwindcss()],
   },
