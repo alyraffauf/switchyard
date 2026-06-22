@@ -38,6 +38,11 @@ uninstall:
 clean:
     rm -f switchyard
 
+# Update the bundled AdGuard tracking-parameter filter list
+update-adguard:
+    curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardFilters/master/TrackParamFilter/sections/general_url.txt -o src/embedded/adguard_filter.txt
+    @echo "Updated src/embedded/adguard_filter.txt"
+
 # Set as default browser
 set-default:
     xdg-mime default {{APPID}}.desktop x-scheme-handler/http
