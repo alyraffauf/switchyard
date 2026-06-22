@@ -1,0 +1,475 @@
+---
+import "../styles/index.css";
+import Icon from "../components/Icon.astro";
+import { Image } from "astro:assets";
+import imgLauncher from "../assets/screenshots/launcher.png";
+import imgBrowserRules from "../assets/screenshots/browser-rules.png";
+import imgLinkRedirections from "../assets/screenshots/link-redirections.png";
+
+const REPO_URL = "https://github.com/alyraffauf/switchyard";
+const DONATE_URL = "https://ko-fi.com/alyraffauf";
+const FLATHUB_URL = "https://flathub.org/apps/io.github.alyraffauf.Switchyard";
+const DEV_URL = "https://aly.codes";
+
+const screenshots = [
+  { src: imgLauncher, alt: "Browser launcher" },
+  { src: imgBrowserRules, alt: "Browser rules panel" },
+  { src: imgLinkRedirections, alt: "Link redirections panel" },
+] as const;
+
+const heroButtons = [
+  { href: FLATHUB_URL, label: "Flathub", icon: "flatpak", primary: true },
+  { href: REPO_URL, label: "GitHub", icon: "github", primary: true },
+  { href: DONATE_URL, label: "Donate", icon: "heart" },
+] as const;
+
+const features = [
+  {
+    icon: "checkCircle",
+    title: "Automatic Routing",
+    description:
+      "Create rules by domain or regex. Links open in the right browser automatically.",
+  },
+  {
+    icon: "sliders",
+    title: "Browser Launcher",
+    description:
+      "No matching rule? Launch a browser with a quick keystroke or mouse click.",
+  },
+  {
+    icon: "shuffle",
+    title: "Link Redirections",
+    description:
+      "Rewrite URLs before they open. Strip trackers, swap domains, and more.",
+  },
+  {
+    icon: "link",
+    title: "Custom URLs",
+    description:
+      "Encode rules directly with switchyard:// links. Perfect for notes and to-dos.",
+  },
+  {
+    icon: "star",
+    title: "Favorite Browser",
+    description:
+      "Pin your favorite browser to appear first and act as fallback.",
+  },
+  {
+    icon: "zap",
+    title: "Fast & Native",
+    description:
+      "A native GNOME app that launches instantly. No background services.",
+  },
+] as const;
+
+const showcases = [
+  {
+    screenshot: screenshots[1],
+    title: "Point-and-Click Setup",
+    description:
+      "Create and manage rules with a clean, native interface. No config files required—just point and click.",
+  },
+  {
+    screenshot: screenshots[2],
+    title: "Your Links, Your Way",
+    description:
+      "Take control of every link you open. Strip tracking parameters and enforce privacy-friendly frontends automatically.",
+  },
+  {
+    code: `[[rules]]
+name = "Video Sites"
+logic = "any"
+browser = "brave-browser.desktop"
+
+[[rules.conditions]]
+type = "domain"
+pattern = "youtube.com"
+
+[[rules.conditions]]
+type = "domain"
+pattern = "twitch.tv"`,
+    title: "Plain Text Configuration",
+    description:
+      "Prefer text editors? Define rules in a simple TOML file. Easy to version control, share, and back up.",
+  },
+] as const;
+
+const installOptions = [
+  {
+    icon: "flatpak",
+    title: "Flatpak",
+    description: "Recommended for most users",
+    link: FLATHUB_URL,
+    linkText: "View on Flathub",
+  },
+  {
+    icon: "nixos",
+    title: "Nix Flake",
+    description: "Run directly or add to your config",
+    command: "nix run github:alyraffauf/switchyard",
+  },
+  {
+    icon: "github",
+    title: "Build from Source",
+    description: "Requires Go 1.24+ and GTK4",
+    link: REPO_URL,
+    linkText: "View on GitHub",
+  },
+] as const;
+
+const footerLinks = [
+  { href: REPO_URL, label: "GitHub" },
+  { href: `${REPO_URL}/issues`, label: "Issues" },
+  { href: DONATE_URL, label: "Donate" },
+] as const;
+
+const installBg = "bg-bg";
+const footerBg = "bg-bg-alt";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Switchyard - A Rules-Based Browser Launcher for Linux</title>
+    <meta
+      name="description"
+      content="Switchyard is a rules-based browser launcher for Linux. Automatically open links in the right browser using domain rules, regex patterns, and URL redirections. Free and open source."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/icon.svg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://switchyard.aly.codes/" />
+    <meta
+      property="og:title"
+      content="Switchyard - A Rules-Based Browser Launcher for Linux"
+    />
+    <meta
+      property="og:description"
+      content="Switchyard is a rules-based browser launcher for Linux. Automatically open links in the right browser using domain rules, regex patterns, and URL redirections. Free and open source."
+    />
+    <meta
+      property="og:image"
+      content="https://switchyard.aly.codes/og-image.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#4f895d" />
+    <link rel="canonical" href="https://switchyard.aly.codes/" />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "Switchyard",
+        operatingSystem: "Linux",
+        applicationCategory: "UtilitiesApplication",
+        description:
+          "A rules-based browser launcher for Linux. Automatically open links in the right browser using domain rules, regex patterns, and URL redirections.",
+        url: "https://switchyard.aly.codes",
+        downloadUrl: FLATHUB_URL,
+        license: "https://www.gnu.org/licenses/gpl-3.0.html",
+        offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+        author: { "@type": "Person", name: "Aly Raffauf", url: DEV_URL },
+      })}
+    />
+  </head>
+  <body>
+    <!-- Breadcrumb nav -->
+    <header
+      class="sticky top-0 z-50 bg-bg/95 backdrop-blur-sm border-b border-border"
+    >
+      <div
+        class="max-w-[1200px] mx-auto px-4 md:px-8 py-2.5 flex items-center gap-2 text-sm"
+      >
+        <a
+          href={DEV_URL}
+          class="flex items-center gap-1.5 text-text-muted hover:text-text transition-colors"
+        >
+          <Icon
+            name="rose"
+            class="w-4 h-4 shrink-0 text-rose-700"
+            aria-hidden="true"
+          />
+          Aly Raffauf
+        </a>
+        <span class="text-text-muted/40">›</span>
+        <span class="text-text flex items-center gap-1.5">
+          <img src="/icon.svg" alt="" class="w-4 h-4" />
+          Switchyard
+        </span>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section
+      class="min-h-screen flex items-center bg-gradient-to-br from-bg to-bg-alt relative overflow-hidden"
+    >
+      <div
+        class="absolute -top-1/2 -right-1/5 w-4/5 h-[200%] hero-bg-glow pointer-events-none"
+      >
+      </div>
+
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-16 items-center max-w-[1200px] mx-auto px-4 md:px-8 py-8 md:py-16 relative z-10"
+      >
+        <div class="contents md:block text-center md:text-left">
+          <div
+            class="flex items-center gap-3 md:gap-4 justify-center md:justify-start mb-4 order-1"
+          >
+            <img
+              src="/icon.svg"
+              alt=""
+              class="w-14 h-14 md:w-[72px] md:h-[72px] shrink-0"
+            />
+            <h1
+              class="text-3xl md:text-[3.5rem] font-bold leading-tight tracking-tight bg-gradient-to-br from-text to-text-muted bg-clip-text text-transparent"
+            >
+              Switchyard
+            </h1>
+          </div>
+          <p
+            class="text-lg md:text-xl text-text-muted font-medium mb-4 order-3"
+          >
+            A rules-based browser launcher for Linux.
+          </p>
+          <p
+            class="text-base md:text-lg text-text-muted leading-relaxed mb-4 max-w-[480px] mx-auto md:mx-0 order-4"
+          >
+            Work links in Chrome. Personal links in Firefox.
+          </p>
+          <div
+            class="inline-block px-3 py-2 md:px-4 md:py-2 bg-primary/10 text-primary rounded-full text-sm font-semibold mb-4 md:mb-8 order-5"
+          >
+            100% Free & Open Source
+          </div>
+          <div
+            class="flex flex-col md:flex-row gap-3 md:gap-4 items-center md:items-start justify-center md:justify-start order-6"
+          >
+            {
+              heroButtons.map((btn) => (
+                <a
+                  href={btn.href}
+                  class={`inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-semibold text-base transition-all duration-200 w-full md:w-auto max-w-[260px] justify-center focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${
+                    btn.primary
+                      ? "bg-primary text-white shadow-primary hover:bg-primary-light hover:-translate-y-0.5 hover:shadow-primary-hover"
+                      : "bg-transparent text-text border-2 border-border hover:border-primary hover:text-primary"
+                  }`}
+                >
+                  {btn.icon && <Icon name={btn.icon} filled class="w-5 h-5" />}
+                  {btn.label}
+                </a>
+              ))
+            }
+          </div>
+        </div>
+        <div class="order-2 md:order-none">
+          <Image
+            src={screenshots[0].src}
+            alt={screenshots[0].alt}
+            data-lightbox="true"
+            role="button"
+            tabindex="0"
+            loading="eager"
+            class="w-full max-w-[280px] md:max-w-[480px] h-auto rounded-xl md:rounded-2xl shadow-lg border border-border cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 mx-auto"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="py-12 md:py-20 bg-bg">
+      <div class="max-w-[1100px] mx-auto px-4 md:px-8">
+        <h2
+          class="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-10 tracking-tight"
+        >
+          Key Features
+        </h2>
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 max-w-[400px] md:max-w-none mx-auto"
+        >
+          {
+            features.map((feature) => (
+              <div class="text-center p-4 md:p-8">
+                <div class="w-11 h-11 md:w-12 md:h-12 mx-auto mb-4 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center text-white">
+                  <Icon name={feature.icon} class="w-5 h-5 md:w-6 md:h-6" />
+                </div>
+                <h3 class="text-base md:text-lg font-bold mb-2">
+                  {feature.title}
+                </h3>
+                <p class="text-text-muted text-sm leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Showcases -->
+    {
+      showcases.map((showcase, index) => (
+        <section
+          class={`py-12 md:py-20 ${index % 2 === 0 ? "bg-bg-alt" : "bg-bg"}`}
+        >
+          <div class="grid grid-cols-1 md:grid-cols-[1.2fr_1fr] gap-6 md:gap-16 items-center max-w-[1200px] mx-auto px-4 md:px-8">
+            {showcase.screenshot && (
+              <Image
+                src={showcase.screenshot.src}
+                alt={showcase.screenshot.alt}
+                loading="lazy"
+                data-lightbox="true"
+                role="button"
+                tabindex="0"
+                class="w-full max-w-[600px] h-auto rounded-xl md:rounded-2xl border border-border shadow-lg cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 mx-auto order-first md:order-none"
+              />
+            )}
+            {showcase.code && (
+              <pre class="bg-bg-alt rounded-xl px-4 py-3 md:px-5 md:py-4 overflow-x-auto shadow-default border border-border text-left">
+                <code class="block font-mono text-xs md:text-sm leading-relaxed text-text whitespace-pre">
+                  {showcase.code}
+                </code>
+              </pre>
+            )}
+            <div
+              class:list={[
+                "text-center md:text-left",
+                { "md:order-first": index % 2 !== 0 },
+              ]}
+            >
+              <h2 class="text-xl md:text-2xl font-bold mb-4 tracking-tight">
+                {showcase.title}
+              </h2>
+              <p class="text-text-muted text-base leading-relaxed max-w-[400px] mx-auto md:mx-0">
+                {showcase.description}
+              </p>
+            </div>
+          </div>
+        </section>
+      ))
+    }
+
+    <!-- Installation -->
+    <section class={`py-12 md:py-20 ${installBg}`} id="install">
+      <div class="max-w-[1100px] mx-auto px-4 md:px-8">
+        <h2
+          class="text-2xl md:text-3xl font-bold text-center mb-8 md:mb-10 tracking-tight"
+        >
+          Get Started
+        </h2>
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[400px] md:max-w-[900px] mx-auto"
+        >
+          {
+            installOptions.map((option) => (
+              <div class="bg-bg p-5 md:p-8 rounded-2xl border border-border transition-all duration-300 hover:shadow-default hover:-translate-y-0.5">
+                <div class="w-9 h-9 md:w-10 md:h-10 mb-4 text-primary">
+                  <Icon name={option.icon} filled class="w-full h-full" />
+                </div>
+                <h3 class="text-base md:text-lg font-bold mb-1">
+                  {option.title}
+                </h3>
+                <p class="text-text-muted text-sm mb-4">{option.description}</p>
+                {"command" in option ? (
+                  <code class="block bg-bg-alt px-3 py-3 md:px-4 rounded-xl text-xs font-mono overflow-x-auto border border-border">
+                    {option.command}
+                  </code>
+                ) : (
+                  <a
+                    href={option.link}
+                    class="block bg-primary text-white px-4 py-3 rounded-xl text-sm font-semibold text-center transition-colors duration-200 hover:bg-primary-light hover:text-white focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  >
+                    {option.linkText}
+                  </a>
+                )}
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class={`py-8 md:py-12 ${footerBg}`}>
+      <div
+        class="max-w-[1100px] mx-auto px-4 md:px-8 flex flex-col items-center gap-5"
+      >
+        <div class="flex items-center gap-3 font-semibold text-lg">
+          <img
+            src="/icon.svg"
+            alt="Switchyard"
+            class="w-8 h-8"
+            loading="lazy"
+          />
+          <span>Switchyard</span>
+        </div>
+        <nav class="flex gap-6 md:gap-8">
+          {
+            footerLinks.map((link) => (
+              <a
+                href={link.href}
+                class="text-text-muted text-sm hover:text-primary"
+              >
+                {link.label}
+              </a>
+            ))
+          }
+        </nav>
+        <p class="text-text-light text-sm">
+          Made by{" "}
+          <a
+            href={DEV_URL}
+            class="text-text-muted hover:text-primary transition-colors"
+          >
+            Aly Raffauf
+          </a>{" "}
+          &middot; GPL-3.0-or-later
+        </p>
+      </div>
+    </footer>
+
+    <script is:inline>
+      function closeLightbox() {
+        document.querySelector('[role="dialog"]')?.remove();
+      }
+
+      function openLightbox(src, alt) {
+        const overlay = document.createElement("div");
+        overlay.className =
+          "fixed inset-0 bg-black/90 flex items-center justify-center z-[1000] cursor-pointer backdrop-blur-sm";
+        overlay.setAttribute("role", "dialog");
+        overlay.setAttribute("aria-modal", "true");
+        overlay.setAttribute("aria-label", "Image preview");
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = alt;
+        img.className =
+          "max-w-[90vw] max-h-[85vh] md:max-h-[90vh] rounded-lg md:rounded-xl shadow-lg";
+        img.addEventListener("click", (e) => e.stopPropagation());
+        overlay.appendChild(img);
+        overlay.addEventListener("click", closeLightbox);
+        document.body.appendChild(overlay);
+      }
+
+      document.addEventListener("click", (e) => {
+        const img = e.target.closest("[data-lightbox]");
+        if (!img) return;
+        openLightbox(img.src, img.alt);
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeLightbox();
+          return;
+        }
+        if (e.key !== "Enter") return;
+        const img = e.target.closest("[data-lightbox]");
+        if (!img) return;
+        openLightbox(img.src, img.alt);
+      });
+    </script>
+  </body>
+</html>

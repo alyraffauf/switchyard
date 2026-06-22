@@ -2,7 +2,7 @@
 
 Landing page for [Switchyard](https://github.com/alyraffauf/switchyard), a rules-based URL router for Linux.
 
-Built with React + Vite. Published as a container image to `ghcr.io/alyraffauf/switchyard-website`.
+Built with Astro. Published as a container image to `ghcr.io/alyraffauf/switchyard-website`.
 
 ## Development
 

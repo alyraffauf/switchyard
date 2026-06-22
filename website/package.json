@@ -4,32 +4,30 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "npx tsx scripts/generate-og-image.tsx && tsc -b && vite build",
+    "dev": "astro dev",
+    "build": "node scripts/generate-og-image.mjs && astro build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "generate-og": "npx tsx scripts/generate-og-image.tsx"
+    "preview": "astro preview",
+    "generate-og": "node scripts/generate-og-image.mjs",
+    "typecheck": "tsc",
+    "format": "prettier --write ."
   },
   "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^9.39.4",
     "@resvg/resvg-js": "^2.6.2",
-    "@tailwindcss/vite": "^4.1.18",
-    "@types/node": "^24.10.1",
-    "@types/react": "^19.2.5",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.1.1",
-    "eslint": "^9.39.1",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.4.24",
-    "globals": "^16.5.0",
-    "satori": "^0.19.1",
-    "tailwindcss": "^4.1.18",
-    "typescript": "~5.9.3",
-    "typescript-eslint": "^8.46.4",
-    "vite": "^7.2.4"
+    "@tailwindcss/vite": "^4.3.1",
+    "@types/node": "^26.0.0",
+    "eslint": "^9.39.4",
+    "globals": "^17.6.0",
+    "prettier": "^3.8.4",
+    "prettier-plugin-astro": "^0.14.1",
+    "satori": "^0.26.0",
+    "tailwindcss": "^4.3.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1"
   }
 }
