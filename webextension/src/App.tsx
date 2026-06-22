@@ -96,7 +96,7 @@ function App() {
       {loaded && browsers.length === 0 && (
         <div className="hint">
           <a
-            href="https://github.com/alyraffauf/Switchyard/blob/master/docs/WebExtension.md#desktop-integration"
+            href="https://switchyard.aly.codes/docs/webextension/#desktop-integration"
             target="_blank"
             rel="noreferrer"
           >
