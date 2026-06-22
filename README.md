@@ -13,6 +13,7 @@
 <p align="center">
   <a href="https://flathub.org/apps/io.github.alyraffauf.Switchyard"><img src="https://flathub.org/api/badge?locale=en&style=flat" alt="Get it on Flathub"></a>
 </p>
+
 ## Features
 
 - **Browser rules**: Automatically open links in specific browsers based on conditions you define.
