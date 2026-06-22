@@ -3,6 +3,10 @@ export const DONATE_URL = "https://ko-fi.com/alyraffauf";
 export const FLATHUB_URL =
   "https://flathub.org/apps/io.github.alyraffauf.Switchyard";
 export const DEV_URL = "https://aly.codes";
+export const FIREFOX_ADDON_URL =
+  "https://addons.mozilla.org/firefox/addon/switchyard/";
+export const CHROME_WEBSTORE_URL =
+  "https://chromewebstore.google.com/detail/switchyard/ncehhpikkabfdcceimdhjjjodogflokc";
 
 export const footerLinks = [
   { href: "/docs/", label: "Docs" },

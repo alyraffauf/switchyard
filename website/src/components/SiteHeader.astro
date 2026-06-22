@@ -1,11 +1,10 @@
 ---
-import Icon from "./Icon.astro";
-import type { IconName } from "../icons";
+import { Icon } from "astro-icon/components";
 
 interface BreadcrumbItem {
   href: string;
   label: string;
-  icon?: IconName;
+  icon?: string;
   switchyardIcon?: boolean;
   current?: boolean;
 }
@@ -17,7 +16,9 @@ interface Props {
 const { items } = Astro.props;
 ---
 
-<header class="sticky top-0 z-50 bg-bg/95 backdrop-blur-sm border-b border-border">
+<header
+  class="sticky top-0 z-50 bg-bg/95 backdrop-blur-sm border-b border-border"
+>
   <nav
     class="max-w-[1200px] mx-auto px-4 md:px-8 py-2.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
     aria-label="Breadcrumb"

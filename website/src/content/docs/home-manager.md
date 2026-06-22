@@ -39,10 +39,10 @@ Add the flake to your inputs and import the module:
 
 ## Options
 
-- **`enable`** *(bool, default `false`)* — Install Switchyard and enable the module.
-- **`package`** *(package, default `switchyard`)* — The Switchyard derivation to install.
-- **`setAsDefaultBrowser`** *(bool, default `true`)* — Register Switchyard as the default handler for `x-scheme-handler/http`, `x-scheme-handler/https`, and `text/html` via `xdg.mimeApps`.
-- **`settings`** *(TOML, default `{}`)* — Contents of `~/.config/switchyard/config.toml`. Freeform; any key from Switchyard's `Config` struct is accepted, omitted keys fall back to built-in defaults.
+- **`enable`** _(bool, default `false`)_ — Install Switchyard and enable the module.
+- **`package`** _(package, default `switchyard`)_ — The Switchyard derivation to install.
+- **`setAsDefaultBrowser`** _(bool, default `true`)_ — Register Switchyard as the default handler for `x-scheme-handler/http`, `x-scheme-handler/https`, and `text/html` via `xdg.mimeApps`.
+- **`settings`** _(TOML, default `{}`)_ — Contents of `~/.config/switchyard/config.toml`. Freeform; any key from Switchyard's `Config` struct is accepted, omitted keys fall back to built-in defaults.
 
 ## Declarative Configuration
 

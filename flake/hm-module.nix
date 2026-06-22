@@ -21,7 +21,7 @@ in {
     };
 
     settings = lib.mkOption {
-      type = toml.type;
+      inherit (toml) type;
       default = {};
       description = ''
         Contents of {file}`$XDG_CONFIG_HOME/switchyard/config.toml`.

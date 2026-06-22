@@ -26,9 +26,17 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   const tabId = tab?.id;
   if (tabId == null) return;
-  if (info.menuItemId === "open-link" && info.linkUrl && ROUTABLE.test(info.linkUrl)) {
+  if (
+    info.menuItemId === "open-link" &&
+    info.linkUrl &&
+    ROUTABLE.test(info.linkUrl)
+  ) {
     openInSwitchyard(info.linkUrl, tabId);
-  } else if (info.menuItemId === "open-page" && tab?.url && ROUTABLE.test(tab.url)) {
+  } else if (
+    info.menuItemId === "open-page" &&
+    tab?.url &&
+    ROUTABLE.test(tab.url)
+  ) {
     openInSwitchyard(tab.url, tabId);
   }
 });

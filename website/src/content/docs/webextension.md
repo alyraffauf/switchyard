@@ -4,9 +4,12 @@ description: Use the Switchyard browser extension and native messaging integrati
 order: 40
 ---
 
-A companion browser extension that lets you open any page in Switchyard with one click. It lives in the `webextension/` directory, ships as a standard WebExtension compatible with Firefox and Chromium, and is included in GitHub releases as `switchyard-webextension.zip`.
+A companion browser extension that lets you open any page in Switchyard with one click. It lives in the `webextension/` directory, ships as a standard WebExtension compatible with Firefox and Chromium, and is available on the [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/switchyard/) and [Chrome Web Store](https://chromewebstore.google.com/detail/switchyard/ncehhpikkabfdcceimdhjjjodogflokc).
 
-The intent is to add deeper integration with the desktop app. Eventually, it will be submitted to the Chrome Web Store and Mozilla.
+- [Get for Firefox](https://addons.mozilla.org/firefox/addon/switchyard/)
+- [Get for Chrome](https://chromewebstore.google.com/detail/switchyard/ncehhpikkabfdcceimdhjjjodogflokc)
+
+The source is also bundled in GitHub releases as `switchyard-webextension.zip` if you prefer to load it manually.
 
 ## How It Works
 

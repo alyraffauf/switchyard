@@ -14,7 +14,7 @@
         version = "dev";
         src = ../browser-setup;
         pyproject = true;
-        build-system = with pkgs.python3.pkgs; [ setuptools ];
+        build-system = with pkgs.python3.pkgs; [setuptools];
       };
 
       switchyard = pkgs.buildGoModule {

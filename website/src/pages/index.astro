@@ -1,13 +1,21 @@
 ---
 import "../styles/index.css";
-import Icon from "../components/Icon.astro";
+import { Icon } from "astro-icon/components";
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import { Image } from "astro:assets";
 import imgLauncher from "../assets/screenshots/launcher.png";
 import imgBrowserRules from "../assets/screenshots/browser-rules.png";
 import imgLinkRedirections from "../assets/screenshots/link-redirections.png";
-import { DEV_URL, DONATE_URL, FLATHUB_URL, REPO_URL } from "../site";
+import {
+  DEV_URL,
+  DONATE_URL,
+  FLATHUB_URL,
+  REPO_URL,
+  FIREFOX_ADDON_URL,
+  CHROME_WEBSTORE_URL,
+} from "../site";
+import { codeToHtml } from "shiki";
 
 const screenshots = [
   { src: imgLauncher, alt: "Browser launcher" },
@@ -16,51 +24,51 @@ const screenshots = [
 ] as const;
 
 const heroButtons = [
-  { href: FLATHUB_URL, label: "Flathub", icon: "flatpak", primary: true },
-  { href: "/docs/", label: "Docs", icon: "book" },
-  { href: DONATE_URL, label: "Donate", icon: "heart" },
+  { href: FLATHUB_URL, label: "Flathub", icon: "simple-icons:flatpak", primary: true },
+  { href: "/docs/", label: "Docs", icon: "lucide:book-open" },
+  { href: DONATE_URL, label: "Donate", icon: "lucide:heart" },
 ] as const;
 
 const features = [
   {
-    icon: "checkCircle",
+    icon: "lucide:circle-check",
     title: "Automatic Routing",
     description:
       "Create rules by domain or regex. Links open in the right browser automatically.",
   },
   {
-    icon: "sliders",
+    icon: "lucide:sliders-horizontal",
     title: "Browser Launcher",
     description:
       "No matching rule? Launch a browser with a quick keystroke or mouse click.",
   },
   {
-    icon: "shuffle",
+    icon: "lucide:shuffle",
     title: "Link Redirections",
     description:
       "Rewrite URLs before they open. Strip trackers, swap domains, and more.",
   },
   {
-    icon: "link",
+    icon: "lucide:link",
     title: "Custom URLs",
     description:
       "Encode rules directly with switchyard:// links. Perfect for notes and to-dos.",
   },
   {
-    icon: "star",
+    icon: "lucide:star",
     title: "Favorite Browser",
     description:
       "Pin your favorite browser to appear first and act as fallback.",
   },
   {
-    icon: "zap",
+    icon: "lucide:zap",
     title: "Fast & Native",
     description:
       "A native GNOME app that launches instantly. No background services.",
   },
 ] as const;
 
-const showcases = [
+const showcasesRaw = [
   {
     screenshot: screenshots[1],
     title: "Point-and-Click Setup",
@@ -90,28 +98,46 @@ pattern = "twitch.tv"`,
     description:
       "Prefer text editors? Define rules in a simple TOML file. Easy to version control, share, and back up.",
   },
-] as const;
+];
+
+const showcases = showcasesRaw.map((s) =>
+  "code" in s && s.code
+    ? {
+        ...s,
+        codeHtml: codeToHtml(s.code, { lang: "toml", theme: "github-dark" }),
+      }
+    : s,
+);
 
 const installOptions = [
   {
-    icon: "flatpak",
+    icon: "simple-icons:flatpak",
     title: "Flatpak",
-    description: "Recommended for most users",
+    description: "Recommended for most users.",
     link: FLATHUB_URL,
     linkText: "View on Flathub",
   },
   {
-    icon: "nixos",
-    title: "Nix Flake",
-    description: "Run directly or add to your config",
-    command: "nix run github:alyraffauf/switchyard",
+    icon: "simple-icons:nixos",
+    title: "Nix",
+    description: "Run directly or add to your config.",
+    link: "/docs/home-manager/",
+    linkText: "View in Docs",
+  },
+] as const;
+
+const extensionOptions = [
+  {
+    icon: "simple-icons:firefoxbrowser",
+    title: "Firefox",
+    link: FIREFOX_ADDON_URL,
+    linkText: "Firefox",
   },
   {
-    icon: "github",
-    title: "Build from Source",
-    description: "Requires Go 1.25+ and GTK4",
-    link: REPO_URL,
-    linkText: "View on GitHub",
+    icon: "simple-icons:googlechrome",
+    title: "Chrome",
+    link: CHROME_WEBSTORE_URL,
+    linkText: "Chrome",
   },
 ] as const;
 
@@ -171,7 +197,7 @@ const installBg = "bg-bg";
   <body>
     <SiteHeader
       items={[
-        { href: DEV_URL, label: "Aly Raffauf", icon: "rose" },
+        { href: DEV_URL, label: "Aly Raffauf", icon: "lucide:rose" },
         {
           href: "/",
           label: "Switchyard",
@@ -237,7 +263,7 @@ const installBg = "bg-bg";
                       : "bg-transparent text-text border-2 border-border hover:border-primary hover:text-primary"
                   }`}
                 >
-                  {btn.icon && <Icon name={btn.icon} filled class="w-5 h-5" />}
+                  {btn.icon && <Icon name={btn.icon} class="w-5 h-5" />}
                   {btn.label}
                 </a>
               ))
@@ -306,17 +332,17 @@ const installBg = "bg-bg";
                 class="w-full max-w-[600px] h-auto rounded-xl md:rounded-2xl border border-border shadow-lg cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 mx-auto order-first md:order-none"
               />
             )}
-            {showcase.code && (
-              <pre class="bg-bg-alt rounded-xl px-4 py-3 md:px-5 md:py-4 overflow-x-auto shadow-default border border-border text-left">
-                <code class="block font-mono text-xs md:text-sm leading-relaxed text-text whitespace-pre">
-                  {showcase.code}
-                </code>
-              </pre>
+            {"codeHtml" in showcase && showcase.codeHtml && (
+              <div
+                class="rounded-xl overflow-x-auto shadow-default border border-border text-left text-xs md:text-sm [&_pre]:bg-bg-alt [&_pre]:px-4 [&_pre]:py-3 md:[&_pre]:px-5 md:[&_pre]:py-4 [&_pre]:m-0 [&_code]:font-mono [&_code]:leading-relaxed"
+                set:html={showcase.codeHtml}
+              />
             )}
             <div
               class:list={[
                 "text-center md:text-left",
                 { "md:order-first": index % 2 !== 0 },
+                { "text-left": "codeHtml" in showcase },
               ]}
             >
               <h2 class="text-xl md:text-2xl font-bold mb-4 tracking-tight">
@@ -345,28 +371,48 @@ const installBg = "bg-bg";
           {
             installOptions.map((option) => (
               <div class="bg-bg p-5 md:p-8 rounded-2xl border border-border transition-all duration-300 hover:shadow-default hover:-translate-y-0.5">
-                <div class="w-9 h-9 md:w-10 md:h-10 mb-4 text-primary">
-                  <Icon name={option.icon} filled class="w-full h-full" />
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-8 h-8 md:w-9 md:h-9 shrink-0 text-primary">
+                    <Icon name={option.icon} class="w-full h-full" />
+                  </div>
+                  <h3 class="text-base md:text-lg font-bold">{option.title}</h3>
                 </div>
-                <h3 class="text-base md:text-lg font-bold mb-1">
-                  {option.title}
-                </h3>
                 <p class="text-text-muted text-sm mb-4">{option.description}</p>
-                {"command" in option ? (
-                  <code class="block bg-bg-alt px-3 py-3 md:px-4 rounded-xl text-xs font-mono overflow-x-auto border border-border">
-                    {option.command}
-                  </code>
-                ) : (
-                  <a
-                    href={option.link}
-                    class="block bg-primary text-white px-4 py-3 rounded-xl text-sm font-semibold text-center transition-colors duration-200 hover:bg-primary-light hover:text-white focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
-                  >
-                    {option.linkText}
-                  </a>
-                )}
+                <a
+                  href={option.link}
+                  class="block bg-primary text-white px-4 py-3 rounded-xl text-sm font-semibold text-center transition-colors duration-200 hover:bg-primary-light hover:text-white focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                >
+                  {option.linkText}
+                </a>
               </div>
             ))
           }
+          <div
+            class="bg-bg p-5 md:p-8 rounded-2xl border border-border transition-all duration-300 hover:shadow-default hover:-translate-y-0.5"
+          >
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-8 h-8 md:w-9 md:h-9 shrink-0 text-primary">
+                <Icon name="lucide:app-window" class="w-full h-full" />
+              </div>
+              <h3 class="text-base md:text-lg font-bold">Browser Extension</h3>
+            </div>
+            <p class="text-text-muted text-sm mb-4">
+              Open in Switchyard with one click.
+            </p>
+            <div class="grid grid-cols-2 gap-3">
+              {
+                extensionOptions.map((option) => (
+                  <a
+                    href={option.link}
+                    class="inline-flex items-center justify-center gap-2 bg-primary text-white px-3 py-2.5 rounded-xl text-sm font-semibold text-center transition-colors duration-200 hover:bg-primary-light hover:text-white focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  >
+                    <Icon name={option.icon} class="w-4 h-4" />
+                    {option.linkText}
+                  </a>
+                ))
+              }
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -11,9 +11,7 @@ const isDocs = variant === "docs";
 
 <footer
   class:list={[
-    isDocs
-      ? "border-t border-border bg-bg py-5"
-      : "py-8 md:py-12 bg-bg-alt",
+    isDocs ? "border-t border-border bg-bg py-5" : "py-8 md:py-12 bg-bg-alt",
   ]}
 >
   <div
@@ -41,7 +39,10 @@ const isDocs = variant === "docs";
     <nav class="flex flex-wrap gap-5 md:gap-8" aria-label="Footer">
       {
         footerLinks.map((link) => (
-          <a href={link.href} class="text-text-muted text-sm hover:text-primary">
+          <a
+            href={link.href}
+            class="text-text-muted text-sm hover:text-primary"
+          >
             {link.label}
           </a>
         ))
