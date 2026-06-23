@@ -60,6 +60,13 @@ func setupAppActions(app *adw.Application, win *adw.Window) {
 	})
 	app.AddAction(donateAction)
 
+	helpAction := gio.NewSimpleAction("help", nil)
+	helpAction.ConnectActivate(func(p *glib.Variant) {
+		launcher := gtk.NewURILauncher(DocsURL)
+		launcher.Launch(context.Background(), &win.Window, nil)
+	})
+	app.AddAction(helpAction)
+
 	quitAction := gio.NewSimpleAction("quit", nil)
 	quitAction.ConnectActivate(func(p *glib.Variant) {
 		win.Close()
@@ -67,6 +74,7 @@ func setupAppActions(app *adw.Application, win *adw.Window) {
 	app.AddAction(quitAction)
 
 	app.SetAccelsForAction("app.quit", []string{"<Ctrl>q"})
+	app.SetAccelsForAction("app.help", []string{"F1"})
 }
 
 func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView *adw.NavigationSplitView) gtk.Widgetter {
@@ -85,6 +93,7 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 	menuBtn.SetTooltipText("Main Menu")
 
 	menu := gio.NewMenu()
+	menu.Append("Documentation", "app.help")
 	menu.Append("Donate ❤️", "app.donate")
 	menu.Append("About", "app.about")
 

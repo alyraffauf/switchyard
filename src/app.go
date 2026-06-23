@@ -20,6 +20,7 @@ const (
 	DonateURL           = "https://ko-fi.com/alyraffauf"
 	ChromeExtensionURL  = "https://chromewebstore.google.com/detail/switchyard/ncehhpikkabfdcceimdhjjjodogflokc"
 	FirefoxExtensionURL = "https://addons.mozilla.org/firefox/addon/switchyard/"
+	DocsURL             = "https://switchyard.aly.codes/docs"
 )
 
 type Contributor struct {
