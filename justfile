@@ -80,22 +80,39 @@ flatpak-bundle: flatpak
 build-extension:
     cd webextension && npm ci && npm run build
 
-# Bundle the browser extension into a zip archive
-bundle-extension: build-extension
+# Package the already-built extension as a Firefox-targeted directory
+package-extension-firefox:
     #!/usr/bin/env bash
     set -euo pipefail
     root="{{justfile_directory()}}"
     extdir="${root}/webextension"
-    outfile="${root}/switchyard-webextension.zip"
+    outdir="${root}/firefox-extension"
+
+    rm -rf "${outdir}"
+    mkdir -p "${outdir}"
+    cp -R "${extdir}/build" "${extdir}/icons" "${extdir}/popup.html" "${outdir}/"
+    rm -f "${outdir}/build/manifest.firefox.json"
+    cp "${extdir}/manifest.firefox.json" "${outdir}/manifest.json"
+    echo "Extension packaged: firefox-extension/"
+
+# Package the already-built extension as a Chrome-targeted zip archive
+package-extension-chrome:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    root="{{justfile_directory()}}"
+    extdir="${root}/webextension"
+    outfile="${root}/switchyard-webextension-chrome.zip"
     staging="$(mktemp -d)"
     trap 'rm -rf "${staging}"' EXIT
 
     rm -f "${outfile}"
     cp -R "${extdir}/build" "${extdir}/icons" "${extdir}/popup.html" "${staging}/"
-    rm -f "${staging}/build/manifest.firefox.json"
-    cp "${extdir}/manifest.firefox.json" "${staging}/manifest.json"
+    jq 'del(.key)' "${extdir}/manifest.json" > "${staging}/manifest.json"
     cd "${staging}" && zip -r "${outfile}" .
-    echo "Extension bundled: switchyard-webextension.zip"
+    echo "Extension bundled: switchyard-webextension-chrome.zip"
+
+# Build the extension once and package it for both Firefox and Chrome
+bundle-extension: build-extension package-extension-firefox package-extension-chrome
 
 # Cut a new release: bump version, commit, tag, and push master + tag
 release version:

@@ -6,24 +6,30 @@ on:
   pull_request:
     branches: [master]
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish to AMO, Chrome Web Store, and GitHub Releases"
+        type: boolean
+        default: false
 name: CI
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   test:
     name: "Test"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v6
         with:
           go-version: "1.24"
-      - uses: extractions/setup-just@v2
+      - uses: extractions/setup-just@v4
       - name: Check generated Flatpak Go module sources
         run: |
           scripts/generate-flatpak-go-modules.py
           git diff --exit-code -- flatpak/go-modules.json
-      - name: Run tests
-        run: just test
-      - name: Generate coverage report
+      - name: Run tests with coverage
         run: just test-coverage
       - name: Display coverage summary
         run: |
@@ -32,7 +38,7 @@ jobs:
           go tool cover -func=coverage.out >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
       - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: coverage.out
@@ -41,82 +47,74 @@ jobs:
     name: "Build WebExtension"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
           node-version: "lts/*"
-      - uses: extractions/setup-just@v2
-      - name: Bundle Firefox extension
+      - uses: extractions/setup-just@v4
+      - name: Bundle extension for Firefox and Chrome
         run: just bundle-extension
       - name: Validate Firefox manifest
+        run: jq -e '.background.scripts == ["build/background.js"] and (.background.service_worker | not)' firefox-extension/manifest.json
+      - name: Validate Chrome manifest
         run: |
-          unzip -p switchyard-webextension.zip manifest.json > /tmp/manifest.json
-          jq -e '.background.scripts == ["build/background.js"] and (.background.service_worker | not)' /tmp/manifest.json
+          unzip -p switchyard-webextension-chrome.zip manifest.json > /tmp/manifest.chrome.json
+          jq -e '.background.service_worker == "build/background.js" and (.background.scripts | not) and (.key | not)' /tmp/manifest.chrome.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: firefox-extension
+          path: firefox-extension
+      - uses: actions/upload-artifact@v7
+        with:
+          name: chrome-extension
+          path: switchyard-webextension-chrome.zip
 
   build-flatpak:
-    name: "Build Flatpak (${{ matrix.variant.arch }})"
-    runs-on: ${{ matrix.variant.runner }}
-    strategy:
-      matrix:
-        variant:
-          - arch: x86_64
-            runner: ubuntu-latest
-          - arch: aarch64
-            runner: ubuntu-24.04-arm
+    name: "Build Flatpak"
+    runs-on: ubuntu-latest
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-49
       options: --privileged
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          bundle: io.github.alyraffauf.Switchyard.Devel-${{ github.sha }}-${{ matrix.variant.arch }}.flatpak
+          bundle: io.github.alyraffauf.Switchyard.Devel-${{ github.sha }}-x86_64.flatpak
           manifest-path: flatpak/io.github.alyraffauf.Switchyard.Devel.yml
           cache-key: flatpak-builder
-          arch: ${{ matrix.variant.arch }}
+          arch: x86_64
 
   publish-amo:
     name: "Publish to AMO"
-    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.publish)
     needs: [build-webextension]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "lts/*"
-      - name: Build extension
-        working-directory: webextension
-        run: npm ci && npm run build
+      - uses: actions/download-artifact@v8
+        with:
+          name: firefox-extension
+          path: firefox-extension
       - name: Submit to AMO
-        run: |
-          staging="$(mktemp -d)"
-          cp -R webextension/build webextension/icons webextension/popup.html "${staging}/"
-          rm -f "${staging}/build/manifest.firefox.json"
-          cp webextension/manifest.firefox.json "${staging}/manifest.json"
-          npx web-ext sign --source-dir="${staging}" --channel=listed --approval-timeout=0 --api-key=${{ secrets.AMO_JWT_ISSUER }} --api-secret=${{ secrets.AMO_JWT_SECRET }}
+        run: npx web-ext sign --source-dir=firefox-extension --channel=listed --approval-timeout=0 --api-key=${{ secrets.AMO_JWT_ISSUER }} --api-secret=${{ secrets.AMO_JWT_SECRET }}
 
   publish-cws:
     name: "Publish to Chrome Web Store"
-    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.publish)
     needs: [build-webextension]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "lts/*"
-      - name: Build extension
-        working-directory: webextension
-        run: npm ci && npm run build
-      - name: Package extension
-        working-directory: webextension
-        run: |
-          jq 'del(.key)' manifest.json > manifest.cws.json
-          mv manifest.cws.json manifest.json
-          zip -r ../switchyard-webextension.zip manifest.json popup.html build icons
+      - uses: actions/download-artifact@v8
+        with:
+          name: chrome-extension
+          path: .
       - name: Submit to Chrome Web Store
-        run: npx chrome-webstore-upload-cli@3 upload --source switchyard-webextension.zip --auto-publish
+        run: npx chrome-webstore-upload-cli@3 upload --source switchyard-webextension-chrome.zip --auto-publish
         env:
           EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
           CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
@@ -125,19 +123,19 @@ jobs:
 
   publish-github:
     name: "Publish GitHub Release"
-    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'workflow_dispatch' && inputs.publish)
     needs: [build-flatpak, test, publish-amo, publish-cws]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - name: Download Flatpak bundles
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: io.github.alyraffauf.Switchyard.Devel-${{ github.sha }}-*.flatpak
           merge-multiple: true
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             *.flatpak

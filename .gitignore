@@ -15,5 +15,6 @@ webextension/build/
 coverage.out
 repo/
 switchyard
-switchyard-webextension.zip
+switchyard-webextension-chrome.zip
+firefox-extension/
 result
