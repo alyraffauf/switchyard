@@ -123,6 +123,8 @@ func validateConditionPattern(condType, pattern string) error {
 	case "keyword":
 		// Keywords can be any non-empty string
 		return nil
+	default:
+		return fmt.Errorf("Invalid condition type: %s", condType)
 	}
 
 	return nil

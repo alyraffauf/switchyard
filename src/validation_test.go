@@ -303,6 +303,12 @@ func TestValidateConditionPattern(t *testing.T) {
 			pattern:  "",
 			wantErr:  true,
 		},
+		{
+			name:     "invalid condition type",
+			condType: "invalid_type",
+			pattern:  "example.com",
+			wantErr:  true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -381,6 +387,14 @@ func TestIsConditionValid(t *testing.T) {
 			},
 			want: false,
 		},
+		{
+			name: "invalid condition type",
+			condition: Condition{
+				Type:    "invalid_type",
+				Pattern: "example.com",
+			},
+			want: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -446,6 +460,14 @@ func TestAreAllConditionsValid(t *testing.T) {
 			conditions: []Condition{
 				{Type: "domain", Pattern: "example.com"},
 				{Type: "regex", Pattern: "[invalid"},
+			},
+			want: false,
+		},
+		{
+			name: "invalid condition type in list",
+			conditions: []Condition{
+				{Type: "domain", Pattern: "example.com"},
+				{Type: "invalid_type", Pattern: "example.com"},
 			},
 			want: false,
 		},
