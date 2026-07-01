@@ -209,16 +209,7 @@ func watchConfigFile(cfg *Config, onChange func()) {
 					}
 
 					newCfg := loadConfig()
-					cfg.PromptOnClick = newCfg.PromptOnClick
-					cfg.FavoriteBrowser = newCfg.FavoriteBrowser
-					cfg.CheckDefaultBrowser = newCfg.CheckDefaultBrowser
-					cfg.ShowAppNames = newCfg.ShowAppNames
-					cfg.ForceDarkMode = newCfg.ForceDarkMode
-					cfg.StayAlive = newCfg.StayAlive
-					cfg.RemoveTrackingParameters = newCfg.RemoveTrackingParameters
-					cfg.HiddenBrowsers = newCfg.HiddenBrowsers
-					cfg.Redirections = newCfg.Redirections
-					cfg.Rules = newCfg.Rules
+					*cfg = *newCfg
 
 					if onChange != nil {
 						onChange()

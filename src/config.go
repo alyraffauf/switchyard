@@ -58,15 +58,20 @@ func configPath() string {
 	return filepath.Join(configDir(), "config.toml")
 }
 
-func loadConfig() *Config {
-	cfg := &Config{
+func newDefaultConfig() *Config {
+	return &Config{
 		PromptOnClick:            true,
 		CheckDefaultBrowser:      true,
 		ShowAppNames:             false, // Default: hide app names, show tooltips
 		ForceDarkMode:            true,  // Default: force dark mode
+		StayAlive:                true,
 		RemoveTrackingParameters: false,
 		Rules:                    []Rule{},
 	}
+}
+
+func loadConfig() *Config {
+	cfg := newDefaultConfig()
 
 	data, err := os.ReadFile(configPath())
 	if err != nil {
@@ -76,11 +81,7 @@ func loadConfig() *Config {
 	if err := toml.Unmarshal(data, cfg); err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: Failed to parse config file: %v\n", err)
 		fmt.Fprintf(os.Stderr, "Using default configuration\n")
-		return &Config{
-			PromptOnClick:       true,
-			CheckDefaultBrowser: true,
-			Rules:               []Rule{},
-		}
+		return cfg
 	}
 
 	var compat struct {
@@ -198,7 +199,7 @@ func importConfig(cfg *Config, path string) error {
 		return err
 	}
 
-	newCfg := &Config{}
+	newCfg := newDefaultConfig()
 	if err := toml.Unmarshal(data, newCfg); err != nil {
 		return err
 	}
