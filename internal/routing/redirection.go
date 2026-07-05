@@ -16,10 +16,7 @@ func ApplyRedirections(rawURL string, redirections []Redirection) string {
 }
 
 func applyRedirection(rawURL string, redirection Redirection) string {
-	redirectionType := redirection.Type
-	if redirectionType == "" {
-		redirectionType = "domain"
-	}
+	redirectionType := NormalizeRedirectionType(redirection.Type)
 
 	switch redirectionType {
 	case "domain":

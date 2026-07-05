@@ -6,33 +6,10 @@ import (
 	"fmt"
 	"html"
 
+	"github.com/alyraffauf/switchyard/internal/routing"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
-
-func formatRedirectionSubtitle(redirection *Redirection) string {
-	redirectionType := redirection.Type
-	if redirectionType == "" {
-		redirectionType = "domain"
-	}
-
-	var typeLabel string
-	switch redirectionType {
-	case "domain":
-		typeLabel = "Domain"
-	case "wildcard":
-		typeLabel = "Wildcard"
-	case "regex":
-		typeLabel = "Regex"
-	default:
-		typeLabel = "Domain"
-	}
-
-	if redirection.Replace == "" {
-		return fmt.Sprintf("%s · Removes match", typeLabel)
-	}
-	return fmt.Sprintf("%s · Replaces with %s", typeLabel, html.EscapeString(redirection.Replace))
-}
 
 func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	toolbarView := adw.NewToolbarView()
@@ -79,10 +56,10 @@ func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 		row := adw.NewActionRow()
 		if redirection.Name != "" {
 			row.SetTitle(redirection.Name)
-			row.SetSubtitle(fmt.Sprintf("%s · %s", html.EscapeString(redirection.Find), formatRedirectionSubtitle(redirection)))
+			row.SetSubtitle(fmt.Sprintf("%s · %s", html.EscapeString(redirection.Find), html.EscapeString(routing.FormatRedirectionSubtitle(redirection))))
 		} else {
 			row.SetTitle(redirection.Find)
-			row.SetSubtitle(formatRedirectionSubtitle(redirection))
+			row.SetSubtitle(html.EscapeString(routing.FormatRedirectionSubtitle(redirection)))
 		}
 		row.SetActivatable(true)
 

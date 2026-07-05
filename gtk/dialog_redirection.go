@@ -50,9 +50,9 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 
 	typeRow := adw.NewComboRow()
 	typeRow.SetTitle("Type")
-	typeRow.SetModel(gtk.NewStringList(getRedirectionTypeLabels()))
+	typeRow.SetModel(gtk.NewStringList(routing.RedirectionTypeLabels()))
 	if !isNew {
-		typeRow.SetSelected(redirectionTypeToIndex(redirection.Type))
+		typeRow.SetSelected(routing.RedirectionTypeToIndex(redirection.Type))
 	}
 	group.Add(typeRow)
 
@@ -74,7 +74,7 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 
 	validateInputs := func() {
 		find := findRow.Text()
-		redirectionType := indexToRedirectionType(typeRow.Selected())
+		redirectionType := routing.IndexToRedirectionType(typeRow.Selected())
 		redirection := Redirection{Type: redirectionType, Find: find, Replace: replaceRow.Text()}
 		err := routing.ValidateRedirection(redirection)
 
@@ -95,7 +95,7 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 	saveBtn.ConnectClicked(func() {
 		name := nameRow.Text()
 		find := findRow.Text()
-		redirectionType := indexToRedirectionType(typeRow.Selected())
+		redirectionType := routing.IndexToRedirectionType(typeRow.Selected())
 
 		if isNew {
 			cfg.Redirections = append(cfg.Redirections, Redirection{

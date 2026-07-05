@@ -62,7 +62,7 @@ func Run() {
 			return
 		}
 
-		sanitized := prepareURLForRouting(rawURL, cfg)
+		sanitized := routing.PrepareURLForRouting(rawURL, cfg.RemoveTrackingParameters, cfg.Redirections)
 		if sanitized == "" {
 			// URL was rejected (mailto:, tel:, etc.) - pass to xdg-open
 			cmd := host.HostCommand("xdg-open", rawURL)
@@ -105,7 +105,7 @@ func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config,
 		return
 	}
 
-	sanitized := prepareURLForRouting(targetURL, cfg)
+	sanitized := routing.PrepareURLForRouting(targetURL, cfg.RemoveTrackingParameters, cfg.Redirections)
 	if sanitized == "" {
 		// Pass non-browser URLs to xdg-open
 		cmd := host.HostCommand("xdg-open", targetURL)
@@ -133,23 +133,6 @@ func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config,
 
 	// No browser specified - use standard routing
 	handleURL(app, browsers, cfg, sanitized)
-}
-
-func prepareURLForRouting(rawURL string, cfg *Config) string {
-	sanitized := routing.SanitizeURL(rawURL)
-	if sanitized == "" {
-		return ""
-	}
-
-	if cfg.RemoveTrackingParameters {
-		sanitized = routing.RemoveTrackingParameters(sanitized)
-	}
-
-	if len(cfg.Redirections) > 0 {
-		sanitized = routing.ApplyRedirections(sanitized, cfg.Redirections)
-	}
-
-	return sanitized
 }
 
 // handleURL routes a URL to the appropriate browser based on rules

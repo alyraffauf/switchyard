@@ -119,6 +119,18 @@ func ValidateRedirection(redirection Redirection) error {
 		redirectionType = "domain"
 	}
 
+	// Reject unknown types before validating the pattern.
+	valid := false
+	for _, def := range redirectionTypes {
+		if def.Type == redirectionType {
+			valid = true
+			break
+		}
+	}
+	if !valid {
+		return fmt.Errorf("Invalid redirection type: %s", redirectionType)
+	}
+
 	switch redirectionType {
 	case "domain":
 		return validateDomainPattern(redirection.Find)

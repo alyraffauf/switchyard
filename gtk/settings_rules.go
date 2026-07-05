@@ -3,78 +3,13 @@
 package gtk
 
 import (
-	"fmt"
+	"html"
 
 	appbrowser "github.com/alyraffauf/switchyard/internal/browser"
+	"github.com/alyraffauf/switchyard/internal/routing"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
-
-// formatRuleSubtitle formats a subtitle for a rule row with pattern included
-func formatRuleSubtitle(rule *Rule, browserName string) string {
-	return formatRuleSubtitleInternal(rule, browserName, true)
-}
-
-// formatRuleSubtitleNoPattern formats a subtitle for a rule row without pattern
-func formatRuleSubtitleNoPattern(rule *Rule, browserName string) string {
-	return formatRuleSubtitleInternal(rule, browserName, false)
-}
-
-func formatRuleSubtitleInternal(rule *Rule, browserName string, includePattern bool) string {
-	if len(rule.Conditions) > 0 {
-		condCount := len(rule.Conditions)
-		var logicText string
-		if rule.Logic == "any" {
-			logicText = "Any match"
-		} else {
-			logicText = "All match"
-		}
-
-		formatSingleCondition := func(cond *Condition) string {
-			return fmt.Sprintf("%s %s", getConditionLabel(cond.Type, cond.Negate), cond.Pattern)
-		}
-
-		if rule.AlwaysAsk {
-			if condCount == 1 && includePattern {
-				return fmt.Sprintf("%s · Always ask", formatSingleCondition(&rule.Conditions[0]))
-			}
-			return fmt.Sprintf("%d conditions (%s) · Always ask", condCount, logicText)
-		}
-		if condCount == 1 && includePattern {
-			return fmt.Sprintf("%s · Opens in %s", formatSingleCondition(&rule.Conditions[0]), browserName)
-		}
-		return fmt.Sprintf("%d conditions (%s) · Opens in %s", condCount, logicText, browserName)
-	}
-
-	return "No conditions"
-}
-
-func getConditionLabel(patternType string, negate bool) string {
-	switch patternType {
-	case "domain":
-		if negate {
-			return "Domain is not"
-		}
-		return "Domain is"
-	case "keyword":
-		if negate {
-			return "URL does not contain"
-		}
-		return "URL contains"
-	case "glob":
-		if negate {
-			return "Wildcard is not"
-		}
-		return "Wildcard is"
-	case "regex":
-		if negate {
-			return "Regex does not match"
-		}
-		return "Regex matches"
-	default:
-		return patternType
-	}
-}
 
 func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widgetter {
 	toolbarView := adw.NewToolbarView()
@@ -128,12 +63,12 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 		row := adw.NewActionRow()
 		if rule.Name != "" {
 			row.SetTitle(rule.Name)
-			row.SetSubtitle(formatRuleSubtitle(rule, getBrowserName(rule.Browser)))
+			row.SetSubtitle(html.EscapeString(routing.FormatRuleSubtitle(rule, getBrowserName(rule.Browser))))
 		} else {
 			if len(rule.Conditions) > 0 {
 				row.SetTitle(rule.Conditions[0].Pattern)
 			}
-			row.SetSubtitle(formatRuleSubtitleNoPattern(rule, getBrowserName(rule.Browser)))
+			row.SetSubtitle(html.EscapeString(routing.FormatRuleSubtitleNoPattern(rule, getBrowserName(rule.Browser))))
 		}
 		row.SetActivatable(true)
 

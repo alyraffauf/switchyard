@@ -162,10 +162,10 @@ func createConditionRow(
 	conditionContainer.SetMarginEnd(12)
 
 	typeDropdown := gtk.NewDropDown(
-		gtk.NewStringList([]string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}),
+		gtk.NewStringList(routing.ConditionTypeLabels()),
 		nil,
 	)
-	typeDropdown.SetSelected(conditionTypeToIndex((*conditions)[conditionIndex].Type))
+	typeDropdown.SetSelected(routing.ConditionTypeToIndex((*conditions)[conditionIndex].Type))
 	typeDropdown.SetVAlign(gtk.AlignCenter)
 	typeDropdown.SetSizeRequest(150, -1)
 	conditionContainer.Append(typeDropdown)
@@ -192,7 +192,7 @@ func createConditionRow(
 	conditionContainer.Append(patternEntry)
 
 	typeDropdown.Connect("notify::selected", func() {
-		(*conditions)[conditionIndex].Type = indexToConditionType(typeDropdown.Selected())
+		(*conditions)[conditionIndex].Type = routing.IndexToConditionType(typeDropdown.Selected())
 		validateConditionEntry(conditions, conditionIndex, typeDropdown, patternEntry, actionButton)
 	})
 
@@ -229,7 +229,7 @@ func validateConditionEntry(
 	actionButton *gtk.Button,
 ) {
 	pattern := patternEntry.Text()
-	conditionType := indexToConditionType(typeDropdown.Selected())
+	conditionType := routing.IndexToConditionType(typeDropdown.Selected())
 
 	err := routing.ValidateConditionPattern(conditionType, pattern)
 	if err != nil {
