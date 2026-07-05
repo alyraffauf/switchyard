@@ -56,9 +56,9 @@ func parseRule(line string) (adGuardRule, bool) {
 	}
 
 	rule := adGuardRule{}
-	if strings.HasPrefix(line, "@@") {
+	if rest, ok := strings.CutPrefix(line, "@@"); ok {
 		rule.isException = true
-		line = line[2:]
+		line = rest
 	}
 
 	parts := strings.Split(line, "$")
@@ -75,10 +75,8 @@ func parseRule(line string) (adGuardRule, bool) {
 	}
 
 	if len(parts) > 1 {
-		options := strings.Split(parts[1], ",")
-		for _, opt := range options {
-			if strings.HasPrefix(opt, "removeparam=") {
-				paramValue := strings.TrimPrefix(opt, "removeparam=")
+		for opt := range strings.SplitSeq(parts[1], ",") {
+			if paramValue, ok := strings.CutPrefix(opt, "removeparam="); ok {
 				if strings.HasPrefix(paramValue, "/") && strings.HasSuffix(paramValue, "/") {
 					if re, err := regexp.Compile("(?i)" + paramValue[1:len(paramValue)-1]); err == nil {
 						rule.parameterRegex = re
