@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package routing
 
 import (
 	"regexp"
@@ -25,7 +25,7 @@ func matchesPattern(url, pattern, patternType string, negate bool) bool {
 	var result bool
 	switch patternType {
 	case "domain":
-		domain := extractDomain(url)
+		domain := ExtractDomain(url)
 		result = strings.EqualFold(domain, pattern)
 	case "keyword":
 		result = strings.Contains(strings.ToLower(url), strings.ToLower(pattern))
@@ -49,7 +49,7 @@ func matchesPattern(url, pattern, patternType string, negate bool) bool {
 
 // matchGlob performs glob-style pattern matching against a URL's domain or full URL
 func matchGlob(url, pattern string) bool {
-	domain := extractDomain(url)
+	domain := ExtractDomain(url)
 
 	// Convert glob to regex: escape dots, convert * to .*
 	regexPattern := "^" + strings.ReplaceAll(strings.ReplaceAll(pattern, ".", "\\."), "*", ".*") + "$"

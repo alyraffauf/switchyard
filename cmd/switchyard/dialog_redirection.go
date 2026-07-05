@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/alyraffauf/switchyard/internal/routing"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
@@ -31,7 +32,6 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 	header, saveBtn := dialogHeader("Cancel", actionLabel, func() { dialog.Close() }, nil)
 	dialog, content, _ := dialogWithToolbar(title, 450, 450, header)
 
-	// Name section
 	nameGroup := adw.NewPreferencesGroup()
 	nameGroup.SetTitle("Name")
 	nameGroup.SetDescription("Give this redirection a descriptive name (optional)")
@@ -44,7 +44,6 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 	nameGroup.Add(nameRow)
 	content.Append(nameGroup)
 
-	// Redirection section
 	group := adw.NewPreferencesGroup()
 	group.SetTitle("Redirection")
 	group.SetDescription("Define how links are modified")
@@ -75,9 +74,9 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 
 	validateInputs := func() {
 		find := findRow.Text()
-		rwType := indexToRedirectionType(typeRow.Selected())
-		r := Redirection{Type: rwType, Find: find, Replace: replaceRow.Text()}
-		err := validateRedirection(r)
+		redirectionType := indexToRedirectionType(typeRow.Selected())
+		redirection := Redirection{Type: redirectionType, Find: find, Replace: replaceRow.Text()}
+		err := routing.ValidateRedirection(redirection)
 
 		if find != "" && err != nil {
 			findRow.AddCSSClass("error")
@@ -96,18 +95,18 @@ func showRedirectionDialog(parent *adw.Window, cfg *Config, redirection *Redirec
 	saveBtn.ConnectClicked(func() {
 		name := nameRow.Text()
 		find := findRow.Text()
-		rwType := indexToRedirectionType(typeRow.Selected())
+		redirectionType := indexToRedirectionType(typeRow.Selected())
 
 		if isNew {
 			cfg.Redirections = append(cfg.Redirections, Redirection{
 				Name:    name,
-				Type:    rwType,
+				Type:    redirectionType,
 				Find:    find,
 				Replace: replaceRow.Text(),
 			})
 		} else {
 			redirection.Name = name
-			redirection.Type = rwType
+			redirection.Type = redirectionType
 			redirection.Find = find
 			redirection.Replace = replaceRow.Text()
 		}

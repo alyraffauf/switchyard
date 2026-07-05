@@ -10,14 +10,14 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-func formatRedirectionSubtitle(r *Redirection) string {
-	rwType := r.Type
-	if rwType == "" {
-		rwType = "domain"
+func formatRedirectionSubtitle(redirection *Redirection) string {
+	redirectionType := redirection.Type
+	if redirectionType == "" {
+		redirectionType = "domain"
 	}
 
 	var typeLabel string
-	switch rwType {
+	switch redirectionType {
 	case "domain":
 		typeLabel = "Domain"
 	case "wildcard":
@@ -28,10 +28,10 @@ func formatRedirectionSubtitle(r *Redirection) string {
 		typeLabel = "Domain"
 	}
 
-	if r.Replace == "" {
+	if redirection.Replace == "" {
 		return fmt.Sprintf("%s · Removes match", typeLabel)
 	}
-	return fmt.Sprintf("%s · Replaces with %s", typeLabel, html.EscapeString(r.Replace))
+	return fmt.Sprintf("%s · Replaces with %s", typeLabel, html.EscapeString(redirection.Replace))
 }
 
 func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
@@ -43,7 +43,6 @@ func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	titleLabel.AddCSSClass("title")
 	header.SetTitleWidget(titleLabel)
 
-	// Add button in header
 	addButton := gtk.NewButton()
 	addButton.SetIconName("list-add-symbolic")
 	addButton.SetTooltipText("Add Redirection")
@@ -60,7 +59,6 @@ func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	content.SetMarginTop(12)
 	content.SetMarginBottom(12)
 
-	// Info banner
 	infoLabel := gtk.NewLabel("Redirections modify links before rules are applied.")
 	infoLabel.SetWrap(true)
 	infoLabel.SetXAlign(0)
@@ -95,50 +93,48 @@ func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 		reorderBox := gtk.NewBox(gtk.OrientationHorizontal, 0)
 		reorderBox.SetVAlign(gtk.AlignCenter)
 
-		upBtn := gtk.NewButton()
-		upBtn.SetIconName("go-up-symbolic")
-		upBtn.AddCSSClass("flat")
-		upBtn.SetSensitive(redirectionIndex > 0)
-		upBtn.SetTooltipText("Move up")
-		upBtn.ConnectClicked(func() {
+		upButton := gtk.NewButton()
+		upButton.SetIconName("go-up-symbolic")
+		upButton.AddCSSClass("flat")
+		upButton.SetSensitive(redirectionIndex > 0)
+		upButton.SetTooltipText("Move up")
+		upButton.ConnectClicked(func() {
 			if redirectionIndex > 0 {
 				cfg.Redirections[redirectionIndex], cfg.Redirections[redirectionIndex-1] = cfg.Redirections[redirectionIndex-1], cfg.Redirections[redirectionIndex]
 				saveConfig(cfg)
 				rebuildRedirectionsList()
 			}
 		})
-		reorderBox.Append(upBtn)
+		reorderBox.Append(upButton)
 
-		downBtn := gtk.NewButton()
-		downBtn.SetIconName("go-down-symbolic")
-		downBtn.AddCSSClass("flat")
-		downBtn.SetSensitive(redirectionIndex < len(cfg.Redirections)-1)
-		downBtn.SetTooltipText("Move down")
-		downBtn.ConnectClicked(func() {
+		downButton := gtk.NewButton()
+		downButton.SetIconName("go-down-symbolic")
+		downButton.AddCSSClass("flat")
+		downButton.SetSensitive(redirectionIndex < len(cfg.Redirections)-1)
+		downButton.SetTooltipText("Move down")
+		downButton.ConnectClicked(func() {
 			if redirectionIndex < len(cfg.Redirections)-1 {
 				cfg.Redirections[redirectionIndex], cfg.Redirections[redirectionIndex+1] = cfg.Redirections[redirectionIndex+1], cfg.Redirections[redirectionIndex]
 				saveConfig(cfg)
 				rebuildRedirectionsList()
 			}
 		})
-		reorderBox.Append(downBtn)
+		reorderBox.Append(downButton)
 
 		row.AddSuffix(reorderBox)
 
-		// Delete button
-		deleteBtn := gtk.NewButton()
-		deleteBtn.SetIconName("edit-delete-symbolic")
-		deleteBtn.AddCSSClass("flat")
-		deleteBtn.AddCSSClass("destructive-action")
-		deleteBtn.SetTooltipText("Remove")
-		deleteBtn.ConnectClicked(func() {
+		deleteButton := gtk.NewButton()
+		deleteButton.SetIconName("edit-delete-symbolic")
+		deleteButton.AddCSSClass("flat")
+		deleteButton.AddCSSClass("destructive-action")
+		deleteButton.SetTooltipText("Remove")
+		deleteButton.ConnectClicked(func() {
 			cfg.Redirections = append(cfg.Redirections[:redirectionIndex], cfg.Redirections[redirectionIndex+1:]...)
 			saveConfig(cfg)
 			rebuildRedirectionsList()
 		})
-		row.AddSuffix(deleteBtn)
+		row.AddSuffix(deleteButton)
 
-		// Edit on click
 		row.ConnectActivated(func() {
 			showEditRedirectionDialog(win, cfg, redirection, rebuildRedirectionsList)
 		})
@@ -149,7 +145,6 @@ func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	rebuildRedirectionsList = func() {
 		clearListBox(redirectionsListBox)
 
-		// handle empty state
 		if len(cfg.Redirections) == 0 {
 			infoLabel.SetVisible(false)
 			redirectionsListBox.SetVisible(false)

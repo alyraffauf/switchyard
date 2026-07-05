@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package routing
 
 import (
 	"testing"
@@ -481,9 +481,9 @@ func TestApplyRedirections(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := applyRedirections(tt.url, tt.redirections)
+			got := ApplyRedirections(tt.url, tt.redirections)
 			if got != tt.want {
-				t.Errorf("applyRedirections() = %q, want %q", got, tt.want)
+				t.Errorf("ApplyRedirections() = %q, want %q", got, tt.want)
 			}
 		})
 	}
@@ -579,15 +579,14 @@ func TestValidateRedirection(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := validateRedirection(tt.redirection)
+			err := ValidateRedirection(tt.redirection)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("validateRedirection() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ValidateRedirection() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
 }
 
-// TestRealWorldRedirections tests common real-world URL transformations
 func TestRealWorldRedirections(t *testing.T) {
 	tests := []struct {
 		name         string
@@ -701,9 +700,9 @@ func TestRealWorldRedirections(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := applyRedirections(tt.url, tt.redirections)
+			got := ApplyRedirections(tt.url, tt.redirections)
 			if got != tt.want {
-				t.Errorf("applyRedirections() = %q, want %q", got, tt.want)
+				t.Errorf("ApplyRedirections() = %q, want %q", got, tt.want)
 			}
 		})
 	}

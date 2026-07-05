@@ -3,6 +3,7 @@
 package main
 
 import (
+	"github.com/alyraffauf/switchyard/internal/routing"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
@@ -23,7 +24,7 @@ func showAddRuleDialog(parent *adw.Window, cfg *Config, browsers []*Browser, reb
 		browserIdx := browserRow.Selected()
 
 		if len(*conditions) > 0 && int(browserIdx) < len(browsers) {
-			if !validateConditions(*conditions) {
+			if !routing.AreAllConditionsValid(*conditions) {
 				return
 			}
 

@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package routing
 
 import (
 	"testing"
 )
 
-// TestRuleMatchesConditions_AND tests AND logic (all conditions must match)
 func TestRuleMatchesConditions_AND(t *testing.T) {
 	tests := []struct {
 		name string
@@ -146,15 +145,14 @@ func TestRuleMatchesConditions_AND(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := tt.rule.matchesConditions(tt.url)
+			result := tt.rule.MatchesConditions(tt.url)
 			if result != tt.want {
-				t.Errorf("Rule.matchesConditions(%q) = %v, want %v", tt.url, result, tt.want)
+				t.Errorf("Rule.MatchesConditions(%q) = %v, want %v", tt.url, result, tt.want)
 			}
 		})
 	}
 }
 
-// TestRuleMatchesConditions_OR tests OR logic (any condition can match)
 func TestRuleMatchesConditions_OR(t *testing.T) {
 	tests := []struct {
 		name string
@@ -264,15 +262,14 @@ func TestRuleMatchesConditions_OR(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := tt.rule.matchesConditions(tt.url)
+			result := tt.rule.MatchesConditions(tt.url)
 			if result != tt.want {
-				t.Errorf("Rule.matchesConditions(%q) = %v, want %v", tt.url, result, tt.want)
+				t.Errorf("Rule.MatchesConditions(%q) = %v, want %v", tt.url, result, tt.want)
 			}
 		})
 	}
 }
 
-// TestConfigMatchRule tests the full rule matching from Config
 func TestConfigMatchRule(t *testing.T) {
 	tests := []struct {
 		name          string
@@ -458,21 +455,20 @@ func TestConfigMatchRule(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			browserID, alwaysAsk, matched := tt.config.matchRule(tt.url)
+			browserID, alwaysAsk, matched := tt.config.MatchRule(tt.url)
 			if browserID != tt.wantBrowserID {
-				t.Errorf("Config.matchRule(%q) browserID = %q, want %q", tt.url, browserID, tt.wantBrowserID)
+				t.Errorf("Config.MatchRule(%q) browserID = %q, want %q", tt.url, browserID, tt.wantBrowserID)
 			}
 			if alwaysAsk != tt.wantAlwaysAsk {
-				t.Errorf("Config.matchRule(%q) alwaysAsk = %v, want %v", tt.url, alwaysAsk, tt.wantAlwaysAsk)
+				t.Errorf("Config.MatchRule(%q) alwaysAsk = %v, want %v", tt.url, alwaysAsk, tt.wantAlwaysAsk)
 			}
 			if matched != tt.wantMatched {
-				t.Errorf("Config.matchRule(%q) matched = %v, want %v", tt.url, matched, tt.wantMatched)
+				t.Errorf("Config.MatchRule(%q) matched = %v, want %v", tt.url, matched, tt.wantMatched)
 			}
 		})
 	}
 }
 
-// TestConfigMatchRule_RuleOrdering tests that rules are matched in order (first match wins)
 func TestConfigMatchRule_RuleOrdering(t *testing.T) {
 	tests := []struct {
 		name          string
@@ -675,13 +671,13 @@ func TestConfigMatchRule_RuleOrdering(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			browserID, _, matched := tt.config.matchRule(tt.url)
+			browserID, _, matched := tt.config.MatchRule(tt.url)
 			if browserID != tt.wantBrowserID {
-				t.Errorf("Config.matchRule(%q) browserID = %q, want %q",
+				t.Errorf("Config.MatchRule(%q) browserID = %q, want %q",
 					tt.url, browserID, tt.wantBrowserID)
 			}
 			if matched != tt.wantMatched {
-				t.Errorf("Config.matchRule(%q) matched = %v, want %v",
+				t.Errorf("Config.MatchRule(%q) matched = %v, want %v",
 					tt.url, matched, tt.wantMatched)
 			}
 		})

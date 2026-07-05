@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package routing
 
 import (
 	"fmt"
@@ -8,20 +8,18 @@ import (
 	"strings"
 )
 
-func extractDomain(rawURL string) string {
-	// Add scheme if missing so url.Parse works correctly
+func ExtractDomain(rawURL string) string {
 	if !strings.Contains(rawURL, "://") {
 		rawURL = "https://" + rawURL
 	}
-	u, err := url.Parse(rawURL)
+	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
 		return ""
 	}
-	return u.Hostname()
+	return parsedURL.Hostname()
 }
 
-func sanitizeURL(rawURL string) string {
-	// Remove newlines and carriage returns (common when URLs are copied from formatted text)
+func SanitizeURL(rawURL string) string {
 	rawURL = strings.ReplaceAll(rawURL, "\n", "")
 	rawURL = strings.ReplaceAll(rawURL, "\r", "")
 	rawURL = strings.TrimSpace(rawURL)
@@ -29,42 +27,42 @@ func sanitizeURL(rawURL string) string {
 		return ""
 	}
 
-	// Reject local file paths
 	if strings.HasPrefix(rawURL, "/") || strings.HasPrefix(rawURL, ".") {
 		return ""
 	}
 
-	u, err := url.Parse(rawURL)
+	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
 		return ""
 	}
 
-	// Add https scheme if missing
-	if u.Scheme == "" {
+	if parsedURL.Scheme == "" {
 		rawURL = "https://" + rawURL
-		u, _ = url.Parse(rawURL)
+		parsedURL, err = url.Parse(rawURL)
+		if err != nil {
+			return ""
+		}
 	}
 
-	// Only allow browser-routable schemes
-	switch u.Scheme {
+	switch parsedURL.Scheme {
 	case "http", "https", "file", "ftp":
-		return u.String()
+		return parsedURL.String()
 	default:
 		return ""
 	}
 }
 
-func parseSwitchyardURL(rawURL string) (targetURL string, browserPrefs []string, err error) {
-	u, err := url.Parse(rawURL)
+func ParseSwitchyardURL(rawURL string) (targetURL string, browserPrefs []string, err error) {
+	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
 		return "", nil, err
 	}
 
-	if u.Scheme != "switchyard" || u.Host != "open" {
+	if parsedURL.Scheme != "switchyard" || parsedURL.Host != "open" {
 		return "", nil, fmt.Errorf("invalid switchyard URL")
 	}
 
-	query := u.Query()
+	query := parsedURL.Query()
 	targetURL = query.Get("url")
 	if targetURL == "" {
 		return "", nil, fmt.Errorf("missing url parameter")

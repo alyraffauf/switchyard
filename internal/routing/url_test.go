@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package routing
 
 import (
 	"testing"
@@ -42,9 +42,9 @@ func TestSanitizeURL(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := sanitizeURL(tt.input)
+			result := SanitizeURL(tt.input)
 			if result != tt.expected {
-				t.Errorf("sanitizeURL(%q) = %q, want %q", tt.input, result, tt.expected)
+				t.Errorf("SanitizeURL(%q) = %q, want %q", tt.input, result, tt.expected)
 			}
 		})
 	}
@@ -82,9 +82,9 @@ func TestExtractDomain(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := extractDomain(tt.input)
+			result := ExtractDomain(tt.input)
 			if result != tt.expected {
-				t.Errorf("extractDomain(%q) = %q, want %q", tt.input, result, tt.expected)
+				t.Errorf("ExtractDomain(%q) = %q, want %q", tt.input, result, tt.expected)
 			}
 		})
 	}
@@ -144,24 +144,24 @@ func TestParseSwitchyardURL(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotURL, gotBrowsers, err := parseSwitchyardURL(tt.input)
+			gotURL, gotBrowsers, err := ParseSwitchyardURL(tt.input)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("parseSwitchyardURL() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ParseSwitchyardURL() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if tt.wantErr {
 				return
 			}
 			if gotURL != tt.wantURL {
-				t.Errorf("parseSwitchyardURL() url = %q, want %q", gotURL, tt.wantURL)
+				t.Errorf("ParseSwitchyardURL() url = %q, want %q", gotURL, tt.wantURL)
 			}
 			if len(gotBrowsers) != len(tt.wantBrowsers) {
-				t.Errorf("parseSwitchyardURL() browsers = %v, want %v", gotBrowsers, tt.wantBrowsers)
+				t.Errorf("ParseSwitchyardURL() browsers = %v, want %v", gotBrowsers, tt.wantBrowsers)
 				return
 			}
 			for i, b := range gotBrowsers {
 				if b != tt.wantBrowsers[i] {
-					t.Errorf("parseSwitchyardURL() browsers[%d] = %q, want %q", i, b, tt.wantBrowsers[i])
+					t.Errorf("ParseSwitchyardURL() browsers[%d] = %q, want %q", i, b, tt.wantBrowsers[i])
 				}
 			}
 		})

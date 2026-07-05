@@ -29,8 +29,12 @@ jobs:
         run: |
           scripts/generate-flatpak-go-modules.py
           git diff --exit-code -- flatpak/go-modules.json
-      - name: Run tests with coverage
-        run: just test-coverage
+      - name: Test routing package with coverage
+        run: just test-routing-coverage
+      - name: Test command config compatibility
+        run: just test-config
+      - name: Test command sanitizer
+        run: just test-sanitizer
       - name: Display coverage summary
         run: |
           echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
@@ -73,7 +77,7 @@ jobs:
     name: "Build Flatpak"
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-49
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-50
       options: --privileged
     steps:
       - uses: actions/checkout@v7

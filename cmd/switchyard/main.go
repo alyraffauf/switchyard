@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/alyraffauf/switchyard/internal/routing"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -98,7 +99,7 @@ func setupApp(cfg *Config) {
 
 // handleSwitchyardURL processes switchyard:// URLs with browser preferences
 func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config, rawURL string) {
-	targetURL, browserPrefs, err := parseSwitchyardURL(rawURL)
+	targetURL, browserPrefs, err := routing.ParseSwitchyardURL(rawURL)
 	if err != nil {
 		// Invalid switchyard URL - ignore
 		return
@@ -135,7 +136,7 @@ func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config,
 }
 
 func prepareURLForRouting(rawURL string, cfg *Config) string {
-	sanitized := sanitizeURL(rawURL)
+	sanitized := routing.SanitizeURL(rawURL)
 	if sanitized == "" {
 		return ""
 	}
@@ -145,7 +146,7 @@ func prepareURLForRouting(rawURL string, cfg *Config) string {
 	}
 
 	if len(cfg.Redirections) > 0 {
-		sanitized = applyRedirections(sanitized, cfg.Redirections)
+		sanitized = routing.ApplyRedirections(sanitized, cfg.Redirections)
 	}
 
 	return sanitized
@@ -154,7 +155,7 @@ func prepareURLForRouting(rawURL string, cfg *Config) string {
 // handleURL routes a URL to the appropriate browser based on rules
 func handleURL(app *adw.Application, browsers []*Browser, cfg *Config, urlStr string) {
 	// Try to match a rule
-	browserID, alwaysAsk, matched := cfg.matchRule(urlStr)
+	browserID, alwaysAsk, matched := cfg.MatchRule(urlStr)
 	if matched {
 		// Check if rule has AlwaysAsk enabled
 		if alwaysAsk {

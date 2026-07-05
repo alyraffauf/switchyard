@@ -3,15 +3,15 @@
 package main
 
 import (
+	"github.com/alyraffauf/switchyard/internal/routing"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-// buildRuleDialogContent creates the shared content for add/edit rule dialogs
 func buildRuleDialogContent(
 	initialRule *Rule,
 	browsers []*Browser,
-	actionBtn *gtk.Button,
+	actionButton *gtk.Button,
 ) (
 	nameEntry *adw.EntryRow,
 	conditions *[]Condition,
@@ -26,7 +26,6 @@ func buildRuleDialogContent(
 	content.SetMarginTop(18)
 	content.SetMarginBottom(18)
 
-	// Name section
 	nameGroup := adw.NewPreferencesGroup()
 	nameGroup.SetTitle("Rule Name")
 	nameGroup.SetDescription("Give this rule a descriptive name (optional)")
@@ -39,7 +38,6 @@ func buildRuleDialogContent(
 	nameGroup.Add(nameEntry)
 	content.Append(nameGroup)
 
-	// Initialize conditions
 	var conditionsSlice []Condition
 	if initialRule != nil && len(initialRule.Conditions) > 0 {
 		conditionsSlice = make([]Condition, len(initialRule.Conditions))
@@ -49,14 +47,12 @@ func buildRuleDialogContent(
 	}
 	conditions = &conditionsSlice
 
-	// Conditions section
 	conditionsGroup := adw.NewPreferencesGroup()
 	conditionsGroup.SetTitle("Conditions")
 	conditionsGroup.SetDescription("Define conditions to match URLs")
 
 	conditionsListBox := createBoxedListBox()
 
-	// Logic selector row
 	logicRow = adw.NewComboRow()
 	logicRow.SetTitle("Match Logic")
 	logicRow.SetModel(gtk.NewStringList([]string{"All conditions", "Any condition"}))
@@ -72,32 +68,27 @@ func buildRuleDialogContent(
 	var rebuildConditions func()
 
 	rebuildConditions = func() {
-		// Clear existing condition rows
 		for _, row := range conditionRows {
 			conditionsListBox.Remove(row)
 		}
 		conditionRows = nil
 
-		// Clear the "Add Condition" button if it exists
-		// Avoids losing track and having multiple buttons unexpectedly
 		if addConditionRow != nil {
 			conditionsListBox.Remove(addConditionRow)
 		}
 
-		// Build condition rows
 		for i := range *conditions {
-			condIdx := i
+			conditionIndex := i
 			row := createConditionRow(
 				conditions,
-				condIdx,
-				actionBtn,
+				conditionIndex,
+				actionButton,
 				rebuildConditions,
 			)
 			conditionsListBox.Append(row)
 			conditionRows = append(conditionRows, row)
 		}
 
-		// Add "Add Condition" row at the end of the list
 		addConditionRow = adw.NewActionRow()
 		addConditionRow.SetTitle("Add Condition")
 		addConditionRow.AddPrefix(gtk.NewImageFromIconName("list-add-symbolic"))
@@ -108,15 +99,13 @@ func buildRuleDialogContent(
 		})
 		conditionsListBox.Append(addConditionRow)
 
-		// Update action button state
-		actionBtn.SetSensitive(areAllConditionsValid(*conditions))
+		actionButton.SetSensitive(routing.AreAllConditionsValid(*conditions))
 	}
 
 	rebuildConditions()
 	conditionsGroup.Add(conditionsListBox)
 	content.Append(conditionsGroup)
 
-	// Action section
 	actionGroup := adw.NewPreferencesGroup()
 	actionGroup.SetTitle("Browser Action")
 	actionGroup.SetDescription("Select which browser opens matching URLs")
@@ -129,26 +118,24 @@ func buildRuleDialogContent(
 	}
 	actionGroup.Add(alwaysAskRow)
 
-	// Browser dropdown
 	browserNames := make([]string, len(browsers))
-	selectedIdx := uint(0)
-	for i, b := range browsers {
-		browserNames[i] = b.Name
-		if initialRule != nil && b.ID == initialRule.Browser {
-			selectedIdx = uint(i)
+	selectedIndex := uint(0)
+	for i, browser := range browsers {
+		browserNames[i] = browser.Name
+		if initialRule != nil && browser.ID == initialRule.Browser {
+			selectedIndex = uint(i)
 		}
 	}
 
 	browserRow = adw.NewComboRow()
 	browserRow.SetTitle("Browser")
 	browserRow.SetModel(gtk.NewStringList(browserNames))
-	browserRow.SetSelected(selectedIdx)
+	browserRow.SetSelected(selectedIndex)
 	if initialRule != nil {
 		browserRow.SetSensitive(!initialRule.AlwaysAsk)
 	}
 	actionGroup.Add(browserRow)
 
-	// Link always ask toggle to browser row sensitivity
 	alwaysAskRow.Connect("notify::active", func() {
 		browserRow.SetSensitive(!alwaysAskRow.Active())
 	})
@@ -158,11 +145,10 @@ func buildRuleDialogContent(
 	return
 }
 
-// createConditionRow creates a single condition editing row with all controls
 func createConditionRow(
 	conditions *[]Condition,
-	condIdx int,
-	actionBtn *gtk.Button,
+	conditionIndex int,
+	actionButton *gtk.Button,
 	rebuildConditions func(),
 ) *gtk.ListBoxRow {
 	conditionRow := gtk.NewListBoxRow()
@@ -175,88 +161,82 @@ func createConditionRow(
 	conditionContainer.SetMarginStart(12)
 	conditionContainer.SetMarginEnd(12)
 
-	// Match type dropdown
 	typeDropdown := gtk.NewDropDown(
 		gtk.NewStringList([]string{"Exact Domain", "URL Contains", "Wildcard", "Regex"}),
 		nil,
 	)
-	typeDropdown.SetSelected(conditionTypeToIndex((*conditions)[condIdx].Type))
+	typeDropdown.SetSelected(conditionTypeToIndex((*conditions)[conditionIndex].Type))
 	typeDropdown.SetVAlign(gtk.AlignCenter)
-	typeDropdown.SetSizeRequest(150, -1) // Fixed width for consistent alignment
+	typeDropdown.SetSizeRequest(150, -1)
 	conditionContainer.Append(typeDropdown)
 
-	// Negate dropdown (is / is not)
 	negateDropdown := gtk.NewDropDown(
 		gtk.NewStringList([]string{"is", "is not"}),
 		nil,
 	)
-	if (*conditions)[condIdx].Negate {
+	if (*conditions)[conditionIndex].Negate {
 		negateDropdown.SetSelected(1)
 	} else {
 		negateDropdown.SetSelected(0)
 	}
 	negateDropdown.SetVAlign(gtk.AlignCenter)
 	negateDropdown.Connect("notify::selected", func() {
-		(*conditions)[condIdx].Negate = negateDropdown.Selected() == 1
+		(*conditions)[conditionIndex].Negate = negateDropdown.Selected() == 1
 	})
 	conditionContainer.Append(negateDropdown)
 
-	// Pattern entry
 	patternEntry := gtk.NewEntry()
-	patternEntry.SetText((*conditions)[condIdx].Pattern)
+	patternEntry.SetText((*conditions)[conditionIndex].Pattern)
 	patternEntry.SetHExpand(true)
 	patternEntry.SetPlaceholderText("Pattern")
 	conditionContainer.Append(patternEntry)
 
-	// Connect handlers
 	typeDropdown.Connect("notify::selected", func() {
-		(*conditions)[condIdx].Type = indexToConditionType(typeDropdown.Selected())
-		validateConditionEntry(conditions, condIdx, typeDropdown, patternEntry, actionBtn)
+		(*conditions)[conditionIndex].Type = indexToConditionType(typeDropdown.Selected())
+		validateConditionEntry(conditions, conditionIndex, typeDropdown, patternEntry, actionButton)
 	})
 
 	patternEntry.Connect("changed", func() {
-		(*conditions)[condIdx].Pattern = patternEntry.Text()
-		validateConditionEntry(conditions, condIdx, typeDropdown, patternEntry, actionBtn)
+		(*conditions)[conditionIndex].Pattern = patternEntry.Text()
+		validateConditionEntry(conditions, conditionIndex, typeDropdown, patternEntry, actionButton)
 	})
 
-	// Delete button
-	deleteBtn := gtk.NewButton()
-	deleteBtn.SetIconName("edit-delete-symbolic")
-	deleteBtn.SetTooltipText("Delete this condition")
-	deleteBtn.AddCSSClass("flat")
-	deleteBtn.AddCSSClass("circular")
-	deleteBtn.AddCSSClass("destructive-action")
-	deleteBtn.SetVAlign(gtk.AlignCenter)
-	deleteBtn.SetSensitive(len(*conditions) > 1)
-	deleteBtn.ConnectClicked(func() {
-		if len(*conditions) > 1 && condIdx < len(*conditions) {
-			*conditions = append((*conditions)[:condIdx], (*conditions)[condIdx+1:]...)
+	deleteButton := gtk.NewButton()
+	deleteButton.SetIconName("edit-delete-symbolic")
+	deleteButton.SetTooltipText("Delete this condition")
+	deleteButton.AddCSSClass("flat")
+	deleteButton.AddCSSClass("circular")
+	deleteButton.AddCSSClass("destructive-action")
+	deleteButton.SetVAlign(gtk.AlignCenter)
+	deleteButton.SetSensitive(len(*conditions) > 1)
+	deleteButton.ConnectClicked(func() {
+		if len(*conditions) > 1 && conditionIndex < len(*conditions) {
+			*conditions = append((*conditions)[:conditionIndex], (*conditions)[conditionIndex+1:]...)
 			rebuildConditions()
 		}
 	})
-	conditionContainer.Append(deleteBtn)
+	conditionContainer.Append(deleteButton)
 
 	conditionRow.SetChild(conditionContainer)
 	return conditionRow
 }
 
-// validateConditionEntry validates a pattern and updates UI accordingly
 func validateConditionEntry(
 	conditions *[]Condition,
-	condIdx int,
+	conditionIndex int,
 	typeDropdown *gtk.DropDown,
 	patternEntry *gtk.Entry,
-	actionBtn *gtk.Button,
+	actionButton *gtk.Button,
 ) {
 	pattern := patternEntry.Text()
-	condType := indexToConditionType(typeDropdown.Selected())
+	conditionType := indexToConditionType(typeDropdown.Selected())
 
-	err := validateConditionPattern(condType, pattern)
+	err := routing.ValidateConditionPattern(conditionType, pattern)
 	if err != nil {
 		patternEntry.AddCSSClass("error")
 	} else {
 		patternEntry.RemoveCSSClass("error")
 	}
 
-	actionBtn.SetSensitive(areAllConditionsValid(*conditions))
+	actionButton.SetSensitive(routing.AreAllConditionsValid(*conditions))
 }

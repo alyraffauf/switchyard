@@ -9,42 +9,14 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/alyraffauf/switchyard/internal/routing"
 	"github.com/pelletier/go-toml/v2"
 )
 
-type Config struct {
-	PromptOnClick            bool          `toml:"prompt_on_click"`
-	FavoriteBrowser          string        `toml:"favorite_browser"`
-	HiddenBrowsers           []string      `toml:"hidden_browsers"`
-	CheckDefaultBrowser      bool          `toml:"check_default_browser"`
-	ShowAppNames             bool          `toml:"show_app_names"`
-	ForceDarkMode            bool          `toml:"force_dark_mode"`
-	StayAlive                bool          `toml:"stay_alive"`
-	RemoveTrackingParameters bool          `toml:"remove_tracking_parameters"`
-	Redirections             []Redirection `toml:"redirections,omitempty"`
-	Rules                    []Rule        `toml:"rules"`
-}
-
-type Redirection struct {
-	Name    string `toml:"name,omitempty"`
-	Type    string `toml:"type,omitempty"` // "domain", "wildcard", or "regex", defaults to "domain"
-	Find    string `toml:"find"`
-	Replace string `toml:"replace"`
-}
-
-type Condition struct {
-	Type    string `toml:"type"` // "domain", "keyword", "glob", "regex"
-	Pattern string `toml:"pattern"`
-	Negate  bool   `toml:"negate,omitempty"`
-}
-
-type Rule struct {
-	Name       string      `toml:"name"`
-	Conditions []Condition `toml:"conditions"`
-	Logic      string      `toml:"logic,omitempty"` // "all" or "any"
-	Browser    string      `toml:"browser"`
-	AlwaysAsk  bool        `toml:"always_ask"`
-}
+type Config = routing.Config
+type Redirection = routing.Redirection
+type Condition = routing.Condition
+type Rule = routing.Rule
 
 func configDir() string {
 	if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
@@ -59,15 +31,7 @@ func configPath() string {
 }
 
 func newDefaultConfig() *Config {
-	return &Config{
-		PromptOnClick:            true,
-		CheckDefaultBrowser:      true,
-		ShowAppNames:             false, // Default: hide app names, show tooltips
-		ForceDarkMode:            true,  // Default: force dark mode
-		StayAlive:                true,
-		RemoveTrackingParameters: false,
-		Rules:                    []Rule{},
-	}
+	return routing.NewDefaultConfig()
 }
 
 func loadConfig() *Config {
@@ -112,44 +76,6 @@ func saveConfig(cfg *Config) error {
 	}
 
 	return os.WriteFile(configPath(), data, 0644)
-}
-
-func (cfg *Config) matchRule(url string) (browserID string, alwaysAsk bool, matched bool) {
-	for _, rule := range cfg.Rules {
-		if rule.matchesConditions(url) {
-			return rule.Browser, rule.AlwaysAsk, true
-		}
-	}
-	return "", false, false
-}
-
-func (r *Rule) matchesConditions(url string) bool {
-	if len(r.Conditions) == 0 {
-		return false
-	}
-
-	logic := r.Logic
-	if logic == "" {
-		logic = "all" // Default to AND logic
-	}
-
-	if logic == "all" {
-		// AND: All conditions must match
-		for _, cond := range r.Conditions {
-			if !matchesPattern(url, cond.Pattern, cond.Type, cond.Negate) {
-				return false
-			}
-		}
-		return true
-	} else {
-		// OR: Any condition must match
-		for _, cond := range r.Conditions {
-			if matchesPattern(url, cond.Pattern, cond.Type, cond.Negate) {
-				return true
-			}
-		}
-		return false
-	}
 }
 
 // hostCommand runs commands on the host when Switchyard is sandboxed by Flatpak.

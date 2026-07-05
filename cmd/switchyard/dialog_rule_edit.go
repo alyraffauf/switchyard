@@ -3,12 +3,12 @@
 package main
 
 import (
+	"github.com/alyraffauf/switchyard/internal/routing"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
 func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, browsers []*Browser, rebuildRulesList func()) {
-	// Ensure rules have at least one condition
 	if len(rule.Conditions) == 0 {
 		rule.Conditions = []Condition{{
 			Type:    "domain",
@@ -30,11 +30,10 @@ func showEditRuleDialog(parent *adw.Window, cfg *Config, rule *Rule, browsers []
 		browserIdx := browserRow.Selected()
 
 		if len(*conditions) > 0 && int(browserIdx) < len(browsers) {
-			if !validateConditions(*conditions) {
+			if !routing.AreAllConditionsValid(*conditions) {
 				return
 			}
 
-			// Update rule
 			rule.Name = nameEntry.Text()
 			rule.Conditions = *conditions
 			rule.Logic = getLogicFromComboRow(logicRow)

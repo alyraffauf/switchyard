@@ -17,19 +17,17 @@ func dialogHeader(cancelLabel, actionLabel string, onCancel, onAction func()) (*
 	cancelBtn.ConnectClicked(func() { onCancel() })
 	header.PackStart(cancelBtn)
 
-	actionBtn := gtk.NewButton()
-	actionBtn.SetLabel(actionLabel)
-	actionBtn.AddCSSClass("suggested-action")
+	actionButton := gtk.NewButton()
+	actionButton.SetLabel(actionLabel)
+	actionButton.AddCSSClass("suggested-action")
 	if onAction != nil {
-		actionBtn.ConnectClicked(func() { onAction() })
+		actionButton.ConnectClicked(func() { onAction() })
 	}
-	header.PackEnd(actionBtn)
+	header.PackEnd(actionButton)
 
-	return header, actionBtn
+	return header, actionButton
 }
 
-// dialogWithToolbar creates a dialog with a standard toolbar and scrolled content area.
-// Returns the dialog and a content box where widgets can be added.
 func dialogWithToolbar(title string, width, height int, header *adw.HeaderBar) (*adw.Dialog, *gtk.Box, *gtk.ScrolledWindow) {
 	dialog := adw.NewDialog()
 	dialog.SetTitle(title)
@@ -55,7 +53,6 @@ func dialogWithToolbar(title string, width, height int, header *adw.HeaderBar) (
 	return dialog, content, scrolledWindow
 }
 
-// simpleDialogWithToolbar creates a dialog without a scrolled window (for simple, small dialogs).
 func simpleDialogWithToolbar(title string, width, height int, header *adw.HeaderBar) (*adw.Dialog, *gtk.Box) {
 	dialog := adw.NewDialog()
 	dialog.SetTitle(title)
@@ -78,9 +75,8 @@ func simpleDialogWithToolbar(title string, width, height int, header *adw.Header
 	return dialog, content
 }
 
-// converts condition type string to combo row index.
-func conditionTypeToIndex(condType string) uint {
-	switch condType {
+func conditionTypeToIndex(conditionType string) uint {
+	switch conditionType {
 	case "domain":
 		return 0
 	case "keyword":
@@ -94,7 +90,6 @@ func conditionTypeToIndex(condType string) uint {
 	}
 }
 
-// convert a combo row index to condition type string.
 func indexToConditionType(index uint) string {
 	switch index {
 	case 0:
@@ -110,14 +105,14 @@ func indexToConditionType(index uint) string {
 	}
 }
 
-func redirectionTypeToIndex(rwType string) uint {
-	switch rwType {
+func redirectionTypeToIndex(redirectionType string) uint {
+	switch redirectionType {
 	case "wildcard":
 		return 1
 	case "regex":
 		return 2
 	default:
-		return 0 // "domain" is default
+		return 0
 	}
 }
 

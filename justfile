@@ -55,17 +55,26 @@ update-go-deps:
     scripts/generate-flatpak-go-modules.py
 
 # Run unit tests
-test:
-    @echo "Running unit tests..."
-    go test -v ./cmd/switchyard/config_test.go ./cmd/switchyard/config_compat_test.go ./cmd/switchyard/url_test.go ./cmd/switchyard/pattern_test.go ./cmd/switchyard/validation_test.go ./cmd/switchyard/redirection_test.go ./cmd/switchyard/app.go ./cmd/switchyard/config.go ./cmd/switchyard/url.go ./cmd/switchyard/pattern.go ./cmd/switchyard/validation.go ./cmd/switchyard/redirection.go
+test-routing:
+    go test -v ./internal/routing
+
+test-config:
+    go test -v ./cmd/switchyard/config_compat_test.go ./cmd/switchyard/app.go ./cmd/switchyard/config.go
+
+test-sanitizer:
+    go test -v ./cmd/switchyard/sanitizer_test.go ./cmd/switchyard/sanitizer.go
+
+test: test-routing test-config test-sanitizer
 
 # Run tests with coverage report
-test-coverage:
+test-routing-coverage:
     @echo "Running tests with coverage..."
-    go test -coverprofile=coverage.out ./cmd/switchyard/config_test.go ./cmd/switchyard/config_compat_test.go ./cmd/switchyard/url_test.go ./cmd/switchyard/pattern_test.go ./cmd/switchyard/validation_test.go ./cmd/switchyard/redirection_test.go ./cmd/switchyard/app.go ./cmd/switchyard/config.go ./cmd/switchyard/url.go ./cmd/switchyard/pattern.go ./cmd/switchyard/validation.go ./cmd/switchyard/redirection.go
+    go test -v -coverprofile=coverage.out ./internal/routing
     go tool cover -func=coverage.out
     @echo ""
     @echo "To view HTML coverage report, run: go tool cover -html=coverage.out"
+
+test-coverage: test-config test-sanitizer test-routing-coverage
 
 # Build and install Flatpak (development version)
 flatpak:
@@ -136,10 +145,9 @@ release version:
         exit 1
     fi
 
-    # Allow cmd/switchyard/app.go, metainfo, extension manifests, and package.json to be dirty; nothing else.
     dirty="$(git status --porcelain -- ':!cmd/switchyard/app.go' ":!${metainfo}" ":!${manifest}" ":!${firefox_manifest}" ":!${pkgjson}")"
     if [ -n "$dirty" ]; then
-        echo "error: working tree has changes outside cmd/switchyard/app.go, ${metainfo}, ${manifest}, ${firefox_manifest}:" >&2
+        echo "error: working tree has changes outside cmd/switchyard/app.go, ${metainfo}, ${manifest}, ${firefox_manifest}, ${pkgjson}:" >&2
         echo "$dirty" >&2
         exit 1
     fi
@@ -154,6 +162,8 @@ release version:
         echo "       add a release entry with notes before running 'just release'" >&2
         exit 1
     fi
+
+    just test
 
     sed -i -E "s/^(\s*Version\s*=\s*)\"[^\"]+\"/\1\"${version}\"/" cmd/switchyard/app.go
     if ! grep -qE "Version\s*=\s*\"${version}\"" cmd/switchyard/app.go; then
