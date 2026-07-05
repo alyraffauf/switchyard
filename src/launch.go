@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/alyraffauf/goxdgdesktop/desktopexec"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
@@ -14,28 +15,7 @@ import (
 // launchCommand executes a desktop file command line with URL substitution
 // and proper activation token handling for window raising on Wayland.
 func launchCommand(cmdline, url string, appInfo *gio.AppInfo) error {
-	hasFieldCode := strings.Contains(cmdline, "%u") ||
-		strings.Contains(cmdline, "%U") ||
-		strings.Contains(cmdline, "%f") ||
-		strings.Contains(cmdline, "%F")
-
-	quotedURL := shellQuoteURL(url)
-
-	// Replace %u, %U, %f, %F with quoted URL
-	cmdline = strings.ReplaceAll(cmdline, "%u", quotedURL)
-	cmdline = strings.ReplaceAll(cmdline, "%U", quotedURL)
-	cmdline = strings.ReplaceAll(cmdline, "%f", quotedURL)
-	cmdline = strings.ReplaceAll(cmdline, "%F", quotedURL)
-
-	// Remove other field codes
-	for _, code := range []string{"%i", "%c", "%k"} {
-		cmdline = strings.ReplaceAll(cmdline, code, "")
-	}
-
-	// Chromium-based desktop files are essentially broken, they include no logic for a URL to pass using typical means. In this case, we work around by appending our URL.
-	if !hasFieldCode && url != "" {
-		cmdline = cmdline + " " + quotedURL
-	}
+	cmdline = desktopexec.SubstituteOrAppendURL(cmdline, url)
 
 	if strings.TrimSpace(cmdline) == "" {
 		return nil

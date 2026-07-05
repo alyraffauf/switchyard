@@ -54,12 +54,6 @@ func sanitizeURL(rawURL string) string {
 	}
 }
 
-// shellQuoteURL returns a shell-safe quoted version of the URL.
-// This prevents shell metacharacters like & from being interpreted.
-func shellQuoteURL(s string) string {
-	return "'" + strings.ReplaceAll(s, "'", "'\"'\"'") + "'"
-}
-
 func parseSwitchyardURL(rawURL string) (targetURL string, browserPrefs []string, err error) {
 	u, err := url.Parse(rawURL)
 	if err != nil {

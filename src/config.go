@@ -152,8 +152,7 @@ func (r *Rule) matchesConditions(url string) bool {
 	}
 }
 
-// hostCommand creates a command that runs on the host system when in flatpak,
-// or directly otherwise
+// hostCommand runs commands on the host when Switchyard is sandboxed by Flatpak.
 func hostCommand(name string, args ...string) *exec.Cmd {
 	if os.Getenv("FLATPAK_ID") != "" {
 		hostArgs := append([]string{"--host", name}, args...)
@@ -163,7 +162,6 @@ func hostCommand(name string, args ...string) *exec.Cmd {
 }
 
 func isDefaultBrowser() bool {
-	// Check if Switchyard is the default browser using xdg-settings
 	cmd := hostCommand("xdg-settings", "get", "default-web-browser")
 
 	output, err := cmd.Output()
@@ -177,7 +175,6 @@ func isDefaultBrowser() bool {
 }
 
 func setAsDefaultBrowser() error {
-	// Set Switchyard as the default browser using xdg-settings
 	desktopFile := getAppID() + ".desktop"
 	cmd := hostCommand("xdg-settings", "set", "default-web-browser", desktopFile)
 	return cmd.Run()

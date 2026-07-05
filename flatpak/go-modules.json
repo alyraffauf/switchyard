@@ -22,6 +22,27 @@
   },
   {
     "type": "file",
+    "url": "https://proxy.golang.org/github.com/alyraffauf/goxdgdesktop/@v/v0.1.0.info",
+    "sha256": "a187d754282645dfc1ec9dd33c05443367c9cd69d3c26d3a10092672cc653f2a",
+    "dest": "go/pkg/mod/cache/download/github.com/alyraffauf/goxdgdesktop/@v",
+    "dest-filename": "v0.1.0.info"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/alyraffauf/goxdgdesktop/@v/v0.1.0.mod",
+    "sha256": "1892feb94f647ff5966e99233b5e87753690359f7802664f35b9d59bb614064e",
+    "dest": "go/pkg/mod/cache/download/github.com/alyraffauf/goxdgdesktop/@v",
+    "dest-filename": "v0.1.0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/alyraffauf/goxdgdesktop/@v/v0.1.0.zip",
+    "sha256": "7a832fed24c398bc6628fe45a65bfd9f0020cfebbb30fc9a335df38f4ba018c8",
+    "dest": "go/pkg/mod/cache/download/github.com/alyraffauf/goxdgdesktop/@v",
+    "dest-filename": "v0.1.0.zip"
+  },
+  {
+    "type": "file",
     "url": "https://proxy.golang.org/github.com/diamondburned/gotk4-adwaita/pkg/@v/v0.0.0-20250703085337-e94555b846b6.info",
     "sha256": "77a90d23b9ccd4355f39b6fa852ea3b26b8a6791b3ee2799c87f92855c64f8b6",
     "dest": "go/pkg/mod/cache/download/github.com/diamondburned/gotk4-adwaita/pkg/@v",
@@ -61,6 +82,27 @@
     "sha256": "8280282c9f2076a2e4b6ef1016a1ac65bd8e926c3aa5fcd981957b2f2ac4a966",
     "dest": "go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v",
     "dest-filename": "v0.3.2-0.20250703063411-16654385f59a.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/kballard/go-shellquote/@v/v0.0.0-20180428030007-95032a82bc51.info",
+    "sha256": "d6f6034c911ee4f7583394452662b95695e9c3807a48e9292e48b52d252d79d5",
+    "dest": "go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v",
+    "dest-filename": "v0.0.0-20180428030007-95032a82bc51.info"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/kballard/go-shellquote/@v/v0.0.0-20180428030007-95032a82bc51.mod",
+    "sha256": "49a2d6c73f667dc0f46322a0d6acfcba14209bfb76ef7e622d61e1091962ff34",
+    "dest": "go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v",
+    "dest-filename": "v0.0.0-20180428030007-95032a82bc51.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/kballard/go-shellquote/@v/v0.0.0-20180428030007-95032a82bc51.zip",
+    "sha256": "ae4cb7b097dc4eb0c248dff00ed3bbf0f36984c4162ad1d615266084e58bd6cc",
+    "dest": "go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v",
+    "dest-filename": "v0.0.0-20180428030007-95032a82bc51.zip"
   },
   {
     "type": "file",
@@ -129,8 +171,10 @@
     "type": "shell",
     "commands": [
       "mkdir -p 'go/pkg/mod/cache/download/github.com/!karpeles!lab/weak/@v' && printf '%s\\n' h1:fNnlPo3aypS9tBzoEQluY13XyUfd/eWaSE/vMvo9s4g= > 'go/pkg/mod/cache/download/github.com/!karpeles!lab/weak/@v/v0.1.1.ziphash'",
+      "mkdir -p go/pkg/mod/cache/download/github.com/alyraffauf/goxdgdesktop/@v && printf '%s\\n' h1:n5+3AjF2ntvON6W0nN4O5bHDmcjYuFtKVCwBr6ekqj0= > go/pkg/mod/cache/download/github.com/alyraffauf/goxdgdesktop/@v/v0.1.0.ziphash",
       "mkdir -p go/pkg/mod/cache/download/github.com/diamondburned/gotk4-adwaita/pkg/@v && printf '%s\\n' h1:WzOC3KtvrC1hJMz3fbJBg0Ye50nt4Tafor+a/bBHNEA= > go/pkg/mod/cache/download/github.com/diamondburned/gotk4-adwaita/pkg/@v/v0.0.0-20250703085337-e94555b846b6.ziphash",
       "mkdir -p go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v && printf '%s\\n' h1:dN2jYYZ71hFhoKFSn24pQdKWLZb/XDydBt8pEIkFjJo= > go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v/v0.3.2-0.20250703063411-16654385f59a.ziphash",
+      "mkdir -p go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v && printf '%s\\n' h1:Z9n2FFNUXsshfwJMBgNA0RU6/i7WVaAegv3PtuIHPMs= > go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v/v0.0.0-20180428030007-95032a82bc51.ziphash",
       "mkdir -p go/pkg/mod/cache/download/github.com/pelletier/go-toml/v2/@v && printf '%s\\n' h1:mye9XuhQ6gvn5h28+VilKrrPoQVanw5PMw/TB0t5Ec4= > go/pkg/mod/cache/download/github.com/pelletier/go-toml/v2/@v/v2.2.4.ziphash",
       "mkdir -p go/pkg/mod/cache/download/go4.org/unsafe/assume-no-moving-gc/@v && printf '%s\\n' h1:lGdhQUN/cnWdSH3291CUuxSEqc+AsGTiDxPP3r2J0l4= > go/pkg/mod/cache/download/go4.org/unsafe/assume-no-moving-gc/@v/v0.0.0-20231121144256-b99613f794b6.ziphash",
       "mkdir -p go/pkg/mod/cache/download/golang.org/x/sync/@v && printf '%s\\n' h1:5KslGYwFpkhGh+Q16bwMP3cOontH8FOep7tGV86Y7SQ= > go/pkg/mod/cache/download/golang.org/x/sync/@v/v0.0.0-20210220032951-036812b2e83c.ziphash"
