@@ -13,7 +13,7 @@ buildGoModule {
   version = "dev";
   src = ./.;
   vendorHash = "sha256-bfetT+kVrnfFH/ykBNUb0dVwBvQr0VndiZBZNWUj0vw=";
-  subPackages = ["src"];
+  subPackages = ["cmd/switchyard"];
 
   ldflags = [
     "-s"

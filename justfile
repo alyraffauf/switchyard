@@ -18,7 +18,7 @@ install-flatpak-deps:
 
 # Build the application
 build:
-    go build -mod=mod -trimpath -ldflags="-s -w" -o switchyard ./src
+    go build -mod=mod -trimpath -ldflags="-s -w" -o switchyard ./cmd/switchyard
 
 # Install to system
 install: build
@@ -40,8 +40,8 @@ clean:
 
 # Update the bundled AdGuard tracking-parameter filter list
 update-adguard:
-    curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardFilters/master/TrackParamFilter/sections/general_url.txt -o src/embedded/adguard_filter.txt
-    @echo "Updated src/embedded/adguard_filter.txt"
+    curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardFilters/master/TrackParamFilter/sections/general_url.txt -o cmd/switchyard/embedded/adguard_filter.txt
+    @echo "Updated cmd/switchyard/embedded/adguard_filter.txt"
 
 # Set as default browser
 set-default:
@@ -57,12 +57,12 @@ update-go-deps:
 # Run unit tests
 test:
     @echo "Running unit tests..."
-    go test -v ./src/config_test.go ./src/config_compat_test.go ./src/url_test.go ./src/pattern_test.go ./src/validation_test.go ./src/redirection_test.go ./src/app.go ./src/config.go ./src/url.go ./src/pattern.go ./src/validation.go ./src/redirection.go
+    go test -v ./cmd/switchyard/config_test.go ./cmd/switchyard/config_compat_test.go ./cmd/switchyard/url_test.go ./cmd/switchyard/pattern_test.go ./cmd/switchyard/validation_test.go ./cmd/switchyard/redirection_test.go ./cmd/switchyard/app.go ./cmd/switchyard/config.go ./cmd/switchyard/url.go ./cmd/switchyard/pattern.go ./cmd/switchyard/validation.go ./cmd/switchyard/redirection.go
 
 # Run tests with coverage report
 test-coverage:
     @echo "Running tests with coverage..."
-    go test -coverprofile=coverage.out ./src/config_test.go ./src/config_compat_test.go ./src/url_test.go ./src/pattern_test.go ./src/validation_test.go ./src/redirection_test.go ./src/app.go ./src/config.go ./src/url.go ./src/pattern.go ./src/validation.go ./src/redirection.go
+    go test -coverprofile=coverage.out ./cmd/switchyard/config_test.go ./cmd/switchyard/config_compat_test.go ./cmd/switchyard/url_test.go ./cmd/switchyard/pattern_test.go ./cmd/switchyard/validation_test.go ./cmd/switchyard/redirection_test.go ./cmd/switchyard/app.go ./cmd/switchyard/config.go ./cmd/switchyard/url.go ./cmd/switchyard/pattern.go ./cmd/switchyard/validation.go ./cmd/switchyard/redirection.go
     go tool cover -func=coverage.out
     @echo ""
     @echo "To view HTML coverage report, run: go tool cover -html=coverage.out"
@@ -136,10 +136,10 @@ release version:
         exit 1
     fi
 
-    # Allow src/app.go, metainfo, extension manifests, and package.json to be dirty; nothing else.
-    dirty="$(git status --porcelain -- ':!src/app.go' ":!${metainfo}" ":!${manifest}" ":!${firefox_manifest}" ":!${pkgjson}")"
+    # Allow cmd/switchyard/app.go, metainfo, extension manifests, and package.json to be dirty; nothing else.
+    dirty="$(git status --porcelain -- ':!cmd/switchyard/app.go' ":!${metainfo}" ":!${manifest}" ":!${firefox_manifest}" ":!${pkgjson}")"
     if [ -n "$dirty" ]; then
-        echo "error: working tree has changes outside src/app.go, ${metainfo}, ${manifest}, ${firefox_manifest}:" >&2
+        echo "error: working tree has changes outside cmd/switchyard/app.go, ${metainfo}, ${manifest}, ${firefox_manifest}:" >&2
         echo "$dirty" >&2
         exit 1
     fi
@@ -155,9 +155,9 @@ release version:
         exit 1
     fi
 
-    sed -i -E "s/^(\s*Version\s*=\s*)\"[^\"]+\"/\1\"${version}\"/" src/app.go
-    if ! grep -qE "Version\s*=\s*\"${version}\"" src/app.go; then
-        echo "error: failed to update Version in src/app.go" >&2
+    sed -i -E "s/^(\s*Version\s*=\s*)\"[^\"]+\"/\1\"${version}\"/" cmd/switchyard/app.go
+    if ! grep -qE "Version\s*=\s*\"${version}\"" cmd/switchyard/app.go; then
+        echo "error: failed to update Version in cmd/switchyard/app.go" >&2
         exit 1
     fi
 
@@ -179,7 +179,7 @@ release version:
         exit 1
     fi
 
-    git add src/app.go "${metainfo}" "${manifest}" "${firefox_manifest}" "${pkgjson}"
+    git add cmd/switchyard/app.go "${metainfo}" "${manifest}" "${firefox_manifest}" "${pkgjson}"
     git commit -m "update for ${tag}"
     git tag -a "${tag}" -m "${tag}"
     git push origin master
