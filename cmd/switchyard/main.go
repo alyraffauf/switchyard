@@ -142,7 +142,7 @@ func prepareURLForRouting(rawURL string, cfg *Config) string {
 	}
 
 	if cfg.RemoveTrackingParameters {
-		sanitized = removeTrackingParameters(sanitized)
+		sanitized = routing.RemoveTrackingParameters(sanitized)
 	}
 
 	if len(cfg.Redirections) > 0 {

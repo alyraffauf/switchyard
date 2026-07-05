@@ -40,8 +40,8 @@ clean:
 
 # Update the bundled AdGuard tracking-parameter filter list
 update-adguard:
-    curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardFilters/master/TrackParamFilter/sections/general_url.txt -o cmd/switchyard/embedded/adguard_filter.txt
-    @echo "Updated cmd/switchyard/embedded/adguard_filter.txt"
+    curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardFilters/master/TrackParamFilter/sections/general_url.txt -o internal/routing/embedded/adguard_filter.txt
+    @echo "Updated internal/routing/embedded/adguard_filter.txt"
 
 # Set as default browser
 set-default:
@@ -59,12 +59,9 @@ test-routing:
     go test -v ./internal/routing
 
 test-config:
-    go test -v ./cmd/switchyard/config_compat_test.go ./cmd/switchyard/app.go ./cmd/switchyard/config.go
+    go test -v ./internal/config
 
-test-sanitizer:
-    go test -v ./cmd/switchyard/sanitizer_test.go ./cmd/switchyard/sanitizer.go
-
-test: test-routing test-config test-sanitizer
+test: test-routing test-config
 
 # Run tests with coverage report
 test-routing-coverage:
@@ -74,7 +71,7 @@ test-routing-coverage:
     @echo ""
     @echo "To view HTML coverage report, run: go tool cover -html=coverage.out"
 
-test-coverage: test-config test-sanitizer test-routing-coverage
+test-coverage: test-config test-routing-coverage
 
 # Build and install Flatpak (development version)
 flatpak:

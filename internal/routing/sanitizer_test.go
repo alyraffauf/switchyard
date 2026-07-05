@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package routing
 
 import (
 	"net/url"
@@ -36,26 +36,26 @@ func TestRemoveTrackingParametersWithRules(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			parsed, err := url.Parse(tt.url)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			parsed, err := url.Parse(test.url)
 			if err != nil {
 				t.Fatalf("url.Parse() error = %v", err)
 			}
 
-			got := removeTrackingParametersWithRules(tt.url, parsed, rules)
-			if got != tt.want {
-				t.Fatalf("removeTrackingParametersWithRules() = %q, want %q", got, tt.want)
+			got := removeTrackingParametersWithRules(test.url, parsed, rules)
+			if got != test.want {
+				t.Fatalf("removeTrackingParametersWithRules() = %q, want %q", got, test.want)
 			}
 		})
 	}
 }
 
 func TestRemoveTrackingParametersUsesBundledRules(t *testing.T) {
-	got := removeTrackingParameters("https://example.com/article?id=1&utm_source=newsletter")
+	got := RemoveTrackingParameters("https://example.com/article?id=1&utm_source=newsletter")
 	want := "https://example.com/article?id=1"
 
 	if got != want {
-		t.Fatalf("removeTrackingParameters() = %q, want %q", got, want)
+		t.Fatalf("RemoveTrackingParameters() = %q, want %q", got, want)
 	}
 }

@@ -31,10 +31,8 @@ jobs:
           git diff --exit-code -- flatpak/go-modules.json
       - name: Test routing package with coverage
         run: just test-routing-coverage
-      - name: Test command config compatibility
+      - name: Test config package
         run: just test-config
-      - name: Test command sanitizer
-        run: just test-sanitizer
       - name: Display coverage summary
         run: |
           echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY
