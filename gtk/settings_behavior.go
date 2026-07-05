@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import (
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
@@ -10,7 +10,6 @@ import (
 func createBehaviorPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widgetter {
 	toolbarView, content, _ := settingsPageLayout("Behavior")
 
-	// General Behavior section
 	behaviorGroup := adw.NewPreferencesGroup()
 	behaviorGroup.SetTitle("General")
 
@@ -32,7 +31,6 @@ func createBehaviorPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.W
 	removeTrackingRow.SetActive(cfg.RemoveTrackingParameters)
 	behaviorGroup.Add(removeTrackingRow)
 
-	// Favorite browser dropdown
 	browserNames := make([]string, len(browsers)+1)
 	browserNames[0] = "None"
 	for i, b := range browsers {
@@ -65,7 +63,6 @@ func createBehaviorPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.W
 
 	content.Append(behaviorGroup)
 
-	// Connect change handlers
 	checkDefaultRow.Connect("notify::active", func() {
 		cfg.CheckDefaultBrowser = checkDefaultRow.Active()
 		saveConfigWithFlag(cfg)

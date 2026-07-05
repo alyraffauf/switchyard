@@ -1,23 +1,21 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import (
 	"context"
 	"fmt"
 	"os"
 
+	"github.com/alyraffauf/switchyard/internal/host"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-// Note: gio/v2 is needed for gio.AsyncResulter in file dialog callbacks
-
 func createAdvancedPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	toolbarView, content, _ := settingsPageLayout("Advanced")
 
-	// Config file info
 	configGroup := adw.NewPreferencesGroup()
 	configGroup.SetTitle("Configuration")
 
@@ -28,7 +26,7 @@ func createAdvancedPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	configRow.AddSuffix(gtk.NewImageFromIconName("document-edit-symbolic"))
 	configRow.ConnectActivated(func() {
 		saveConfig(cfg)
-		cmd := hostCommand("xdg-open", configPath())
+		cmd := host.HostCommand("xdg-open", configPath())
 		if err := cmd.Start(); err != nil {
 			fmt.Printf("Failed to open config file: %v\n", err)
 		}
@@ -36,7 +34,6 @@ func createAdvancedPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	})
 	configGroup.Add(configRow)
 
-	// Export config
 	exportRow := adw.NewActionRow()
 	exportRow.SetTitle("Export Configuration")
 	exportRow.SetSubtitle("Save configuration to a file")
@@ -64,7 +61,6 @@ func createAdvancedPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 	})
 	configGroup.Add(exportRow)
 
-	// Import config
 	importRow := adw.NewActionRow()
 	importRow.SetTitle("Import Configuration")
 	importRow.SetSubtitle("Load configuration from a file")

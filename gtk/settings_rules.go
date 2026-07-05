@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import (
 	"fmt"
 
+	appbrowser "github.com/alyraffauf/switchyard/internal/browser"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
@@ -84,7 +85,6 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 	titleLabel.AddCSSClass("title")
 	header.SetTitleWidget(titleLabel)
 
-	// Add Rule button in header
 	addButton := gtk.NewButton()
 	addButton.SetIconName("list-add-symbolic")
 	addButton.SetTooltipText("Add Rule")
@@ -101,7 +101,6 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 	content.SetMarginTop(12)
 	content.SetMarginBottom(12)
 
-	// Info banner
 	infoLabel := gtk.NewLabel("Rules route links to browsers. First match wins.")
 	infoLabel.SetWrap(true)
 	infoLabel.SetXAlign(0)
@@ -114,7 +113,6 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 	rulesListBox := createBoxedListBox()
 	emptyState := createEmptyState("view-list-symbolic", "No Browser Rules", "Add rules to automatically open links in specific browsers")
 
-	// Helper to get browser name from ID
 	getBrowserName := func(id string) string {
 		if browser := findBrowserByID(browsers, id); browser != nil {
 			return browser.Name
@@ -139,13 +137,13 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 		}
 		row.SetActivatable(true)
 
-		// Browser icon
 		var icon *gtk.Image
 		if rule.AlwaysAsk {
 			appBrowser := &Browser{
-				ID:      getAppID(),
-				Icon:    getAppID(),
-				AppInfo: nil,
+				Browser: &appbrowser.Browser{
+					ID:   getAppID(),
+					Icon: getAppID(),
+				},
 			}
 			icon = loadBrowserIcon(appBrowser, 24)
 		} else {
@@ -159,7 +157,6 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 		}
 		row.AddPrefix(icon)
 
-		// Reorder buttons
 		reorderBox := gtk.NewBox(gtk.OrientationHorizontal, 0)
 		reorderBox.SetVAlign(gtk.AlignCenter)
 
@@ -193,7 +190,6 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 
 		row.AddSuffix(reorderBox)
 
-		// Delete button
 		deleteBtn := gtk.NewButton()
 		deleteBtn.SetIconName("edit-delete-symbolic")
 		deleteBtn.AddCSSClass("flat")
@@ -206,7 +202,6 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 		})
 		row.AddSuffix(deleteBtn)
 
-		// Edit on click
 		row.ConnectActivated(func() {
 			showEditRuleDialog(win, cfg, rule, browsers, rebuildRulesList)
 		})
@@ -217,7 +212,7 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 	rebuildRulesList = func() {
 		clearListBox(rulesListBox)
 
-		// Show/hide empty state vs rules list
+		// Swap between the empty-state page and the populated list.
 		if len(cfg.Rules) == 0 {
 			infoLabel.SetVisible(false)
 			rulesListBox.SetVisible(false)
@@ -234,7 +229,6 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 		}
 	}
 
-	// Initial build
 	rebuildRulesList()
 
 	content.Append(rulesListBox)
@@ -242,7 +236,6 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 	scrolled.SetChild(content)
 	toolbarView.SetContent(scrolled)
 
-	// Connect Add Rule button handler
 	addButton.ConnectClicked(func() {
 		showAddRuleDialog(win, cfg, browsers, rebuildRulesList)
 	})

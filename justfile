@@ -61,7 +61,10 @@ test-routing:
 test-config:
     go test -v ./internal/config
 
-test: test-routing test-config
+test-browser:
+    go test -v ./internal/browser
+
+test: test-routing test-config test-browser
 
 # Run tests with coverage report
 test-routing-coverage:
@@ -71,7 +74,7 @@ test-routing-coverage:
     @echo ""
     @echo "To view HTML coverage report, run: go tool cover -html=coverage.out"
 
-test-coverage: test-config test-routing-coverage
+test-coverage: test-config test-browser test-routing-coverage
 
 # Build and install Flatpak (development version)
 flatpak:
@@ -142,9 +145,9 @@ release version:
         exit 1
     fi
 
-    dirty="$(git status --porcelain -- ':!cmd/switchyard/app.go' ":!${metainfo}" ":!${manifest}" ":!${firefox_manifest}" ":!${pkgjson}")"
+    dirty="$(git status --porcelain -- ':!gtk/app.go' ":!${metainfo}" ":!${manifest}" ":!${firefox_manifest}" ":!${pkgjson}")"
     if [ -n "$dirty" ]; then
-        echo "error: working tree has changes outside cmd/switchyard/app.go, ${metainfo}, ${manifest}, ${firefox_manifest}, ${pkgjson}:" >&2
+        echo "error: working tree has changes outside gtk/app.go, ${metainfo}, ${manifest}, ${firefox_manifest}, ${pkgjson}:" >&2
         echo "$dirty" >&2
         exit 1
     fi
@@ -162,9 +165,9 @@ release version:
 
     just test
 
-    sed -i -E "s/^(\s*Version\s*=\s*)\"[^\"]+\"/\1\"${version}\"/" cmd/switchyard/app.go
-    if ! grep -qE "Version\s*=\s*\"${version}\"" cmd/switchyard/app.go; then
-        echo "error: failed to update Version in cmd/switchyard/app.go" >&2
+    sed -i -E "s/^(\s*Version\s*=\s*)\"[^\"]+\"/\1\"${version}\"/" gtk/app.go
+    if ! grep -qE "Version\s*=\s*\"${version}\"" gtk/app.go; then
+        echo "error: failed to update Version in gtk/app.go" >&2
         exit 1
     fi
 
@@ -186,7 +189,7 @@ release version:
         exit 1
     fi
 
-    git add cmd/switchyard/app.go "${metainfo}" "${manifest}" "${firefox_manifest}" "${pkgjson}"
+    git add gtk/app.go "${metainfo}" "${manifest}" "${firefox_manifest}" "${pkgjson}"
     git commit -m "update for ${tag}"
     git tag -a "${tag}" -m "${tag}"
     git push origin master

@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import (
 	"context"
 	"fmt"
 	"strings"
 
+	appbrowser "github.com/alyraffauf/switchyard/internal/browser"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
@@ -14,7 +15,7 @@ import (
 )
 
 func showBrowserActionsMenu(btn *gtk.Button, browser *Browser, url string) {
-	actions := ListDesktopActions(browser.AppInfo)
+	actions := appbrowser.ListDesktopActions(browser.ID)
 	if len(actions) == 0 {
 		return
 	}
@@ -77,7 +78,6 @@ func setupLauncherActions(win *adw.Window, app *adw.Application, browsers []*Bro
 	})
 	actionGroup.AddAction(shortcutsAction)
 
-	// Action to launch browser with a specific desktop action
 	launchActionAction := gio.NewSimpleAction("launch-action", glib.NewVariantType("s"))
 	launchActionAction.ConnectActivate(func(param *glib.Variant) {
 		if param == nil {
@@ -105,7 +105,7 @@ func setupLauncherActions(win *adw.Window, app *adw.Application, browsers []*Bro
 			return
 		}
 
-		actions := ListDesktopActions(selectedBrowser.AppInfo)
+		actions := appbrowser.ListDesktopActions(selectedBrowser.ID)
 		for _, action := range actions {
 			if action.ID == actionID {
 				launchBrowserAction(selectedBrowser, action, url)

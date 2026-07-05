@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import (
 	"context"
@@ -21,17 +21,14 @@ func showSettingsWindow(app *adw.Application, browsers []*Browser, cfg *Config) 
 
 	setupAppActions(app, win)
 
-	// Navigation split view
 	splitView := adw.NewNavigationSplitView()
 	splitView.SetShowContent(true)
 	splitView.SetMinSidebarWidth(200)
 	splitView.SetMaxSidebarWidth(200)
 
-	// Sidebar
 	sidebarPage := adw.NewNavigationPage(createSidebar(win, cfg, browsers, splitView), "Switchyard")
 	splitView.SetSidebar(sidebarPage)
 
-	// Initial content
 	contentPage := adw.NewNavigationPage(createRulesPage(win, browsers, cfg), "Browser Rules")
 	splitView.SetContent(contentPage)
 
@@ -80,7 +77,6 @@ func setupAppActions(app *adw.Application, win *adw.Window) {
 func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView *adw.NavigationSplitView) gtk.Widgetter {
 	toolbarView := adw.NewToolbarView()
 
-	// Header with menu
 	sidebarHeader := adw.NewHeaderBar()
 	sidebarHeader.SetShowEndTitleButtons(false)
 
@@ -106,7 +102,6 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 
 	toolbarView.AddTopBar(sidebarHeader)
 
-	// Navigation list
 	scrolled := gtk.NewScrolledWindow()
 	scrolled.SetPolicy(gtk.PolicyNever, gtk.PolicyAutomatic)
 	scrolled.SetVExpand(true)
@@ -115,7 +110,6 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 	listBox.SetSelectionMode(gtk.SelectionSingle)
 	listBox.AddCSSClass("navigation-sidebar")
 
-	// Navigation rows
 	appearanceRow := adw.NewActionRow()
 	appearanceRow.SetTitle("Appearance")
 	appearanceRow.AddPrefix(gtk.NewImageFromIconName("applications-graphics-symbolic"))
@@ -141,6 +135,7 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 	advancedRow.AddPrefix(gtk.NewImageFromIconName("preferences-other-symbolic"))
 	listBox.Append(advancedRow)
 
+	// Separator above Link Redirections (2) and Advanced (4) to group the rows.
 	listBox.SetHeaderFunc(func(row, before *gtk.ListBoxRow) {
 		if row.Index() == 2 || row.Index() == 4 {
 			row.SetHeader(gtk.NewSeparator(gtk.OrientationHorizontal))

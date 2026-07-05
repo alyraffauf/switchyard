@@ -1,7 +1,7 @@
 // Switchyard - A configurable default browser for Linux
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import "os"
 

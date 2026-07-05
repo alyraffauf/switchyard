@@ -1,21 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package browser
 
 import (
 	"github.com/alyraffauf/goxdgdesktop/desktopfile"
 	"github.com/alyraffauf/goxdgdesktop/xdg"
-	"github.com/diamondburned/gotk4/pkg/gio/v2"
 )
 
-type DesktopAction = desktopfile.Action
+// Action is a desktop-entry action, e.g. "new-private-window".
+type Action = desktopfile.Action
 
-func ListDesktopActions(appInfo *gio.AppInfo) []DesktopAction {
-	if appInfo == nil {
-		return nil
-	}
-
-	appID := appInfo.ID()
+// ListDesktopActions returns the actions declared in appID's desktop entry.
+// It returns nil when the desktop file is missing or cannot be parsed.
+func ListDesktopActions(appID string) []Action {
 	if appID == "" {
 		return nil
 	}

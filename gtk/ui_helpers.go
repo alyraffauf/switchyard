@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import (
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
@@ -48,20 +48,17 @@ var launcherMetrics = launcherMetricsType{
 	NarrowColumns:  2,
 }
 
-// loadBrowserIcon loads a browser icon using GIcon for best quality.
-// Using GIcon allows GTK to select the optimal icon size from the theme,
-// avoiding blurry scaling that occurs with named icons.
+// loadBrowserIcon builds an image for the browser, preferring the live GIcon so
+// GTK picks the sharpest themed size instead of blurry named-icon scaling.
 func loadBrowserIcon(browser *Browser, size int) *gtk.Image {
-	// Try to use GIcon from AppInfo for best quality
-	if browser.AppInfo != nil {
-		if gicon := browser.AppInfo.Icon(); gicon != nil {
+	if browser.appInfo != nil {
+		if gicon := browser.appInfo.Icon(); gicon != nil {
 			image := gtk.NewImageFromGIcon(gicon)
 			image.SetPixelSize(size)
 			return image
 		}
 	}
 
-	// Fallback to icon name
 	iconName := browser.Icon
 	if iconName == "" {
 		iconName = "web-browser-symbolic"
@@ -72,7 +69,7 @@ func loadBrowserIcon(browser *Browser, size int) *gtk.Image {
 	return image
 }
 
-// hold the callback functions for browser button interactions.
+// BrowserButtonCallbacks holds the handlers for browser button interactions.
 type BrowserButtonCallbacks struct {
 	OnClick      func(browser *Browser)
 	OnRightClick func(btn *gtk.Button, browser *Browser)
@@ -94,7 +91,6 @@ func createBrowserButton(browser *Browser, showLabel bool, callbacks BrowserButt
 	iconBox.SetHAlign(gtk.AlignCenter)
 	iconBox.SetVAlign(gtk.AlignCenter)
 
-	// Browser icon
 	icon := loadBrowserIcon(browser, launcherMetrics.IconSize)
 	icon.SetHAlign(gtk.AlignCenter)
 	icon.SetVAlign(gtk.AlignCenter)
@@ -106,7 +102,6 @@ func createBrowserButton(browser *Browser, showLabel bool, callbacks BrowserButt
 	labelValue := coreglib.NewValue(browser.Name)
 	btn.UpdateProperty([]gtk.AccessibleProperty{gtk.AccessiblePropertyLabel}, []coreglib.Value{*labelValue})
 
-	// Show browser name based on config
 	if showLabel {
 		label := gtk.NewLabel(browser.Name)
 		label.SetEllipsize(pango.EllipsizeEnd)
@@ -141,7 +136,7 @@ func createBrowserButton(browser *Browser, showLabel bool, callbacks BrowserButt
 	return btn
 }
 
-// wrap a FlowBox with its breakpoints for the launcher
+// LauncherFlowBox wraps a FlowBox with its launcher breakpoints.
 type LauncherFlowBox struct {
 	FlowBox          *gtk.FlowBox
 	NarrowBreakpoint *adw.Breakpoint

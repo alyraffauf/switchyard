@@ -33,6 +33,8 @@ jobs:
         run: just test-routing-coverage
       - name: Test config package
         run: just test-config
+      - name: Test browser package
+        run: just test-browser
       - name: Display coverage summary
         run: |
           echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY

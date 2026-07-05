@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 
 	appconfig "github.com/alyraffauf/switchyard/internal/config"
+	"github.com/alyraffauf/switchyard/internal/host"
 	"github.com/alyraffauf/switchyard/internal/routing"
 )
 
@@ -34,17 +34,8 @@ func saveConfig(config *Config) error {
 	return appconfig.Save(configPath(), config)
 }
 
-// hostCommand runs commands on the host when Switchyard is sandboxed by Flatpak.
-func hostCommand(name string, args ...string) *exec.Cmd {
-	if os.Getenv("FLATPAK_ID") != "" {
-		hostArgs := append([]string{"--host", name}, args...)
-		return exec.Command("flatpak-spawn", hostArgs...)
-	}
-	return exec.Command(name, args...)
-}
-
 func isDefaultBrowser() bool {
-	cmd := hostCommand("xdg-settings", "get", "default-web-browser")
+	cmd := host.HostCommand("xdg-settings", "get", "default-web-browser")
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -58,7 +49,7 @@ func isDefaultBrowser() bool {
 
 func setAsDefaultBrowser() error {
 	desktopFile := getAppID() + ".desktop"
-	cmd := hostCommand("xdg-settings", "set", "default-web-browser", desktopFile)
+	cmd := host.HostCommand("xdg-settings", "set", "default-web-browser", desktopFile)
 	return cmd.Run()
 }
 

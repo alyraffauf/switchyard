@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import (
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"

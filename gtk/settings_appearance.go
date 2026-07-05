@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import (
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
@@ -10,7 +10,6 @@ import (
 func createAppearancePage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widgetter {
 	toolbarView, content, _ := settingsPageLayout("Appearance")
 
-	// General section
 	appearanceGroup := adw.NewPreferencesGroup()
 	appearanceGroup.SetTitle("General")
 
@@ -22,7 +21,6 @@ func createAppearancePage(win *adw.Window, browsers []*Browser, cfg *Config) gtk
 
 	content.Append(appearanceGroup)
 
-	// Launcher section
 	launcherGroup := adw.NewPreferencesGroup()
 	launcherGroup.SetTitle("Launcher")
 
@@ -32,7 +30,6 @@ func createAppearancePage(win *adw.Window, browsers []*Browser, cfg *Config) gtk
 	showNamesRow.SetActive(cfg.ShowAppNames)
 	launcherGroup.Add(showNamesRow)
 
-	// Hidden browsers row
 	hiddenBrowsersRow := adw.NewActionRow()
 	hiddenBrowsersRow.SetTitle("Hidden browsers")
 	hiddenBrowsersRow.SetSubtitle("Hide browsers you don't use")
@@ -49,7 +46,6 @@ func createAppearancePage(win *adw.Window, browsers []*Browser, cfg *Config) gtk
 
 	content.Append(launcherGroup)
 
-	// Connect change handlers
 	forceDarkRow.Connect("notify::active", func() {
 		cfg.ForceDarkMode = forceDarkRow.Active()
 		saveConfigWithFlag(cfg)

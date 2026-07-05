@@ -2,7 +2,7 @@
 
 // Native-messaging host: stdin/stdout JSON framing with browser extensions.
 
-package main
+package gtk
 
 import (
 	"encoding/binary"

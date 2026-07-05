@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import (
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
@@ -16,22 +16,18 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 	win.SetApplication(&app.Application)
 	win.SetResizable(false)
 
-	// Main layout
 	mainBox := gtk.NewBox(gtk.OrientationVertical, 0)
 
-	// create early so button handlers can reference it
+	// Created early so button handlers can capture it.
 	urlEntry := createURLEntry(url)
 
-	// Content area with browser buttons
 	contentBox := createLauncherContentBox()
 	launcherFlow := createLauncherFlowBox()
 	flowBox := launcherFlow.FlowBox
 
-	// Add responsive breakpoints to window
 	win.AddBreakpoint(launcherFlow.NarrowBreakpoint)
 	win.AddBreakpoint(launcherFlow.MediumBreakpoint)
 
-	// Create browser buttons
 	callbacks := BrowserButtonCallbacks{
 		OnClick: func(browser *Browser) {
 			launchBrowser(browser, urlEntry.Text())
@@ -47,10 +43,9 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 		flowBox.Insert(btn, -1)
 	}
 
-	// Correct max column items. This helps getting rid of empty item spacing.
+	// Cap columns at the browser count so a short row has no empty trailing cells.
 	flowBox.SetMaxChildrenPerLine(min(flowBox.MaxChildrenPerLine(), uint(len(filteredBrowsers))))
 
-	// Handle Enter/Space activation on selected FlowBox child
 	flowBox.ConnectChildActivated(func(child *gtk.FlowBoxChild) {
 		idx := child.Index()
 		if idx >= 0 && idx < len(filteredBrowsers) {
@@ -59,12 +54,11 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 		}
 	})
 
-	// Select first browser by default for keyboard navigation
+	// Select the first browser so keyboard navigation has a starting point.
 	if first := flowBox.ChildAtIndex(0); first != nil {
 		flowBox.SelectChild(first)
 	}
 
-	// URL entry activation launches selected browser
 	urlEntry.ConnectActivate(func() {
 		selected := flowBox.SelectedChildren()
 		if len(selected) > 0 {
@@ -82,16 +76,14 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 	contentBox.Append(flowBox)
 	mainBox.Append(contentBox)
 
-	// Bottom bar
 	bottomBar := createLauncherBottomBar(urlEntry, func() { win.Close() })
 	mainBox.Append(bottomBar)
 
 	win.SetContent(mainBox)
 
-	// Keyboard shortcuts
 	keyController := gtk.NewEventControllerKey()
 	keyController.ConnectKeyPressed(func(keyval, keycode uint, state gdk.ModifierType) bool {
-		// Ctrl+[1-9] for quick selection
+		// Ctrl+[1-9] selects a browser by position.
 		if keyval >= gdk.KEY_1 && keyval <= gdk.KEY_9 && state&gdk.ControlMask != 0 {
 			idx := int(keyval - gdk.KEY_1)
 			if idx < len(filteredBrowsers) {
@@ -100,7 +92,6 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 				return true
 			}
 		}
-		// Escape to close
 		if keyval == gdk.KEY_Escape {
 			win.Close()
 			return true
@@ -109,16 +100,14 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 	})
 	win.AddController(keyController)
 
-	// Set up action handlers
 	actionGroup := setupLauncherActions(win, app, filteredBrowsers, url, func() { win.Close() })
 	win.InsertActionGroup("win", actionGroup)
 
 	win.Present()
 }
 
-// filter hidden browsers and moves favorite to front.
+// filterAndSortBrowsers drops hidden browsers and moves the favorite to the front.
 func filterAndSortBrowsers(browsers []*Browser, cfg *Config) []*Browser {
-	// Filter hidden browsers
 	hiddenSet := make(map[string]bool)
 	for _, id := range cfg.HiddenBrowsers {
 		hiddenSet[id] = true
@@ -131,7 +120,6 @@ func filterAndSortBrowsers(browsers []*Browser, cfg *Config) []*Browser {
 		}
 	}
 
-	// Move favorite to front
 	if cfg.FavoriteBrowser != "" {
 		for i, browser := range filtered {
 			if browser.ID == cfg.FavoriteBrowser {

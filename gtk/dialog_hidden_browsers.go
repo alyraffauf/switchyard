@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import (
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
@@ -18,13 +18,11 @@ func showHiddenBrowsersDialog(parent *adw.Window, cfg *Config, browsers []*Brows
 
 	listBox := createBoxedListBox()
 
-	// Create a map for quick lookup of hidden browsers
 	hiddenSet := make(map[string]bool)
 	for _, id := range cfg.HiddenBrowsers {
 		hiddenSet[id] = true
 	}
 
-	// Add a row for each browser
 	for _, browser := range browsers {
 		b := browser // capture for closure
 
@@ -37,28 +35,23 @@ func showHiddenBrowsersDialog(parent *adw.Window, cfg *Config, browsers []*Brows
 		rowBox.SetMarginTop(8)
 		rowBox.SetMarginBottom(8)
 
-		// Browser icon
 		icon := loadBrowserIcon(b, 24)
 		rowBox.Append(icon)
 
-		// Browser name
 		nameLabel := gtk.NewLabel(b.Name)
 		nameLabel.SetXAlign(0)
 		nameLabel.SetHExpand(true)
 		rowBox.Append(nameLabel)
 
-		// Checkbox
 		checkBox := gtk.NewCheckButton()
 		checkBox.SetActive(hiddenSet[b.ID])
 		checkBox.SetVAlign(gtk.AlignCenter)
 
-		// Connect handler to update config
 		checkBox.ConnectToggled(func() {
 			isHidden := checkBox.Active()
 
-			// Update the hidden browsers list
 			if isHidden {
-				// Add to hidden list if not already present
+				// Append only if not already hidden.
 				found := false
 				for _, id := range cfg.HiddenBrowsers {
 					if id == b.ID {
@@ -70,7 +63,6 @@ func showHiddenBrowsersDialog(parent *adw.Window, cfg *Config, browsers []*Brows
 					cfg.HiddenBrowsers = append(cfg.HiddenBrowsers, b.ID)
 				}
 			} else {
-				// Remove from hidden list
 				newHidden := make([]string, 0)
 				for _, id := range cfg.HiddenBrowsers {
 					if id != b.ID {
@@ -80,7 +72,6 @@ func showHiddenBrowsersDialog(parent *adw.Window, cfg *Config, browsers []*Brows
 				cfg.HiddenBrowsers = newHidden
 			}
 
-			// Save config
 			saveConfigWithFlag(cfg)
 		})
 

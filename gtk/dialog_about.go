@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package main
+package gtk
 
 import (
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
@@ -19,7 +19,6 @@ func showAboutDialog(parent *adw.Window) {
 	about.SetWebsite(WebsiteURL)
 	about.SetIssueURL(IssueURL)
 
-	// Set developers from contributors list
 	developerStrings := make([]string, len(Contributors))
 	for i, contributor := range Contributors {
 		developerStrings[i] = contributor.Name + " " + contributor.URL
