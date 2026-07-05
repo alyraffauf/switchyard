@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	appbrowser "github.com/alyraffauf/switchyard/internal/browser"
+	appconfig "github.com/alyraffauf/switchyard/internal/config"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
@@ -49,7 +50,8 @@ func setupLauncherActions(win *adw.Window, app *adw.Application, browsers []*Bro
 
 	settingsAction := gio.NewSimpleAction("settings", nil)
 	settingsAction.ConnectActivate(func(p *glib.Variant) {
-		showSettingsWindow(app, browsers, loadConfig())
+		cfg, _ := appconfig.Load(appconfig.Path())
+		showSettingsWindow(app, browsers, cfg)
 	})
 	actionGroup.AddAction(settingsAction)
 

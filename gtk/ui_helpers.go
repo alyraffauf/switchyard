@@ -3,6 +3,7 @@
 package gtk
 
 import (
+	appconfig "github.com/alyraffauf/switchyard/internal/config"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	coreglib "github.com/diamondburned/gotk4/pkg/core/glib"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
@@ -253,7 +254,7 @@ func saveConfigWithFlag(cfg *Config) {
 	savingMux.Lock()
 	isSaving = true
 	savingMux.Unlock()
-	saveConfig(cfg)
+	appconfig.Save(appconfig.Path(), cfg)
 	glib.TimeoutAdd(100, func() bool {
 		savingMux.Lock()
 		isSaving = false

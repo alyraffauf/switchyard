@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html"
 
+	appconfig "github.com/alyraffauf/switchyard/internal/config"
 	"github.com/alyraffauf/switchyard/internal/routing"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
@@ -78,7 +79,7 @@ func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 		upButton.ConnectClicked(func() {
 			if redirectionIndex > 0 {
 				cfg.Redirections[redirectionIndex], cfg.Redirections[redirectionIndex-1] = cfg.Redirections[redirectionIndex-1], cfg.Redirections[redirectionIndex]
-				saveConfig(cfg)
+				appconfig.Save(appconfig.Path(), cfg)
 				rebuildRedirectionsList()
 			}
 		})
@@ -92,7 +93,7 @@ func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 		downButton.ConnectClicked(func() {
 			if redirectionIndex < len(cfg.Redirections)-1 {
 				cfg.Redirections[redirectionIndex], cfg.Redirections[redirectionIndex+1] = cfg.Redirections[redirectionIndex+1], cfg.Redirections[redirectionIndex]
-				saveConfig(cfg)
+				appconfig.Save(appconfig.Path(), cfg)
 				rebuildRedirectionsList()
 			}
 		})
@@ -107,7 +108,7 @@ func createRedirectionsPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 		deleteButton.SetTooltipText("Remove")
 		deleteButton.ConnectClicked(func() {
 			cfg.Redirections = append(cfg.Redirections[:redirectionIndex], cfg.Redirections[redirectionIndex+1:]...)
-			saveConfig(cfg)
+			appconfig.Save(appconfig.Path(), cfg)
 			rebuildRedirectionsList()
 		})
 		row.AddSuffix(deleteButton)

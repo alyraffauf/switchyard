@@ -5,6 +5,7 @@ package gtk
 import (
 	"context"
 
+	appconfig "github.com/alyraffauf/switchyard/internal/config"
 	"github.com/alyraffauf/switchyard/internal/host"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -190,7 +191,7 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 }
 
 func watchConfigFile(cfg *Config, onChange func()) {
-	configFile := gio.NewFileForPath(configPath())
+	configFile := gio.NewFileForPath(appconfig.Path())
 	monitorIface, err := configFile.Monitor(context.Background(), gio.FileMonitorNone)
 	if err == nil && monitorIface != nil {
 		monitor := gio.BaseFileMonitor(monitorIface)
@@ -204,7 +205,7 @@ func watchConfigFile(cfg *Config, onChange func()) {
 						return
 					}
 
-					newCfg := loadConfig()
+					newCfg, _ := appconfig.Load(appconfig.Path())
 					*cfg = *newCfg
 
 					if onChange != nil {

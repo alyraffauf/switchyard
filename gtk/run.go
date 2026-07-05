@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	appconfig "github.com/alyraffauf/switchyard/internal/config"
 	"github.com/alyraffauf/switchyard/internal/host"
 	"github.com/alyraffauf/switchyard/internal/routing"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
@@ -33,7 +34,7 @@ func Run() {
 	})
 
 	app.ConnectActivate(func() {
-		cfg := loadConfig()
+		cfg, _ := appconfig.Load(appconfig.Path())
 		if cfg.StayAlive {
 			app.Hold()
 		}
@@ -43,7 +44,7 @@ func Run() {
 	})
 
 	app.ConnectOpen(func(files []gio.Filer, hint string) {
-		cfg := loadConfig()
+		cfg, _ := appconfig.Load(appconfig.Path())
 		if cfg.StayAlive {
 			app.Hold()
 		}

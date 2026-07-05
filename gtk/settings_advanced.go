@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 
+	appconfig "github.com/alyraffauf/switchyard/internal/config"
 	"github.com/alyraffauf/switchyard/internal/host"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -21,12 +22,12 @@ func createAdvancedPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 
 	configRow := adw.NewActionRow()
 	configRow.SetTitle("Configuration File")
-	configRow.SetSubtitle(configPath())
+	configRow.SetSubtitle(appconfig.Path())
 	configRow.SetActivatable(true)
 	configRow.AddSuffix(gtk.NewImageFromIconName("document-edit-symbolic"))
 	configRow.ConnectActivated(func() {
-		saveConfig(cfg)
-		cmd := host.HostCommand("xdg-open", configPath())
+		appconfig.Save(appconfig.Path(), cfg)
+		cmd := host.HostCommand("xdg-open", appconfig.Path())
 		if err := cmd.Start(); err != nil {
 			fmt.Printf("Failed to open config file: %v\n", err)
 		}
@@ -54,7 +55,7 @@ func createAdvancedPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 			if path == "" {
 				return
 			}
-			if err := exportConfig(cfg, path); err != nil {
+			if err := appconfig.Export(path, cfg); err != nil {
 				fmt.Fprintf(os.Stderr, "Failed to export config: %v\n", err)
 			}
 		})
@@ -90,7 +91,12 @@ func createAdvancedPage(win *adw.Window, cfg *Config) gtk.Widgetter {
 
 			warnDialog.ConnectResponse(func(response string) {
 				if response == "import" {
-					if err := importConfig(cfg, path); err != nil {
+					imported, err := appconfig.Import(path)
+					if err == nil {
+						*cfg = *imported
+						err = appconfig.Save(appconfig.Path(), cfg)
+					}
+					if err != nil {
 						fmt.Fprintf(os.Stderr, "Failed to import config: %v\n", err)
 					}
 				}

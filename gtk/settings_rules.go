@@ -6,6 +6,7 @@ import (
 	"html"
 
 	appbrowser "github.com/alyraffauf/switchyard/internal/browser"
+	appconfig "github.com/alyraffauf/switchyard/internal/config"
 	"github.com/alyraffauf/switchyard/internal/routing"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
@@ -103,7 +104,7 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 		upBtn.ConnectClicked(func() {
 			if ruleIndex > 0 {
 				cfg.Rules[ruleIndex], cfg.Rules[ruleIndex-1] = cfg.Rules[ruleIndex-1], cfg.Rules[ruleIndex]
-				saveConfig(cfg)
+				appconfig.Save(appconfig.Path(), cfg)
 				rebuildRulesList()
 			}
 		})
@@ -117,7 +118,7 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 		downBtn.ConnectClicked(func() {
 			if ruleIndex < len(cfg.Rules)-1 {
 				cfg.Rules[ruleIndex], cfg.Rules[ruleIndex+1] = cfg.Rules[ruleIndex+1], cfg.Rules[ruleIndex]
-				saveConfig(cfg)
+				appconfig.Save(appconfig.Path(), cfg)
 				rebuildRulesList()
 			}
 		})
@@ -132,7 +133,7 @@ func createRulesPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.Widg
 		deleteBtn.SetTooltipText("Delete rule")
 		deleteBtn.ConnectClicked(func() {
 			cfg.Rules = append(cfg.Rules[:ruleIndex], cfg.Rules[ruleIndex+1:]...)
-			saveConfig(cfg)
+			appconfig.Save(appconfig.Path(), cfg)
 			rebuildRulesList()
 		})
 		row.AddSuffix(deleteBtn)
