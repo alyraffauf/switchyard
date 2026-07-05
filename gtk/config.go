@@ -5,10 +5,8 @@ package gtk
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	appconfig "github.com/alyraffauf/switchyard/internal/config"
-	"github.com/alyraffauf/switchyard/internal/host"
 	"github.com/alyraffauf/switchyard/internal/routing"
 )
 
@@ -32,25 +30,6 @@ func loadConfig() *Config {
 
 func saveConfig(config *Config) error {
 	return appconfig.Save(configPath(), config)
-}
-
-func isDefaultBrowser() bool {
-	cmd := host.HostCommand("xdg-settings", "get", "default-web-browser")
-
-	output, err := cmd.Output()
-	if err != nil {
-		return false
-	}
-
-	defaultBrowser := strings.TrimSpace(string(output))
-	desktopFile := getAppID() + ".desktop"
-	return defaultBrowser == desktopFile
-}
-
-func setAsDefaultBrowser() error {
-	desktopFile := getAppID() + ".desktop"
-	cmd := host.HostCommand("xdg-settings", "set", "default-web-browser", desktopFile)
-	return cmd.Run()
 }
 
 func exportConfig(config *Config, path string) error {

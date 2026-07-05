@@ -29,12 +29,8 @@ jobs:
         run: |
           scripts/generate-flatpak-go-modules.py
           git diff --exit-code -- flatpak/go-modules.json
-      - name: Test routing package with coverage
-        run: just test-routing-coverage
-      - name: Test config package
-        run: just test-config
-      - name: Test browser package
-        run: just test-browser
+      - name: Test internal packages with coverage
+        run: just test-coverage
       - name: Display coverage summary
         run: |
           echo "## Test Coverage Summary" >> $GITHUB_STEP_SUMMARY

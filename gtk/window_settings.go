@@ -5,6 +5,7 @@ package gtk
 import (
 	"context"
 
+	"github.com/alyraffauf/switchyard/internal/host"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
 	"github.com/diamondburned/gotk4/pkg/glib/v2"
@@ -34,7 +35,7 @@ func showSettingsWindow(app *adw.Application, browsers []*Browser, cfg *Config) 
 
 	win.SetContent(splitView)
 
-	if cfg.CheckDefaultBrowser && !isDefaultBrowser() {
+	if cfg.CheckDefaultBrowser && !host.IsDefaultBrowser(getAppID()) {
 		showDefaultBrowserPrompt(win, cfg, func() {})
 	}
 

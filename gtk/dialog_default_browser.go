@@ -3,6 +3,7 @@
 package gtk
 
 import (
+	"github.com/alyraffauf/switchyard/internal/host"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
@@ -25,7 +26,7 @@ func showDefaultBrowserPrompt(parent gtk.Widgetter, cfg *Config, updateUI func()
 
 	dialog.ConnectResponse(func(response string) {
 		if response == "yes" {
-			setAsDefaultBrowser()
+			host.SetDefaultBrowser(getAppID())
 			cfg.CheckDefaultBrowser = false
 			saveConfig(cfg)
 			updateUI()

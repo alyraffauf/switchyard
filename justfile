@@ -55,26 +55,16 @@ update-go-deps:
     scripts/generate-flatpak-go-modules.py
 
 # Run unit tests
-test-routing:
-    go test -v ./internal/routing
-
-test-config:
-    go test -v ./internal/config
-
-test-browser:
-    go test -v ./internal/browser
-
-test: test-routing test-config test-browser
+test:
+    go test ./internal/...
 
 # Run tests with coverage report
-test-routing-coverage:
+test-coverage:
     @echo "Running tests with coverage..."
-    go test -v -coverprofile=coverage.out ./internal/routing
+    go test -coverprofile=coverage.out ./internal/...
     go tool cover -func=coverage.out
     @echo ""
     @echo "To view HTML coverage report, run: go tool cover -html=coverage.out"
-
-test-coverage: test-config test-browser test-routing-coverage
 
 # Build and install Flatpak (development version)
 flatpak:
