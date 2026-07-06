@@ -32,7 +32,6 @@ func newStyles(darkBG bool) styles {
 	s.title = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#FFFDF5")).
 		Background(lipgloss.Color(green)).
-		Width(browserListWidth).
 		Align(lipgloss.Center)
 
 	s.pagination = list.DefaultStyles(darkBG).PaginationStyle.PaddingLeft(4)

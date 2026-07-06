@@ -188,7 +188,7 @@ func (m model) View() tea.View {
 	if m.pickingAction {
 		columns = sideBySideView(m)
 	} else {
-		columns = m.browserList.View()
+		columns = browserColumnView(m)
 	}
 
 	content := lipgloss.JoinVertical(lipgloss.Left,
@@ -250,13 +250,37 @@ func centeredStageRowView(height int, content string) string {
 		Render(positioned)
 }
 
-func sideBySideView(m model) string {
-	browserView := m.browserList.View()
+func browserColumnView(m model) string {
+	return lipgloss.JoinVertical(lipgloss.Left,
+		headerView(m, "Switchyard", browserListWidth),
+		m.browserList.View(),
+		pagerView(m),
+	)
+}
 
-	header := lipgloss.NewStyle().
-		Padding(0, 0, 1, 2).
-		Render(m.styles.title.Render("Actions"))
-	actionView := lipgloss.JoinVertical(lipgloss.Left, header, m.actionList.View())
+func headerView(m model, title string, width int) string {
+	header := m.styles.title.
+		Width(width).
+		Render(title)
+	return lipgloss.JoinVertical(lipgloss.Left, header, "")
+}
+
+func pagerView(m model) string {
+	pager := " "
+	if m.browserList.Paginator.TotalPages < 2 {
+		return pager
+	}
+	pager = m.browserList.Paginator.View()
+	return lipgloss.PlaceHorizontal(browserListWidth, lipgloss.Center, pager)
+}
+
+func sideBySideView(m model) string {
+	browserView := browserColumnView(m)
+
+	actionView := lipgloss.JoinVertical(lipgloss.Left,
+		headerView(m, "Actions", actionListWidth),
+		m.actionList.View(),
+	)
 
 	height := max(lipgloss.Height(browserView), lipgloss.Height(actionView))
 	separator := m.styles.separator.Render(verticalRule(height))

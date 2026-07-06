@@ -20,10 +20,11 @@ const (
 	browserListWidth = 30
 	actionListWidth  = 25
 	listHeight       = 20
+	listHeaderHeight = 2
+	listPagerHeight  = 1
 
-	// The actions column is a 2-row header stacked on its list; making the list
-	// shorter keeps that column the same height as the browser list.
-	actionListHeight = listHeight - 2
+	browserListHeight = listHeight - listHeaderHeight - listPagerHeight
+	actionListHeight  = browserListHeight
 
 	// Everything is laid out inside this fixed-size box and then centered, so
 	// opening actions never resizes the outer block. Width has slack for the
@@ -62,8 +63,10 @@ func initialModel(cfg *config.Config, url string) model {
 	delegate.Styles = newDelegateStyles(true)
 
 	browserList := list.New(items, delegate, browserListWidth, listHeight)
-	browserList.Title = "Switchyard"
+	browserList.SetHeight(browserListHeight)
+	browserList.SetShowTitle(false)
 	browserList.SetShowStatusBar(false)
+	browserList.SetShowPagination(false)
 	browserList.SetFilteringEnabled(false)
 	browserList.SetShowHelp(false)
 
