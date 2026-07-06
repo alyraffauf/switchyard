@@ -49,17 +49,16 @@ func Run() {
 			app.Hold()
 		}
 		setupApp(cfg)
-		browsers := detectBrowsers()
 
 		if len(files) == 0 {
-			showSettingsWindow(app, browsers, cfg)
+			showSettingsWindow(app, detectBrowsers(), cfg)
 			return
 		}
 
 		rawURL := files[0].URI()
 
 		if u, err := url.Parse(rawURL); err == nil && u.Scheme == "switchyard" {
-			handleSwitchyardURL(app, browsers, cfg, rawURL)
+			handleSwitchyardURL(app, cfg, rawURL)
 			return
 		}
 
@@ -71,7 +70,7 @@ func Run() {
 			return
 		}
 
-		handleURL(app, browsers, cfg, sanitized)
+		handleURL(app, cfg, sanitized)
 	})
 
 	if code := app.Run(os.Args); code > 0 {
@@ -99,7 +98,7 @@ func setupApp(cfg *Config) {
 }
 
 // handleSwitchyardURL processes switchyard:// URLs with browser preferences
-func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config, rawURL string) {
+func handleSwitchyardURL(app *adw.Application, cfg *Config, rawURL string) {
 	targetURL, browserPrefs, err := routing.ParseSwitchyardURL(rawURL)
 	if err != nil {
 		// Invalid switchyard URL - ignore
@@ -122,8 +121,7 @@ func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config,
 			if !strings.HasSuffix(id, ".desktop") {
 				id = id + ".desktop"
 			}
-			if browser := findBrowserByID(browsers, id); browser != nil {
-				launchBrowser(browser, sanitized)
+			if launchBrowserByID(id, sanitized) {
 				return
 			}
 		}
@@ -131,34 +129,32 @@ func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config,
 	}
 
 	// No browser specified or none matched — use standard routing.
-	handleURL(app, browsers, cfg, sanitized)
+	handleURL(app, cfg, sanitized)
 }
 
 // handleURL routes a URL to the appropriate browser based on rules
-func handleURL(app *adw.Application, browsers []*Browser, cfg *Config, urlStr string) {
+func handleURL(app *adw.Application, cfg *Config, urlStr string) {
 	browserID, alwaysAsk, matched := cfg.MatchRule(urlStr)
 	if matched {
 		if alwaysAsk {
-			showLauncherWindow(app, urlStr, browsers, cfg)
+			showLauncherWindow(app, urlStr, detectBrowsers(), cfg)
 			return
 		}
 
-		if browser := findBrowserByID(browsers, browserID); browser != nil {
-			launchBrowser(browser, urlStr)
+		if launchBrowserByID(browserID, urlStr) {
 			return
 		}
 		// Rule matched but browser not found — show launcher.
-		showLauncherWindow(app, urlStr, browsers, cfg)
+		showLauncherWindow(app, urlStr, detectBrowsers(), cfg)
 		return
 	}
 
 	// No rule matched: fall back to the favorite browser, else prompt.
 	if !cfg.PromptOnClick && cfg.FavoriteBrowser != "" {
-		if browser := findBrowserByID(browsers, cfg.FavoriteBrowser); browser != nil {
-			launchBrowser(browser, urlStr)
+		if launchBrowserByID(cfg.FavoriteBrowser, urlStr) {
 			return
 		}
 	}
 
-	showLauncherWindow(app, urlStr, browsers, cfg)
+	showLauncherWindow(app, urlStr, detectBrowsers(), cfg)
 }

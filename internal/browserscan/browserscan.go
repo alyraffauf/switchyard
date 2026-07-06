@@ -7,6 +7,7 @@ package browserscan
 import (
 	"cmp"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -70,6 +71,58 @@ func Installed() []browser.Browser {
 	})
 
 	return browsers
+}
+
+// Find returns a displayable HTTP(S) browser by desktop file ID.
+func Find(id string) (browser.Browser, bool) {
+	if id == "" || strings.HasPrefix(id, selfIDPrefix) {
+		return browser.Browser{}, false
+	}
+
+	for _, dir := range applicationsDirs() {
+		path, ok := desktopFilePath(dir, id)
+		if !ok {
+			continue
+		}
+		return parseBrowser(id, path)
+	}
+
+	return browser.Browser{}, false
+}
+
+func findDesktopFile(id string) string {
+	for _, dir := range applicationsDirs() {
+		if path, ok := desktopFilePath(dir, id); ok {
+			return path
+		}
+	}
+	return ""
+}
+
+func desktopFilePath(dir, id string) (string, bool) {
+	path := filepath.Join(dir, id)
+	if _, err := os.Stat(path); err == nil {
+		return path, true
+	}
+
+	var match string
+	_ = filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			if d != nil && d.IsDir() {
+				return fs.SkipDir
+			}
+			return nil
+		}
+		if d.IsDir() || !strings.HasSuffix(d.Name(), ".desktop") {
+			return nil
+		}
+		if desktopID(dir, path) != id {
+			return nil
+		}
+		match = path
+		return fs.SkipAll
+	})
+	return match, match != ""
 }
 
 // desktopID is path's desktop-file ID relative to dir, with separators replaced

@@ -273,6 +273,102 @@ MimeType=x-scheme-handler/https;
 	}
 }
 
+func TestFindBrowser(t *testing.T) {
+	home, _ := isolatedDirs(t)
+	writeDesktop(t, home, "test-browser.desktop", browserEntry)
+
+	got, ok := Find("test-browser.desktop")
+	if !ok {
+		t.Fatal("Find returned false")
+	}
+	if got.ID != "test-browser.desktop" || got.Name != "Test Browser" ||
+		got.Icon != "test-browser" || got.Exec != "test-browser %u" {
+		t.Errorf("unexpected browser: %+v", got)
+	}
+}
+
+func TestFindMissingOrRejected(t *testing.T) {
+	tests := []struct {
+		name     string
+		id       string
+		contents string
+	}{
+		{
+			name: "missing",
+			id:   "missing.desktop",
+		},
+		{
+			name: "hidden",
+			id:   "hidden.desktop",
+			contents: `[Desktop Entry]
+Type=Application
+Name=Hidden
+Hidden=true
+MimeType=x-scheme-handler/http;
+`,
+		},
+		{
+			name: "not browser",
+			id:   "app.desktop",
+			contents: `[Desktop Entry]
+Type=Application
+Name=App
+MimeType=text/plain;
+`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			home, _ := isolatedDirs(t)
+			if tt.contents != "" {
+				writeDesktop(t, home, tt.id, tt.contents)
+			}
+
+			if got, ok := Find(tt.id); ok {
+				t.Errorf("Find returned %+v, want false", got)
+			}
+		})
+	}
+}
+
+func TestFindShadowingRejectedHomeSuppressesSystem(t *testing.T) {
+	home, system := isolatedDirs(t)
+	writeDesktop(t, home, "browser.desktop", `[Desktop Entry]
+Type=Application
+Name=Hidden Home Browser
+NoDisplay=true
+MimeType=x-scheme-handler/http;
+`)
+	writeDesktop(t, system, "browser.desktop", browserEntry)
+
+	if got, ok := Find("browser.desktop"); ok {
+		t.Errorf("Find returned %+v, want false", got)
+	}
+}
+
+func TestFindNestedSubdirID(t *testing.T) {
+	home, _ := isolatedDirs(t)
+	writeDesktop(t, home, "sub/foo.desktop", browserEntry)
+
+	got, ok := Find("sub-foo.desktop")
+	if !ok {
+		t.Fatal("Find returned false")
+	}
+	if got.ID != "sub-foo.desktop" {
+		t.Errorf("got ID %q, want %q", got.ID, "sub-foo.desktop")
+	}
+}
+
+func TestFindExcludesSwitchyardFamily(t *testing.T) {
+	home, _ := isolatedDirs(t)
+	writeDesktop(t, home, "io.github.alyraffauf.Switchyard.desktop", browserEntry)
+
+	if got, ok := Find("io.github.alyraffauf.Switchyard.desktop"); ok {
+		t.Errorf("Find returned %+v, want false", got)
+	}
+}
+
 func BenchmarkInstalledManyDesktopFiles(b *testing.B) {
 	home := filepath.Join(b.TempDir(), "applications")
 	system := filepath.Join(b.TempDir(), "applications")

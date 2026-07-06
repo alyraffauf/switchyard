@@ -51,6 +51,28 @@ func detectBrowsers() []*Browser {
 	return browsers
 }
 
+func appInfoForID(id string) *gio.AppInfo {
+	for _, appInfo := range gio.AppInfoGetRecommendedForType("x-scheme-handler/http") {
+		if appInfo.ID() == id {
+			return appInfo
+		}
+	}
+	return nil
+}
+
+func launchBrowserByID(id, url string) bool {
+	browserModel, ok := browserscan.Find(id)
+	if !ok {
+		return false
+	}
+
+	launchBrowser(&Browser{
+		Browser: &browserModel,
+		appInfo: appInfoForID(browserModel.ID),
+	}, url)
+	return true
+}
+
 func launchBrowser(b *Browser, url string) {
 	if b.Exec == "" {
 		fmt.Fprintf(os.Stderr, "Error: No command line for browser %s\n", b.Name)

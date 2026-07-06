@@ -4,7 +4,6 @@ package browserscan
 
 import (
 	"github.com/alyraffauf/goxdgdesktop/desktopfile"
-	"github.com/alyraffauf/goxdgdesktop/xdg"
 	"github.com/alyraffauf/switchyard/internal/browser"
 )
 
@@ -13,7 +12,7 @@ func ListDesktopActions(appID string) []browser.Action {
 		return nil
 	}
 
-	desktopFilePath := xdg.FindDesktopFile(appID)
+	desktopFilePath := findDesktopFile(appID)
 	if desktopFilePath == "" {
 		return nil
 	}
