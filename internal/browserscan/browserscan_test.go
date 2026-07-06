@@ -3,6 +3,7 @@
 package browserscan
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -269,5 +270,48 @@ MimeType=x-scheme-handler/https;
 		if got[i] != want[i] {
 			t.Fatalf("got %v, want %v", got, want)
 		}
+	}
+}
+
+func BenchmarkInstalledManyDesktopFiles(b *testing.B) {
+	home := filepath.Join(b.TempDir(), "applications")
+	system := filepath.Join(b.TempDir(), "applications")
+	orig := applicationsDirs
+	applicationsDirs = func() []string { return []string{home, system} }
+	b.Cleanup(func() { applicationsDirs = orig })
+
+	for i := range 500 {
+		writeBenchmarkDesktop(b, home, fmt.Sprintf("browser-%03d.desktop", i), fmt.Sprintf(`[Desktop Entry]
+Type=Application
+Name=Browser %03d
+Icon=browser
+Exec=browser-%03d %%u
+MimeType=x-scheme-handler/http;x-scheme-handler/https;
+`, i, i))
+		writeBenchmarkDesktop(b, home, fmt.Sprintf("app-%03d.desktop", i), fmt.Sprintf(`[Desktop Entry]
+Type=Application
+Name=App %03d
+Exec=app-%03d
+MimeType=text/plain;
+`, i, i))
+	}
+
+	b.ResetTimer()
+	for b.Loop() {
+		got := Installed()
+		if len(got) != 500 {
+			b.Fatalf("got %d browsers, want 500", len(got))
+		}
+	}
+}
+
+func writeBenchmarkDesktop(b *testing.B, dir, rel, contents string) {
+	b.Helper()
+	path := filepath.Join(dir, filepath.FromSlash(rel))
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		b.Fatalf("mkdir: %v", err)
+	}
+	if err := os.WriteFile(path, []byte(contents), 0o644); err != nil {
+		b.Fatalf("write %s: %v", rel, err)
 	}
 }
