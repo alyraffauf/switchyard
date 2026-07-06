@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"strings"
 
-	appbrowser "github.com/alyraffauf/switchyard/internal/browser"
 	appconfig "github.com/alyraffauf/switchyard/internal/config"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -16,13 +15,12 @@ import (
 )
 
 func showBrowserActionsMenu(btn *gtk.Button, browser *Browser, url string) {
-	actions := appbrowser.ListDesktopActions(browser.ID)
-	if len(actions) == 0 {
+	if len(browser.Actions) == 0 {
 		return
 	}
 
 	menu := gio.NewMenu()
-	for _, action := range actions {
+	for _, action := range browser.Actions {
 		menu.Append(action.Name, fmt.Sprintf("win.launch-action::%s:%s", browser.ID, action.ID))
 	}
 
@@ -107,8 +105,7 @@ func setupLauncherActions(win *adw.Window, app *adw.Application, browsers []*Bro
 			return
 		}
 
-		actions := appbrowser.ListDesktopActions(selectedBrowser.ID)
-		for _, action := range actions {
+		for _, action := range selectedBrowser.Actions {
 			if action.ID == actionID {
 				launchBrowserAction(selectedBrowser, action, url)
 				onClose()

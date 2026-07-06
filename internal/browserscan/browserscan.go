@@ -100,15 +100,15 @@ func parseBrowser(id, path string) (browser.Browser, bool) {
 		return browser.Browser{}, false
 	}
 
-	name, _ := file.Get(desktopfile.EntrySection, "Name")
 	icon, _ := file.Get(desktopfile.EntrySection, "Icon")
 	exec, _ := file.Get(desktopfile.EntrySection, "Exec")
 
 	return browser.Browser{
-		ID:   id,
-		Name: name,
-		Icon: icon,
-		Exec: exec,
+		ID:      id,
+		Name:    browser.LocalizedString(file, desktopfile.EntrySection, "Name"),
+		Icon:    icon,
+		Exec:    exec,
+		Actions: browser.LocalizedActions(file),
 	}, true
 }
 

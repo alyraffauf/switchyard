@@ -53,6 +53,13 @@ func ids(browsers []browser.Browser) []string {
 	return out
 }
 
+func clearLocaleEnv(t *testing.T) {
+	t.Helper()
+	for _, env := range []string{"LANGUAGE", "LC_ALL", "LC_MESSAGES", "LANG"} {
+		t.Setenv(env, "")
+	}
+}
+
 func TestInstalledIncludesBrowserAndFields(t *testing.T) {
 	home, _ := isolatedDirs(t)
 	writeDesktop(t, home, "test-browser.desktop", browserEntry)
@@ -61,14 +68,43 @@ func TestInstalledIncludesBrowserAndFields(t *testing.T) {
 	if len(got) != 1 {
 		t.Fatalf("got %d browsers, want 1: %v", len(got), ids(got))
 	}
-	want := browser.Browser{
-		ID:   "test-browser.desktop",
-		Name: "Test Browser",
-		Icon: "test-browser",
-		Exec: "test-browser %u",
+	b := got[0]
+	if b.ID != "test-browser.desktop" || b.Name != "Test Browser" ||
+		b.Icon != "test-browser" || b.Exec != "test-browser %u" {
+		t.Errorf("unexpected fields: %+v", b)
 	}
-	if got[0] != want {
-		t.Errorf("got %+v, want %+v", got[0], want)
+	if len(b.Actions) != 0 {
+		t.Errorf("expected no actions, got %v", b.Actions)
+	}
+}
+
+func TestInstalledLocalizedNameAndActions(t *testing.T) {
+	clearLocaleEnv(t)
+	t.Setenv("LANG", "fr_FR.UTF-8")
+
+	home, _ := isolatedDirs(t)
+	writeDesktop(t, home, "loc.desktop", `[Desktop Entry]
+Type=Application
+Name=Web Browser
+Name[fr]=Navigateur Web
+Exec=browser %u
+MimeType=x-scheme-handler/http;
+
+[Desktop Action new-window]
+Name=New Window
+Name[fr]=Nouvelle fenêtre
+Exec=browser --new-window %u
+`)
+
+	got := Installed()
+	if len(got) != 1 {
+		t.Fatalf("got %d browsers, want 1", len(got))
+	}
+	if got[0].Name != "Navigateur Web" {
+		t.Errorf("browser name: got %q, want %q", got[0].Name, "Navigateur Web")
+	}
+	if len(got[0].Actions) != 1 || got[0].Actions[0].Name != "Nouvelle fenêtre" {
+		t.Errorf("actions: got %+v", got[0].Actions)
 	}
 }
 

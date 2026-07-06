@@ -5,9 +5,9 @@ package gtk
 import (
 	"fmt"
 	"os"
-	"sort"
 
 	appbrowser "github.com/alyraffauf/switchyard/internal/browser"
+	"github.com/alyraffauf/switchyard/internal/browserscan"
 	"github.com/alyraffauf/switchyard/internal/host"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -24,39 +24,24 @@ type Browser struct {
 // DesktopAction is a desktop-entry action such as "new-private-window".
 type DesktopAction = appbrowser.Action
 
-// detectBrowsers returns the installed browsers that handle HTTP URLs, sorted
-// by name. GIO transparently covers system apps, Flatpaks, and Snaps.
+// detectBrowsers gets metadata from browserscan and an optional live GIO handle.
 func detectBrowsers() []*Browser {
-	appInfos := gio.AppInfoGetRecommendedForType("x-scheme-handler/http")
-
-	browsers := make([]*Browser, 0, len(appInfos))
-	selfDesktopID := getAppID() + ".desktop"
-
-	for _, appInfo := range appInfos {
-		id := appInfo.ID()
-		if id == "" || id == selfDesktopID {
-			continue
+	appInfoByID := make(map[string]*gio.AppInfo)
+	for _, appInfo := range gio.AppInfoGetRecommendedForType("x-scheme-handler/http") {
+		if id := appInfo.ID(); id != "" {
+			appInfoByID[id] = appInfo
 		}
-
-		icon := ""
-		if gicon := appInfo.Icon(); gicon != nil {
-			icon = gicon.String()
-		}
-
-		browsers = append(browsers, &Browser{
-			Browser: &appbrowser.Browser{
-				ID:   id,
-				Name: appInfo.Name(),
-				Icon: icon,
-				Exec: appInfo.Commandline(),
-			},
-			appInfo: appInfo,
-		})
 	}
 
-	sort.Slice(browsers, func(i, j int) bool {
-		return browsers[i].Name < browsers[j].Name
-	})
+	installed := browserscan.Installed()
+	browsers := make([]*Browser, 0, len(installed))
+	for i := range installed {
+		browserModel := installed[i]
+		browsers = append(browsers, &Browser{
+			Browser: &browserModel,
+			appInfo: appInfoByID[browserModel.ID],
+		})
+	}
 
 	return browsers
 }

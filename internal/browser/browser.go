@@ -7,8 +7,9 @@ package browser
 
 // Browser is an installed web browser that can open URLs.
 type Browser struct {
-	ID   string // desktop file ID, e.g. "firefox.desktop"
-	Name string
-	Icon string // themed icon name; may be empty
-	Exec string // desktop-entry command line with field codes, e.g. "firefox %u"
+	ID      string // desktop file ID, e.g. "firefox.desktop"
+	Name    string
+	Icon    string
+	Exec    string
+	Actions []Action
 }

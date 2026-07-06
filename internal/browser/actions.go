@@ -26,5 +26,5 @@ func ListDesktopActions(appID string) []Action {
 	if err != nil {
 		return nil
 	}
-	return file.Actions()
+	return LocalizedActions(file)
 }
