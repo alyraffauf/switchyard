@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"charm.land/bubbles/v2/list"
+	"charm.land/bubbles/v2/textinput"
 	tea "charm.land/bubbletea/v2"
 	"github.com/alyraffauf/switchyard/internal/browser"
 	"github.com/alyraffauf/switchyard/internal/browserscan"
@@ -19,6 +20,16 @@ const (
 	browserListWidth = 30
 	actionListWidth  = 25
 	listHeight       = 20
+
+	// The actions column is a 2-row header stacked on its list; making the list
+	// shorter keeps that column the same height as the browser list.
+	actionListHeight = listHeight - 2
+
+	// Everything is laid out inside this fixed-size box and then centered, so
+	// opening actions never resizes the outer block. Width has slack for the
+	// widest help line, which is wider than the browser+separator+actions columns.
+	stageWidth  = 70
+	stageHeight = listHeight
 )
 
 func initialModel(cfg *config.Config, url string) model {
@@ -60,19 +71,26 @@ func initialModel(cfg *config.Config, url string) model {
 	actionDelegate.ShowDescription = false
 	actionDelegate.Styles = newDelegateStyles(true)
 
-	actionList := list.New([]list.Item{}, actionDelegate, actionListWidth, listHeight)
+	actionList := list.New([]list.Item{}, actionDelegate, actionListWidth, actionListHeight)
 	actionList.SetShowTitle(false)
 	actionList.SetShowStatusBar(false)
 	actionList.SetShowPagination(false)
 	actionList.SetFilteringEnabled(false)
 	actionList.SetShowHelp(false)
 
+	urlInput := textinput.New()
+	urlInput.Prompt = "🔗 "
+	urlInput.Placeholder = "https://…"
+	urlInput.SetValue(url)
+	urlInput.CharLimit = 0
+	urlInput.SetWidth(browserListWidth)
+
 	m := model{
 		browserList:    browserList,
 		actionList:     actionList,
 		delegate:       delegate,
 		actionDelegate: actionDelegate,
-		url:            url,
+		urlInput:       urlInput,
 	}
 	m.updateStyles(true)
 	return m

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"charm.land/bubbles/v2/list"
+	"charm.land/bubbles/v2/textinput"
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 	"github.com/alyraffauf/switchyard/internal/browser"
@@ -17,7 +18,8 @@ type model struct {
 	actionList     list.Model
 	delegate       list.DefaultDelegate
 	actionDelegate list.DefaultDelegate
-	url            string
+	urlInput       textinput.Model
+	urlFocused     bool
 	choice         string
 	styles         styles
 	width          int
@@ -40,6 +42,8 @@ func (m *model) updateStyles(isDark bool) {
 	m.actionList.Styles.PaginationStyle = m.styles.pagination
 	m.actionList.Styles.HelpStyle = m.styles.help
 	m.actionList.SetDelegate(m.actionDelegate)
+
+	m.urlInput.SetStyles(newURLInputStyles(isDark))
 }
 
 func (m model) Init() tea.Cmd {
@@ -58,18 +62,36 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 
 	case tea.KeyPressMsg:
-		if m.pickingAction {
-			if next, cmd, handled := handleActionKey(msg, m); handled {
+		if m.urlFocused {
+			if next, cmd, handled := handleURLInputKey(msg, m); handled {
 				return next, cmd
 			}
 		} else {
-			if next, cmd, handled := handleBrowserKey(msg, m); handled {
-				return next, cmd
+			switch msg.String() {
+			case "/":
+				m.urlFocused = true
+				return m, m.urlInput.Focus()
+			}
+		}
+
+		if !m.urlFocused {
+			if m.pickingAction {
+				if next, cmd, handled := handleActionKey(msg, m); handled {
+					return next, cmd
+				}
+			} else {
+				if next, cmd, handled := handleBrowserKey(msg, m); handled {
+					return next, cmd
+				}
 			}
 		}
 	}
 
 	var cmd tea.Cmd
+	if m.urlFocused {
+		m.urlInput, cmd = m.urlInput.Update(msg)
+		return m, cmd
+	}
 	if m.pickingAction {
 		m.actionList, cmd = m.actionList.Update(msg)
 	} else {
@@ -80,11 +102,22 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func launchAndQuit(m model, name, exec string) (model, tea.Cmd, bool) {
 	m.choice = name
-	if err := browser.Launch(exec, m.url, "", host.InFlatpak()); err != nil {
+	url := m.urlInput.Value()
+	if err := browser.Launch(exec, url, "", host.InFlatpak()); err != nil {
 		fmt.Fprintf(os.Stderr, "Error launching %s: %v\n", name, err)
 	}
 	m.quitting = true
 	return m, tea.Quit, true
+}
+
+func handleURLInputKey(msg tea.KeyPressMsg, m model) (model, tea.Cmd, bool) {
+	switch msg.String() {
+	case "esc", "tab", "enter":
+		m.urlFocused = false
+		m.urlInput.Blur()
+		return m, nil, true
+	}
+	return m, nil, false
 }
 
 func handleBrowserKey(msg tea.KeyPressMsg, m model) (model, tea.Cmd, bool) {
@@ -150,12 +183,18 @@ func (m model) View() tea.View {
 		return launchingView(m)
 	}
 
-	var content string
+	var columns string
 	if m.pickingAction {
-		content = sideBySideView(m)
+		columns = sideBySideView(m)
 	} else {
-		content = m.browserList.View()
+		columns = m.browserList.View()
 	}
+
+	content := lipgloss.JoinVertical(lipgloss.Left,
+		browserStageRowView(m, stageHeight, columns),
+		"",
+		statusRowView(m),
+	)
 
 	if m.width > 0 && m.height > 0 {
 		content = lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, content)
@@ -167,11 +206,52 @@ func (m model) View() tea.View {
 	return v
 }
 
+func browserStageRowView(m model, height int, content string) string {
+	align := lipgloss.Center
+	if m.pickingAction {
+		align = lipgloss.Left
+	}
+
+	positioned := lipgloss.PlaceHorizontal(stageWidth, align, content)
+	return lipgloss.NewStyle().
+		Width(stageWidth).
+		Height(height).
+		Render(positioned)
+}
+
+func urlBarView(m model) string {
+	urlInput := m.urlInput.View()
+	return centeredStageRowView(lipgloss.Height(urlInput), m.styles.urlBar.Render(urlInput))
+}
+
+func statusRowView(m model) string {
+	if m.urlFocused {
+		return urlBarView(m)
+	}
+	return helpView(m)
+}
+
+func helpView(m model) string {
+	var hints string
+	if m.pickingAction {
+		hints = "↑↓ navigate  •  ↩ launch  •  ← back  •  / edit URL  •  q quit"
+	} else {
+		hints = "↑↓ navigate  •  ↩ launch  •  → actions  •  / edit URL  •  q quit"
+	}
+	return centeredStageRowView(lipgloss.Height(hints), m.styles.helpText.Render(hints))
+}
+
+func centeredStageRowView(height int, content string) string {
+	positioned := lipgloss.PlaceHorizontal(stageWidth, lipgloss.Center, content)
+	return lipgloss.NewStyle().
+		Width(stageWidth).
+		Height(height).
+		Render(positioned)
+}
+
 func sideBySideView(m model) string {
 	browserView := m.browserList.View()
 
-	// Mirror the list's title bar geometry (Padding(0, 0, 1, 2)) so the first
-	// action row lines up with the first browser row.
 	header := lipgloss.NewStyle().
 		Padding(0, 0, 1, 2).
 		Render(m.styles.title.Render("Actions"))

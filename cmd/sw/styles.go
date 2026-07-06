@@ -2,6 +2,7 @@ package main
 
 import (
 	"charm.land/bubbles/v2/list"
+	"charm.land/bubbles/v2/textinput"
 	"charm.land/lipgloss/v2"
 )
 
@@ -16,8 +17,10 @@ type styles struct {
 	title      lipgloss.Style
 	pagination lipgloss.Style
 	help       lipgloss.Style
+	helpText   lipgloss.Style
 	quitText   lipgloss.Style
 	separator  lipgloss.Style
+	urlBar     lipgloss.Style
 }
 
 func newStyles(darkBG bool) styles {
@@ -29,7 +32,8 @@ func newStyles(darkBG bool) styles {
 	s.title = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#FFFDF5")).
 		Background(lipgloss.Color(green)).
-		Padding(0, 1)
+		Width(browserListWidth).
+		Align(lipgloss.Center)
 
 	s.pagination = list.DefaultStyles(darkBG).PaginationStyle.PaddingLeft(4)
 
@@ -45,6 +49,13 @@ func newStyles(darkBG bool) styles {
 	s.separator = lipgloss.NewStyle().
 		Foreground(ld(lipgloss.Color("#b0b0b0"), lipgloss.Color("240"))).
 		Padding(0, 2)
+
+	s.urlBar = lipgloss.NewStyle().
+		MarginBottom(0)
+
+	s.helpText = lipgloss.NewStyle().
+		MarginTop(0).
+		Foreground(ld(lipgloss.Color("#999999"), lipgloss.Color("#666666")))
 
 	return s
 }
@@ -67,6 +78,22 @@ func newDelegateStyles(darkBG bool) list.DefaultItemStyles {
 
 	s.DimmedTitle = s.DimmedTitle.Foreground(ld(lipgloss.Color("#A49FA5"), lipgloss.Color("#777777")))
 	s.DimmedDesc = s.DimmedDesc.Foreground(ld(lipgloss.Color("#C2B8C2"), lipgloss.Color("#4D4D4D")))
+
+	return s
+}
+
+func newURLInputStyles(darkBG bool) textinput.Styles {
+	s := textinput.DefaultStyles(darkBG)
+	ld := lipgloss.LightDark(darkBG)
+
+	s.Focused.Prompt = lipgloss.NewStyle().
+		Foreground(lipgloss.Color(greenBright))
+	s.Blurred.Prompt = lipgloss.NewStyle().
+		Foreground(lipgloss.Color(green))
+
+	s.Focused.Placeholder = lipgloss.NewStyle().
+		Foreground(ld(lipgloss.Color("#999999"), lipgloss.Color("#666666")))
+	s.Blurred.Placeholder = s.Focused.Placeholder
 
 	return s
 }
