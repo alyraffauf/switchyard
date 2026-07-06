@@ -234,12 +234,23 @@ func statusRowView(m model) string {
 
 func helpView(m model) string {
 	var hints string
-	if m.pickingAction {
+	switch {
+	case m.pickingAction:
 		hints = "↑↓ navigate  •  ↩ launch  •  ← back  •  / edit URL  •  q quit"
-	} else {
+	case selectedBrowserHasActions(m):
 		hints = "↑↓ navigate  •  ↩ launch  •  → actions  •  / edit URL  •  q quit"
+	default:
+		hints = "↑↓ navigate  •  ↩ launch  •  / edit URL  •  q quit"
 	}
 	return centeredStageRowView(lipgloss.Height(hints), m.styles.helpText.Render(hints))
+}
+
+func selectedBrowserHasActions(m model) bool {
+	selected, ok := m.browserList.SelectedItem().(browserItem)
+	if !ok {
+		return false
+	}
+	return len(browserscan.ListDesktopActions(selected.id)) != 0
 }
 
 func centeredStageRowView(height int, content string) string {
