@@ -323,6 +323,20 @@
   },
   {
     "type": "file",
+    "url": "https://proxy.golang.org/github.com/jessevdk/go-flags/@v/v1.4.0.mod",
+    "sha256": "9fff48f350dbc6bb066594e94496defa195e8b55206d261ca5b2f989f6782a2d",
+    "dest": "go/pkg/mod/cache/download/github.com/jessevdk/go-flags/@v",
+    "dest-filename": "v1.4.0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/jessevdk/go-flags/@v/v1.4.0.zip",
+    "sha256": "a26e72c3f4c220df8b65ac6eb3d358a8ad2efc300b212318582893ea882726f9",
+    "dest": "go/pkg/mod/cache/download/github.com/jessevdk/go-flags/@v",
+    "dest-filename": "v1.4.0.zip"
+  },
+  {
+    "type": "file",
     "url": "https://proxy.golang.org/github.com/kballard/go-shellquote/@v/v0.0.0-20180428030007-95032a82bc51.mod",
     "sha256": "49a2d6c73f667dc0f46322a0d6acfcba14209bfb76ef7e622d61e1091962ff34",
     "dest": "go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v",
@@ -532,6 +546,48 @@
     "dest-filename": "v0.35.0.zip"
   },
   {
+    "type": "file",
+    "url": "https://proxy.golang.org/gopkg.in/check.v1/@v/v0.0.0-20161208181325-20d25e280405.mod",
+    "sha256": "5c306e0d633cd66a11b40e2e5fbbc6da42110db7d72ea3c1524ceb45ee40c33f",
+    "dest": "go/pkg/mod/cache/download/gopkg.in/check.v1/@v",
+    "dest-filename": "v0.0.0-20161208181325-20d25e280405.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/gopkg.in/check.v1/@v/v0.0.0-20161208181325-20d25e280405.zip",
+    "sha256": "4e1817f964ca34e545b81afda0325a5e89cf58de2e413d8207c0afddd0fdc15c",
+    "dest": "go/pkg/mod/cache/download/gopkg.in/check.v1/@v",
+    "dest-filename": "v0.0.0-20161208181325-20d25e280405.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/gopkg.in/yaml.v1/@v/v1.0.0-20140924161607-9f9df34309c0.mod",
+    "sha256": "17b76a6ecf3c4d0aff62a58bfe7e401a5f58fe9bc38f9c4b6fd8da660bca4135",
+    "dest": "go/pkg/mod/cache/download/gopkg.in/yaml.v1/@v",
+    "dest-filename": "v1.0.0-20140924161607-9f9df34309c0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/gopkg.in/yaml.v1/@v/v1.0.0-20140924161607-9f9df34309c0.zip",
+    "sha256": "7abff7973fdab7386de5a1e9e197d8dc50d41ded9d24ff914685900caa0eb742",
+    "dest": "go/pkg/mod/cache/download/gopkg.in/yaml.v1/@v",
+    "dest-filename": "v1.0.0-20140924161607-9f9df34309c0.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/howett.net/plist/@v/v1.0.1.mod",
+    "sha256": "c82cd5b5579d83db1ba908f04184b56c04fb4a9052042e832ce68f7adc739335",
+    "dest": "go/pkg/mod/cache/download/howett.net/plist/@v",
+    "dest-filename": "v1.0.1.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/howett.net/plist/@v/v1.0.1.zip",
+    "sha256": "a73da26d715d28d6086411893d10d9efdf7c023f208518180aeaec7da7485a21",
+    "dest": "go/pkg/mod/cache/download/howett.net/plist/@v",
+    "dest-filename": "v1.0.1.zip"
+  },
+  {
     "type": "shell",
     "commands": [
       "mkdir -p go/pkg/mod/cache/download/charm.land/bubbles/v2/@v && printf '%s\\n' h1:7r55WzBxpo/R3z98hGmY7KKPd3ET6vsf0Fb9sDHOV60= > go/pkg/mod/cache/download/charm.land/bubbles/v2/@v/v2.1.1.ziphash && printf '%s' '{\"Version\":\"v2.1.1\"}' > go/pkg/mod/cache/download/charm.land/bubbles/v2/@v/v2.1.1.info",
@@ -557,6 +613,7 @@
       "mkdir -p go/pkg/mod/cache/download/github.com/diamondburned/gotk4-adwaita/pkg/@v && printf '%s\\n' h1:WzOC3KtvrC1hJMz3fbJBg0Ye50nt4Tafor+a/bBHNEA= > go/pkg/mod/cache/download/github.com/diamondburned/gotk4-adwaita/pkg/@v/v0.0.0-20250703085337-e94555b846b6.ziphash && printf '%s' '{\"Version\":\"v0.0.0-20250703085337-e94555b846b6\"}' > go/pkg/mod/cache/download/github.com/diamondburned/gotk4-adwaita/pkg/@v/v0.0.0-20250703085337-e94555b846b6.info",
       "mkdir -p go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v && printf '%s\\n' h1:dN2jYYZ71hFhoKFSn24pQdKWLZb/XDydBt8pEIkFjJo= > go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v/v0.3.2-0.20250703063411-16654385f59a.ziphash && printf '%s' '{\"Version\":\"v0.3.2-0.20250703063411-16654385f59a\"}' > go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v/v0.3.2-0.20250703063411-16654385f59a.info",
       "mkdir -p go/pkg/mod/cache/download/github.com/dustin/go-humanize/@v && printf '%s\\n' h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY= > go/pkg/mod/cache/download/github.com/dustin/go-humanize/@v/v1.0.1.ziphash && printf '%s' '{\"Version\":\"v1.0.1\"}' > go/pkg/mod/cache/download/github.com/dustin/go-humanize/@v/v1.0.1.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/jessevdk/go-flags/@v && printf '%s\\n' h1:4IU2WS7AumrZ/40jfhf4QVDMsQwqA7VEHozFRrGARJA= > go/pkg/mod/cache/download/github.com/jessevdk/go-flags/@v/v1.4.0.ziphash && printf '%s' '{\"Version\":\"v1.4.0\"}' > go/pkg/mod/cache/download/github.com/jessevdk/go-flags/@v/v1.4.0.info",
       "mkdir -p go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v && printf '%s\\n' h1:Z9n2FFNUXsshfwJMBgNA0RU6/i7WVaAegv3PtuIHPMs= > go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v/v0.0.0-20180428030007-95032a82bc51.ziphash && printf '%s' '{\"Version\":\"v0.0.0-20180428030007-95032a82bc51\"}' > go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v/v0.0.0-20180428030007-95032a82bc51.info",
       "mkdir -p go/pkg/mod/cache/download/github.com/kylelemons/godebug/@v && printf '%s\\n' h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0SNc= > go/pkg/mod/cache/download/github.com/kylelemons/godebug/@v/v1.1.0.ziphash && printf '%s' '{\"Version\":\"v1.1.0\"}' > go/pkg/mod/cache/download/github.com/kylelemons/godebug/@v/v1.1.0.info",
       "mkdir -p go/pkg/mod/cache/download/github.com/lucasb-eyer/go-colorful/@v && printf '%s\\n' h1:UtrWVfLdarDgc44HcS7pYloGHJUjHV/4FwW4TvVgFr4= > go/pkg/mod/cache/download/github.com/lucasb-eyer/go-colorful/@v/v1.4.0.ziphash && printf '%s' '{\"Version\":\"v1.4.0\"}' > go/pkg/mod/cache/download/github.com/lucasb-eyer/go-colorful/@v/v1.4.0.info",
@@ -571,7 +628,10 @@
       "mkdir -p go/pkg/mod/cache/download/golang.org/x/mod/@v && printf '%s\\n' h1:EGMPT//Ezu+ylkCijjPc+f4Aih7sZvaAr+O3EHBxvZg= > go/pkg/mod/cache/download/golang.org/x/mod/@v/v0.26.0.ziphash && printf '%s' '{\"Version\":\"v0.26.0\"}' > go/pkg/mod/cache/download/golang.org/x/mod/@v/v0.26.0.info",
       "mkdir -p go/pkg/mod/cache/download/golang.org/x/sync/@v && printf '%s\\n' h1:HLII4xRRTtCRkxYp4HNFF0Js/Og6q2i++KXbg0gHCwM= > go/pkg/mod/cache/download/golang.org/x/sync/@v/v0.21.0.ziphash && printf '%s' '{\"Version\":\"v0.21.0\"}' > go/pkg/mod/cache/download/golang.org/x/sync/@v/v0.21.0.info",
       "mkdir -p go/pkg/mod/cache/download/golang.org/x/sys/@v && printf '%s\\n' h1:noSf2Fq6F8DBgS+LysIkx7rIExoNHJsxOAtPp4rthXw= > go/pkg/mod/cache/download/golang.org/x/sys/@v/v0.46.0.ziphash && printf '%s' '{\"Version\":\"v0.46.0\"}' > go/pkg/mod/cache/download/golang.org/x/sys/@v/v0.46.0.info",
-      "mkdir -p go/pkg/mod/cache/download/golang.org/x/tools/@v && printf '%s\\n' h1:mBffYraMEf7aa0sB+NuKnuCy8qI/9Bughn8dC2Gu5r0= > go/pkg/mod/cache/download/golang.org/x/tools/@v/v0.35.0.ziphash && printf '%s' '{\"Version\":\"v0.35.0\"}' > go/pkg/mod/cache/download/golang.org/x/tools/@v/v0.35.0.info"
+      "mkdir -p go/pkg/mod/cache/download/golang.org/x/tools/@v && printf '%s\\n' h1:mBffYraMEf7aa0sB+NuKnuCy8qI/9Bughn8dC2Gu5r0= > go/pkg/mod/cache/download/golang.org/x/tools/@v/v0.35.0.ziphash && printf '%s' '{\"Version\":\"v0.35.0\"}' > go/pkg/mod/cache/download/golang.org/x/tools/@v/v0.35.0.info",
+      "mkdir -p go/pkg/mod/cache/download/gopkg.in/check.v1/@v && printf '%s\\n' h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM= > go/pkg/mod/cache/download/gopkg.in/check.v1/@v/v0.0.0-20161208181325-20d25e280405.ziphash && printf '%s' '{\"Version\":\"v0.0.0-20161208181325-20d25e280405\"}' > go/pkg/mod/cache/download/gopkg.in/check.v1/@v/v0.0.0-20161208181325-20d25e280405.info",
+      "mkdir -p go/pkg/mod/cache/download/gopkg.in/yaml.v1/@v && printf '%s\\n' h1:POO/ycCATvegFmVuPpQzZFJ+pGZeX22Ufu6fibxDVjU= > go/pkg/mod/cache/download/gopkg.in/yaml.v1/@v/v1.0.0-20140924161607-9f9df34309c0.ziphash && printf '%s' '{\"Version\":\"v1.0.0-20140924161607-9f9df34309c0\"}' > go/pkg/mod/cache/download/gopkg.in/yaml.v1/@v/v1.0.0-20140924161607-9f9df34309c0.info",
+      "mkdir -p go/pkg/mod/cache/download/howett.net/plist/@v && printf '%s\\n' h1:37GdZ8tP09Q35o9ych3ehygcsL+HqKSwzctveSlarvM= > go/pkg/mod/cache/download/howett.net/plist/@v/v1.0.1.ziphash && printf '%s' '{\"Version\":\"v1.0.1\"}' > go/pkg/mod/cache/download/howett.net/plist/@v/v1.0.1.info"
     ]
   }
 ]
