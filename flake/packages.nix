@@ -5,7 +5,10 @@
     pkgs,
     self',
     ...
-  }: {
+  }: let
+    # Shared across both Go packages
+    vendorHash = "sha256-Mkb8LSMUeKqOHxvHq7W1/7rxRr73Cx3L1Pf7+xjWgaE=";
+  in {
     packages = {
       default = self'.packages.switchyard;
 
@@ -17,7 +20,11 @@
         build-system = with pkgs.python3.pkgs; [setuptools];
       };
 
-      switchyard = pkgs.callPackage ../package.nix {};
+      # GTK GUI (cmd/switchyard).
+      switchyard = pkgs.callPackage ../nix/switchyard.nix {inherit vendorHash;};
+
+      # Terminal browser picker (cmd/sw).
+      sw = pkgs.callPackage ../nix/sw.nix {inherit vendorHash;};
     };
   };
 }

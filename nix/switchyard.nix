@@ -6,13 +6,14 @@
   libadwaita,
   lib,
   pkg-config,
+  vendorHash,
   wrapGAppsHook4,
 }:
 buildGoModule {
   pname = "switchyard";
   version = "dev";
-  src = ./.;
-  vendorHash = "sha256-Mkb8LSMUeKqOHxvHq7W1/7rxRr73Cx3L1Pf7+xjWgaE=";
+  src = ../.;
+  inherit vendorHash;
   subPackages = ["cmd/switchyard"];
 
   ldflags = [
