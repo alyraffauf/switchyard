@@ -132,12 +132,16 @@ func main() {
 			os.Exit(1)
 		}
 		allBrowsers := browserscan.Installed()
-		for _, pref := range browserPrefs {
-			id := pref
-			if !strings.HasSuffix(id, ".desktop") {
-				id += ".desktop"
+		for _, browserPreference := range browserPrefs {
+			if launchOrLog(allBrowsers, browserPreference, targetURL) {
+				return
 			}
-			if launchOrLog(allBrowsers, id, targetURL) {
+
+			if strings.HasSuffix(browserPreference, ".desktop") {
+				continue
+			}
+
+			if launchOrLog(allBrowsers, browserPreference+".desktop", targetURL) {
 				return
 			}
 		}

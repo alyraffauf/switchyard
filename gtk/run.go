@@ -115,13 +115,16 @@ func handleSwitchyardURL(app *adw.Application, cfg *Config, rawURL string) {
 
 	// If browser preferences specified, try each in order
 	if len(browserPrefs) > 0 {
-		for _, pref := range browserPrefs {
-			// Try with and without .desktop suffix
-			id := pref
-			if !strings.HasSuffix(id, ".desktop") {
-				id = id + ".desktop"
+		for _, browserPreference := range browserPrefs {
+			if launchBrowserByID(browserPreference, sanitized) {
+				return
 			}
-			if launchBrowserByID(id, sanitized) {
+
+			if strings.HasSuffix(browserPreference, ".desktop") {
+				continue
+			}
+
+			if launchBrowserByID(browserPreference+".desktop", sanitized) {
 				return
 			}
 		}

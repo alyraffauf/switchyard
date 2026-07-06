@@ -2,7 +2,9 @@
 
 package browser
 
-import "github.com/alyraffauf/goxdgdesktop/desktopfile"
-
-// Action is a desktop-entry action, e.g. "new-private-window".
-type Action = desktopfile.Action
+// Action is an app-specific launch action, e.g. "new-private-window".
+type Action struct {
+	ID   string
+	Name string
+	Exec string
+}

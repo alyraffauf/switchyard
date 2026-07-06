@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+//go:build !darwin
+
 package browserscan
 
 import (
@@ -20,12 +22,15 @@ func localizedString(file *desktopfile.File, section, key string) string {
 }
 
 func localizedActions(file *desktopfile.File) []browser.Action {
-	actions := file.Actions()
-	for i := range actions {
-		section := desktopfile.ActionSectionStart + actions[i].ID
-		if name := localizedString(file, section, "Name"); name != "" {
-			actions[i].Name = name
+	desktopActions := file.Actions()
+	actions := make([]browser.Action, len(desktopActions))
+	for i, action := range desktopActions {
+		name := action.Name
+		section := desktopfile.ActionSectionStart + action.ID
+		if localized := localizedString(file, section, "Name"); localized != "" {
+			name = localized
 		}
+		actions[i] = browser.Action{ID: action.ID, Name: name, Exec: action.Exec}
 	}
 	return actions
 }

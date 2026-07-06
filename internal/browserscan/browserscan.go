@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+//go:build !darwin
+
 // Package browserscan discovers installed HTTP(S) browsers by parsing the
 // .desktop files on the XDG data search path. It has no GTK/GIO dependency.
 package browserscan
 
 import (
-	"cmp"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -16,9 +17,6 @@ import (
 	"github.com/alyraffauf/goxdgdesktop/xdg"
 	"github.com/alyraffauf/switchyard/internal/browser"
 )
-
-// A browser switcher must never list itself, across all packaged variants.
-const selfIDPrefix = "io.github.alyraffauf.Switchyard"
 
 var httpSchemeHandlers = []string{
 	"x-scheme-handler/http",
@@ -55,7 +53,7 @@ func Installed() []browser.Browser {
 			}
 			seen[id] = true
 
-			if strings.HasPrefix(id, selfIDPrefix) {
+			if isSelf(id) {
 				return nil
 			}
 
@@ -66,16 +64,14 @@ func Installed() []browser.Browser {
 		})
 	}
 
-	slices.SortFunc(browsers, func(first, second browser.Browser) int {
-		return cmp.Compare(first.Name, second.Name)
-	})
+	sortByName(browsers)
 
 	return browsers
 }
 
 // Find returns a displayable HTTP(S) browser by desktop file ID.
 func Find(id string) (browser.Browser, bool) {
-	if id == "" || strings.HasPrefix(id, selfIDPrefix) {
+	if isSelf(id) {
 		return browser.Browser{}, false
 	}
 

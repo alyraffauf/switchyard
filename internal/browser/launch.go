@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+//go:build !darwin
+
 package browser
 
 import (
@@ -12,24 +14,11 @@ import (
 
 const activationTokenEnv = "XDG_ACTIVATION_TOKEN"
 
-// Launch runs cmdline for url in the background. activationToken is the
-// Wayland/X11 startup token for raising the window and may be empty; when
-// inFlatpak is set the command runs on the host via flatpak-spawn. An empty
-// command line is a no-op.
-func Launch(cmdline, url, activationToken string, inFlatpak bool) error {
-	cmd := buildCommand(cmdline, url, activationToken, inFlatpak)
-	if cmd == nil {
-		return nil
-	}
-	if err := cmd.Start(); err != nil {
-		return err
-	}
-	go cmd.Wait()
-	return nil
-}
-
-// buildCommand assembles the OS command that launches cmdline for url, or nil
-// when the resolved command line is empty.
+// buildCommand assembles the OS command that launches cmdline for url via a
+// desktop Exec line, honoring activationToken (the Wayland/X11 startup token
+// for raising the window, may be empty) and running on the host via
+// flatpak-spawn when inFlatpak is set. Returns nil when the resolved command
+// line is empty.
 func buildCommand(cmdline, url, activationToken string, inFlatpak bool) *exec.Cmd {
 	if url != "" {
 		cmdline = desktopexec.SubstituteOrAppendURL(cmdline, url)
