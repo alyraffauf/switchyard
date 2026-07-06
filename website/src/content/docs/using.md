@@ -4,9 +4,9 @@ description: Learn what Switchyard does and how to start routing links.
 order: 10
 ---
 
-Switchyard is a rules-based browser launcher for Linux. Once it is set as your default browser, clicked links pass through Switchyard first. It can then open the link in a specific browser, ask you which browser to use, or rewrite the URL before opening it.
+Switchyard is a powerful, rules-based browser launcher. Once it is set as your default browser, clicked links pass through Switchyard first. It can then open the link in a specific browser, ask you which browser to use, or rewrite the URL before opening it.
 
-Use it when different parts of your life belong in different browsers: work links in Chrome, personal links in Firefox, video links in Brave, or privacy-friendly redirects before anything opens.
+Use it when different parts of your life live in different browsers: work links in Chrome, personal links in Firefox, video links in Brave, or to add  privacy-friendly redirects before anything opens.
 
 The basic flow is:
 
