@@ -57,7 +57,7 @@ func buildCommand(cmdline, url, activationToken string, inFlatpak bool) *exec.Cm
 }
 
 // stripDesktopFieldCodes removes desktop field codes without shell-quoting.
-// SubstituteURL would produce "''" for an empty URL, which most browsers
+// SubstituteURL would produce "”" for an empty URL, which most browsers
 // interpret as file:///.
 func stripDesktopFieldCodes(cmdline string) string {
 	for _, code := range []string{"%u", "%U", "%f", "%F", "%i", "%c", "%k"} {
