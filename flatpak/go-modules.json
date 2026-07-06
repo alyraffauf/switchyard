@@ -1,10 +1,45 @@
 [
   {
     "type": "file",
-    "url": "https://proxy.golang.org/github.com/!karpeles!lab/weak/@v/v0.1.1.info",
-    "sha256": "7e533b1da8754c1317254f09d51294e04810bf47e78554014669bb1f55bed9ea",
-    "dest": "go/pkg/mod/cache/download/github.com/!karpeles!lab/weak/@v",
-    "dest-filename": "v0.1.1.info"
+    "url": "https://proxy.golang.org/charm.land/bubbles/v2/@v/v2.1.1.mod",
+    "sha256": "135ab3850dde855313d5b91e21e39ccb6c5a607f184d4834c93d01b4c2e1e8ac",
+    "dest": "go/pkg/mod/cache/download/charm.land/bubbles/v2/@v",
+    "dest-filename": "v2.1.1.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/charm.land/bubbles/v2/@v/v2.1.1.zip",
+    "sha256": "24579b6f253484f6ce0f7a7619dde3e08f7f086c7c4d6030a2a3b13032129bc1",
+    "dest": "go/pkg/mod/cache/download/charm.land/bubbles/v2/@v",
+    "dest-filename": "v2.1.1.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/charm.land/bubbletea/v2/@v/v2.0.8.mod",
+    "sha256": "751049c026efd6817be643df2a8bfc4dd459048ead81a6db9f9748e520bfd595",
+    "dest": "go/pkg/mod/cache/download/charm.land/bubbletea/v2/@v",
+    "dest-filename": "v2.0.8.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/charm.land/bubbletea/v2/@v/v2.0.8.zip",
+    "sha256": "5ce9c6662519a3cae6424c7d140bf61326f85591ba9c96b641a9606d1acd2b2a",
+    "dest": "go/pkg/mod/cache/download/charm.land/bubbletea/v2/@v",
+    "dest-filename": "v2.0.8.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/charm.land/lipgloss/v2/@v/v2.0.5.mod",
+    "sha256": "1e90d3a8d816db1728e9cd1d3346416795c5f05699d6a0abbc0305c830ec99e5",
+    "dest": "go/pkg/mod/cache/download/charm.land/lipgloss/v2/@v",
+    "dest-filename": "v2.0.5.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/charm.land/lipgloss/v2/@v/v2.0.5.zip",
+    "sha256": "be756b9a383edc6a7ab6bd70686400309601f809630c058a147dcba561854f97",
+    "dest": "go/pkg/mod/cache/download/charm.land/lipgloss/v2/@v",
+    "dest-filename": "v2.0.5.zip"
   },
   {
     "type": "file",
@@ -22,10 +57,17 @@
   },
   {
     "type": "file",
-    "url": "https://proxy.golang.org/github.com/alyraffauf/goxdgdesktop/@v/v0.1.0.info",
-    "sha256": "a187d754282645dfc1ec9dd33c05443367c9cd69d3c26d3a10092672cc653f2a",
-    "dest": "go/pkg/mod/cache/download/github.com/alyraffauf/goxdgdesktop/@v",
-    "dest-filename": "v0.1.0.info"
+    "url": "https://proxy.golang.org/github.com/!make!now!just/heredoc/@v/v1.0.0.mod",
+    "sha256": "dc1d84bb336e71e8696b999eeca5c0bd5cd6b40870a4cdc71ad118873e01014a",
+    "dest": "go/pkg/mod/cache/download/github.com/!make!now!just/heredoc/@v",
+    "dest-filename": "v1.0.0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/!make!now!just/heredoc/@v/v1.0.0.zip",
+    "sha256": "062afe6e11aa3c3ac0035d08907b80d5e5b7563905603391ee774bda440abf16",
+    "dest": "go/pkg/mod/cache/download/github.com/!make!now!just/heredoc/@v",
+    "dest-filename": "v1.0.0.zip"
   },
   {
     "type": "file",
@@ -43,10 +85,199 @@
   },
   {
     "type": "file",
-    "url": "https://proxy.golang.org/github.com/diamondburned/gotk4-adwaita/pkg/@v/v0.0.0-20250703085337-e94555b846b6.info",
-    "sha256": "77a90d23b9ccd4355f39b6fa852ea3b26b8a6791b3ee2799c87f92855c64f8b6",
-    "dest": "go/pkg/mod/cache/download/github.com/diamondburned/gotk4-adwaita/pkg/@v",
-    "dest-filename": "v0.0.0-20250703085337-e94555b846b6.info"
+    "url": "https://proxy.golang.org/github.com/atotto/clipboard/@v/v0.1.4.mod",
+    "sha256": "871822cbc7df3792f78a100886b7f499f73555938e336b918682119688ea8ad0",
+    "dest": "go/pkg/mod/cache/download/github.com/atotto/clipboard/@v",
+    "dest-filename": "v0.1.4.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/atotto/clipboard/@v/v0.1.4.zip",
+    "sha256": "d67b2c36c662751309fd2ec351df3651584bea840bd27be9a90702c3a238b43f",
+    "dest": "go/pkg/mod/cache/download/github.com/atotto/clipboard/@v",
+    "dest-filename": "v0.1.4.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/aymanbagabas/go-udiff/@v/v0.4.1.mod",
+    "sha256": "c03ad1d34f81476b00ebc5b3b31ab7535b64631e3b24331ad33945182e77492d",
+    "dest": "go/pkg/mod/cache/download/github.com/aymanbagabas/go-udiff/@v",
+    "dest-filename": "v0.4.1.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/aymanbagabas/go-udiff/@v/v0.4.1.zip",
+    "sha256": "3782bb9735dc4c1e4c98ff7d7713af27f276e1a0ff493e4b237ff51ebd92efbd",
+    "dest": "go/pkg/mod/cache/download/github.com/aymanbagabas/go-udiff/@v",
+    "dest-filename": "v0.4.1.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/bits-and-blooms/bitset/@v/v1.24.4.mod",
+    "sha256": "e1d76f51cb52ad77a366c14e391f29ff1adba192135a9a4cbeca5e87ad7e41fd",
+    "dest": "go/pkg/mod/cache/download/github.com/bits-and-blooms/bitset/@v",
+    "dest-filename": "v1.24.4.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/bits-and-blooms/bitset/@v/v1.24.4.zip",
+    "sha256": "f0677752f880ed313a2c9c055e4d2bd2408f228e12ac7c69ecdb396a00fe0827",
+    "dest": "go/pkg/mod/cache/download/github.com/bits-and-blooms/bitset/@v",
+    "dest-filename": "v1.24.4.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/colorprofile/@v/v0.4.3.mod",
+    "sha256": "4da50dc5179ea48dc7c55db78f05b4911047341ef749027b3969130edf1fd43b",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/colorprofile/@v",
+    "dest-filename": "v0.4.3.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/colorprofile/@v/v0.4.3.zip",
+    "sha256": "656472ff48f01a098418a31667f3253cf34e04d4e1cb6c1a0a80f76ad370b689",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/colorprofile/@v",
+    "dest-filename": "v0.4.3.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/harmonica/@v/v0.2.0.mod",
+    "sha256": "febcf2a805f63ad7d34b707ead4839a517b13075dbc912e66632ac586ae8a383",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/harmonica/@v",
+    "dest-filename": "v0.2.0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/harmonica/@v/v0.2.0.zip",
+    "sha256": "8494d728916551f0fc9a065fa854dfae2d75c7191ce839bae07de1a6290db40a",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/harmonica/@v",
+    "dest-filename": "v0.2.0.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/ultraviolet/@v/v0.0.0-20260703014108-f5a850f9c2b7.mod",
+    "sha256": "f57eff8111d573347030016bea9b9d8320bc1d1c582b626fc7c3a7771a88c8fe",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/ultraviolet/@v",
+    "dest-filename": "v0.0.0-20260703014108-f5a850f9c2b7.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/ultraviolet/@v/v0.0.0-20260703014108-f5a850f9c2b7.zip",
+    "sha256": "50b02b46f486e24d807a9784b68968743b1e502b09d08d9fb9b71484bbc50c1f",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/ultraviolet/@v",
+    "dest-filename": "v0.0.0-20260703014108-f5a850f9c2b7.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/x/ansi/@v/v0.11.7.mod",
+    "sha256": "aaef80208dfa0cab40a81411c7c4f0884e0af69be60ddd24e5d62cb40f05db6d",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/x/ansi/@v",
+    "dest-filename": "v0.11.7.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/x/ansi/@v/v0.11.7.zip",
+    "sha256": "1d52a11e3ddfeabe350df8b1a5ee7a8660ac6903ae3a9f1031d9668384d59f6a",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/x/ansi/@v",
+    "dest-filename": "v0.11.7.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/x/exp/golden/@v/v0.0.0-20250806222409-83e3a29d542f.mod",
+    "sha256": "1b93bb4e83fb71d5869a8dc7f65ef716291b28af5407d69309c6cf95ac978805",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/x/exp/golden/@v",
+    "dest-filename": "v0.0.0-20250806222409-83e3a29d542f.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/x/exp/golden/@v/v0.0.0-20250806222409-83e3a29d542f.zip",
+    "sha256": "68636b6cdec0e4fc0bbe0b50c4efc52c82f2e175d118a9033631abdd9594b527",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/x/exp/golden/@v",
+    "dest-filename": "v0.0.0-20250806222409-83e3a29d542f.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/x/term/@v/v0.2.2.mod",
+    "sha256": "6df18166815b45f523a79580acfa95f12990a1568e6325f9d60b5825df952962",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/x/term/@v",
+    "dest-filename": "v0.2.2.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/x/term/@v/v0.2.2.zip",
+    "sha256": "0452a430f7e6882393f81ba19a70a63709960acb9743e1199a7b04d908e6b506",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/x/term/@v",
+    "dest-filename": "v0.2.2.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/x/termios/@v/v0.1.1.mod",
+    "sha256": "4094a8d0a57055f0bfb8a1191e69ee282e2de40d3ab7724cc134ca26fc02b9d1",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/x/termios/@v",
+    "dest-filename": "v0.1.1.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/x/termios/@v/v0.1.1.zip",
+    "sha256": "3dd9823ed5db08d398c276e216e4150560d3a6894814c4404251b4210b22abed",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/x/termios/@v",
+    "dest-filename": "v0.1.1.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/x/windows/@v/v0.2.2.mod",
+    "sha256": "2256def13bee56024d8300ad8474563bb2b0d5f769ac9ca9f89868cab014b6e3",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/x/windows/@v",
+    "dest-filename": "v0.2.2.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/charmbracelet/x/windows/@v/v0.2.2.zip",
+    "sha256": "fb3f82357ad9a8a25a42dfa1880434149dd6fcc43e0b32a03664f72082ce5c2f",
+    "dest": "go/pkg/mod/cache/download/github.com/charmbracelet/x/windows/@v",
+    "dest-filename": "v0.2.2.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/clipperhouse/displaywidth/@v/v0.11.0.mod",
+    "sha256": "643bf909351d7bc8ff29a8a7bb44cca11efe181ed66e5efe57d695bb023effb3",
+    "dest": "go/pkg/mod/cache/download/github.com/clipperhouse/displaywidth/@v",
+    "dest-filename": "v0.11.0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/clipperhouse/displaywidth/@v/v0.11.0.zip",
+    "sha256": "27830c91cdfb2a648748db21f7a2734dcb50d21c620edde51d488ba4e7967e3d",
+    "dest": "go/pkg/mod/cache/download/github.com/clipperhouse/displaywidth/@v",
+    "dest-filename": "v0.11.0.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/clipperhouse/stringish/@v/v0.1.1.mod",
+    "sha256": "1f6bf9cd22f45b59bf4c7987d69df990d83611c0fe5bf7bdf7d20886eb1b9b81",
+    "dest": "go/pkg/mod/cache/download/github.com/clipperhouse/stringish/@v",
+    "dest-filename": "v0.1.1.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/clipperhouse/stringish/@v/v0.1.1.zip",
+    "sha256": "b64486091fd9c743a51a025c0c171b0d6f43e5a8fbba799e6d3029f79315621f",
+    "dest": "go/pkg/mod/cache/download/github.com/clipperhouse/stringish/@v",
+    "dest-filename": "v0.1.1.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/clipperhouse/uax29/v2/@v/v2.7.0.mod",
+    "sha256": "f3c5f4e4f9e7fb16aea5fd9dc5f24c3ff9c157b1a67576c0f2140117589507a0",
+    "dest": "go/pkg/mod/cache/download/github.com/clipperhouse/uax29/v2/@v",
+    "dest-filename": "v2.7.0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/clipperhouse/uax29/v2/@v/v2.7.0.zip",
+    "sha256": "67b1278f1ffb4e4d783a390e48fe7396864650138e785d4b4bfca5914333f761",
+    "dest": "go/pkg/mod/cache/download/github.com/clipperhouse/uax29/v2/@v",
+    "dest-filename": "v2.7.0.zip"
   },
   {
     "type": "file",
@@ -64,13 +295,6 @@
   },
   {
     "type": "file",
-    "url": "https://proxy.golang.org/github.com/diamondburned/gotk4/pkg/@v/v0.3.2-0.20250703063411-16654385f59a.info",
-    "sha256": "0814b4785cad2580330a276d4489d8f7020d8324bc8d07414ad2e95f2dba6635",
-    "dest": "go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v",
-    "dest-filename": "v0.3.2-0.20250703063411-16654385f59a.info"
-  },
-  {
-    "type": "file",
     "url": "https://proxy.golang.org/github.com/diamondburned/gotk4/pkg/@v/v0.3.2-0.20250703063411-16654385f59a.mod",
     "sha256": "29aeb2bd52a9d5be6e91c14d78d1fa0c5164c41b41c8fba919f173e744a8c417",
     "dest": "go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v",
@@ -85,10 +309,17 @@
   },
   {
     "type": "file",
-    "url": "https://proxy.golang.org/github.com/kballard/go-shellquote/@v/v0.0.0-20180428030007-95032a82bc51.info",
-    "sha256": "d6f6034c911ee4f7583394452662b95695e9c3807a48e9292e48b52d252d79d5",
-    "dest": "go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v",
-    "dest-filename": "v0.0.0-20180428030007-95032a82bc51.info"
+    "url": "https://proxy.golang.org/github.com/dustin/go-humanize/@v/v1.0.1.mod",
+    "sha256": "4325999d0a6841031258a2561c22879d9fbdf77abc6b32a17b1cb6edf0810fb2",
+    "dest": "go/pkg/mod/cache/download/github.com/dustin/go-humanize/@v",
+    "dest-filename": "v1.0.1.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/dustin/go-humanize/@v/v1.0.1.zip",
+    "sha256": "319404ea84c8a4e2d3d83f30988b006e7dd04976de3e1a1a90484ad94679fa46",
+    "dest": "go/pkg/mod/cache/download/github.com/dustin/go-humanize/@v",
+    "dest-filename": "v1.0.1.zip"
   },
   {
     "type": "file",
@@ -106,10 +337,59 @@
   },
   {
     "type": "file",
-    "url": "https://proxy.golang.org/github.com/pelletier/go-toml/v2/@v/v2.2.4.info",
-    "sha256": "5a5d616e85f301cb0123bd18dbbedafca624c402a91771db1079dd3e4a9a6d14",
-    "dest": "go/pkg/mod/cache/download/github.com/pelletier/go-toml/v2/@v",
-    "dest-filename": "v2.2.4.info"
+    "url": "https://proxy.golang.org/github.com/kylelemons/godebug/@v/v1.1.0.mod",
+    "sha256": "1605871e895331a39f5952559ebbc91228d86b8100354f857b562866eca5bb13",
+    "dest": "go/pkg/mod/cache/download/github.com/kylelemons/godebug/@v",
+    "dest-filename": "v1.1.0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/kylelemons/godebug/@v/v1.1.0.zip",
+    "sha256": "dbbd0ce8c2f4932bb03704d73026b21af12bd68d5b8f4798dbf10a487a2b6d13",
+    "dest": "go/pkg/mod/cache/download/github.com/kylelemons/godebug/@v",
+    "dest-filename": "v1.1.0.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/lucasb-eyer/go-colorful/@v/v1.4.0.mod",
+    "sha256": "84f9c38e9884ab013c837cb16aee139500d3d5c6ccab02439881db2ecf28f660",
+    "dest": "go/pkg/mod/cache/download/github.com/lucasb-eyer/go-colorful/@v",
+    "dest-filename": "v1.4.0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/lucasb-eyer/go-colorful/@v/v1.4.0.zip",
+    "sha256": "f2c9689fc5ca32b6ed1436bcce879b44e7b9d14f670681ab41974213f2acb217",
+    "dest": "go/pkg/mod/cache/download/github.com/lucasb-eyer/go-colorful/@v",
+    "dest-filename": "v1.4.0.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/mattn/go-runewidth/@v/v0.0.24.mod",
+    "sha256": "f18f3c73f59d138fd565f9e019b4187136381589e88507704f4618e42d5af58e",
+    "dest": "go/pkg/mod/cache/download/github.com/mattn/go-runewidth/@v",
+    "dest-filename": "v0.0.24.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/mattn/go-runewidth/@v/v0.0.24.zip",
+    "sha256": "d517d2a2c73f75892a25c895ed40313b4906264e76a64509e3c2215800d34210",
+    "dest": "go/pkg/mod/cache/download/github.com/mattn/go-runewidth/@v",
+    "dest-filename": "v0.0.24.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/muesli/cancelreader/@v/v0.2.2.mod",
+    "sha256": "4343f36dcc06d4ce4e170190062b5d224ff5be831f742531ec27a3d709378fe1",
+    "dest": "go/pkg/mod/cache/download/github.com/muesli/cancelreader/@v",
+    "dest-filename": "v0.2.2.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/muesli/cancelreader/@v/v0.2.2.zip",
+    "sha256": "f0654e7f8f8a49b02ff10a75ccaa0eb08a65aaacbc45f5ba93305276e2ac7f61",
+    "dest": "go/pkg/mod/cache/download/github.com/muesli/cancelreader/@v",
+    "dest-filename": "v0.2.2.zip"
   },
   {
     "type": "file",
@@ -127,10 +407,45 @@
   },
   {
     "type": "file",
-    "url": "https://proxy.golang.org/go4.org/unsafe/assume-no-moving-gc/@v/v0.0.0-20231121144256-b99613f794b6.info",
-    "sha256": "9f78abe1b91314ab2db5f24429c81b5b0f423d9382a3885f4c560246938f67cb",
-    "dest": "go/pkg/mod/cache/download/go4.org/unsafe/assume-no-moving-gc/@v",
-    "dest-filename": "v0.0.0-20231121144256-b99613f794b6.info"
+    "url": "https://proxy.golang.org/github.com/rivo/uniseg/@v/v0.4.7.mod",
+    "sha256": "a1e174890fc9f252450211fadeb53756f9cf5ab7b19697765f9fb255f81ea898",
+    "dest": "go/pkg/mod/cache/download/github.com/rivo/uniseg/@v",
+    "dest-filename": "v0.4.7.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/rivo/uniseg/@v/v0.4.7.zip",
+    "sha256": "b995e4aa0cc1e5779cc61138ac925cb8c1e963e40c80e4b93ee8553812ebb792",
+    "dest": "go/pkg/mod/cache/download/github.com/rivo/uniseg/@v",
+    "dest-filename": "v0.4.7.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/sahilm/fuzzy/@v/v0.1.3.mod",
+    "sha256": "65031811e1fd30cf3402438ba852756d95990a9e7e4a466592b9e92ab6e22f8a",
+    "dest": "go/pkg/mod/cache/download/github.com/sahilm/fuzzy/@v",
+    "dest-filename": "v0.1.3.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/sahilm/fuzzy/@v/v0.1.3.zip",
+    "sha256": "d93c49af536d39cd2f25be6f75e4bd4c3af5b0ca8f9b19121f9b7a6536d05c30",
+    "dest": "go/pkg/mod/cache/download/github.com/sahilm/fuzzy/@v",
+    "dest-filename": "v0.1.3.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/xo/terminfo/@v/v0.0.0-20220910002029-abceb7e1c41e.mod",
+    "sha256": "719d53397f5ee7a2a8a47b06acd9ddae063cbe3d6caf38edeca477c2d1fe2cce",
+    "dest": "go/pkg/mod/cache/download/github.com/xo/terminfo/@v",
+    "dest-filename": "v0.0.0-20220910002029-abceb7e1c41e.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/github.com/xo/terminfo/@v/v0.0.0-20220910002029-abceb7e1c41e.zip",
+    "sha256": "b8f4270191e08e135e932dfe168769046a4268ec7f3892593b1d773b2c5fa4cf",
+    "dest": "go/pkg/mod/cache/download/github.com/xo/terminfo/@v",
+    "dest-filename": "v0.0.0-20220910002029-abceb7e1c41e.zip"
   },
   {
     "type": "file",
@@ -148,36 +463,115 @@
   },
   {
     "type": "file",
-    "url": "https://proxy.golang.org/golang.org/x/sync/@v/v0.0.0-20210220032951-036812b2e83c.info",
-    "sha256": "693dd9ad086551b2c99e3678bed8609005a8ffdfd0485036693c28f37d336f84",
-    "dest": "go/pkg/mod/cache/download/golang.org/x/sync/@v",
-    "dest-filename": "v0.0.0-20210220032951-036812b2e83c.info"
+    "url": "https://proxy.golang.org/golang.org/x/exp/@v/v0.0.0-20231006140011-7918f672742d.mod",
+    "sha256": "0d5f9c8a8ba99a605f5d023665ebdc66e8e38dd7f6b6555bd3f0ba09c6e22ef4",
+    "dest": "go/pkg/mod/cache/download/golang.org/x/exp/@v",
+    "dest-filename": "v0.0.0-20231006140011-7918f672742d.mod"
   },
   {
     "type": "file",
-    "url": "https://proxy.golang.org/golang.org/x/sync/@v/v0.0.0-20210220032951-036812b2e83c.mod",
-    "sha256": "421f6139686d5891f3dc5a563d0995780d3279f65cad4d225cea52686794161c",
-    "dest": "go/pkg/mod/cache/download/golang.org/x/sync/@v",
-    "dest-filename": "v0.0.0-20210220032951-036812b2e83c.mod"
+    "url": "https://proxy.golang.org/golang.org/x/exp/@v/v0.0.0-20231006140011-7918f672742d.zip",
+    "sha256": "23587b91343b10b7ba6292bb4354624086a9c6dce65e3e7d878f28a84621245d",
+    "dest": "go/pkg/mod/cache/download/golang.org/x/exp/@v",
+    "dest-filename": "v0.0.0-20231006140011-7918f672742d.zip"
   },
   {
     "type": "file",
-    "url": "https://proxy.golang.org/golang.org/x/sync/@v/v0.0.0-20210220032951-036812b2e83c.zip",
-    "sha256": "92a8663af035a6831dcc9cc9d895a1f4bb51fc21efe97f04fa0676fc14992a46",
+    "url": "https://proxy.golang.org/golang.org/x/mod/@v/v0.26.0.mod",
+    "sha256": "429c65117eb26ef4ab1d411eb11882d9df35d477cdaefe72939af90761aabe25",
+    "dest": "go/pkg/mod/cache/download/golang.org/x/mod/@v",
+    "dest-filename": "v0.26.0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/golang.org/x/mod/@v/v0.26.0.zip",
+    "sha256": "559ae04b112e304086df0300cf0bee7ce21497c36c088c461d68891b55905605",
+    "dest": "go/pkg/mod/cache/download/golang.org/x/mod/@v",
+    "dest-filename": "v0.26.0.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/golang.org/x/sync/@v/v0.21.0.mod",
+    "sha256": "a3e29e76060bd561060454b1fa2bdcd66674f60c9ca93833b8106355e34c603c",
     "dest": "go/pkg/mod/cache/download/golang.org/x/sync/@v",
-    "dest-filename": "v0.0.0-20210220032951-036812b2e83c.zip"
+    "dest-filename": "v0.21.0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/golang.org/x/sync/@v/v0.21.0.zip",
+    "sha256": "ee65459023de7f24836f6e2123144b5329bd0a4d05a87c3c448509378e2e6be7",
+    "dest": "go/pkg/mod/cache/download/golang.org/x/sync/@v",
+    "dest-filename": "v0.21.0.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/golang.org/x/sys/@v/v0.46.0.mod",
+    "sha256": "57f4393ea18d5446a12363b35c23a616d843fa1669c7121a70a2bc3a9677d665",
+    "dest": "go/pkg/mod/cache/download/golang.org/x/sys/@v",
+    "dest-filename": "v0.46.0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/golang.org/x/sys/@v/v0.46.0.zip",
+    "sha256": "36dc83b6bc5884d260cdbd9d09e597b1eed64d15dfdc374ca6e31aef99d533d7",
+    "dest": "go/pkg/mod/cache/download/golang.org/x/sys/@v",
+    "dest-filename": "v0.46.0.zip"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/golang.org/x/tools/@v/v0.35.0.mod",
+    "sha256": "3104836d5c92f046e64149ddd1c42df237855f8a6520abd9ca5374e554ed99d9",
+    "dest": "go/pkg/mod/cache/download/golang.org/x/tools/@v",
+    "dest-filename": "v0.35.0.mod"
+  },
+  {
+    "type": "file",
+    "url": "https://proxy.golang.org/golang.org/x/tools/@v/v0.35.0.zip",
+    "sha256": "6d2391d8a9a89e54c79cdeaf5e776dfc079838c90c3ac49e97fd91cf20606e9a",
+    "dest": "go/pkg/mod/cache/download/golang.org/x/tools/@v",
+    "dest-filename": "v0.35.0.zip"
   },
   {
     "type": "shell",
     "commands": [
-      "mkdir -p 'go/pkg/mod/cache/download/github.com/!karpeles!lab/weak/@v' && printf '%s\\n' h1:fNnlPo3aypS9tBzoEQluY13XyUfd/eWaSE/vMvo9s4g= > 'go/pkg/mod/cache/download/github.com/!karpeles!lab/weak/@v/v0.1.1.ziphash'",
-      "mkdir -p go/pkg/mod/cache/download/github.com/alyraffauf/goxdgdesktop/@v && printf '%s\\n' h1:n5+3AjF2ntvON6W0nN4O5bHDmcjYuFtKVCwBr6ekqj0= > go/pkg/mod/cache/download/github.com/alyraffauf/goxdgdesktop/@v/v0.1.0.ziphash",
-      "mkdir -p go/pkg/mod/cache/download/github.com/diamondburned/gotk4-adwaita/pkg/@v && printf '%s\\n' h1:WzOC3KtvrC1hJMz3fbJBg0Ye50nt4Tafor+a/bBHNEA= > go/pkg/mod/cache/download/github.com/diamondburned/gotk4-adwaita/pkg/@v/v0.0.0-20250703085337-e94555b846b6.ziphash",
-      "mkdir -p go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v && printf '%s\\n' h1:dN2jYYZ71hFhoKFSn24pQdKWLZb/XDydBt8pEIkFjJo= > go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v/v0.3.2-0.20250703063411-16654385f59a.ziphash",
-      "mkdir -p go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v && printf '%s\\n' h1:Z9n2FFNUXsshfwJMBgNA0RU6/i7WVaAegv3PtuIHPMs= > go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v/v0.0.0-20180428030007-95032a82bc51.ziphash",
-      "mkdir -p go/pkg/mod/cache/download/github.com/pelletier/go-toml/v2/@v && printf '%s\\n' h1:mye9XuhQ6gvn5h28+VilKrrPoQVanw5PMw/TB0t5Ec4= > go/pkg/mod/cache/download/github.com/pelletier/go-toml/v2/@v/v2.2.4.ziphash",
-      "mkdir -p go/pkg/mod/cache/download/go4.org/unsafe/assume-no-moving-gc/@v && printf '%s\\n' h1:lGdhQUN/cnWdSH3291CUuxSEqc+AsGTiDxPP3r2J0l4= > go/pkg/mod/cache/download/go4.org/unsafe/assume-no-moving-gc/@v/v0.0.0-20231121144256-b99613f794b6.ziphash",
-      "mkdir -p go/pkg/mod/cache/download/golang.org/x/sync/@v && printf '%s\\n' h1:5KslGYwFpkhGh+Q16bwMP3cOontH8FOep7tGV86Y7SQ= > go/pkg/mod/cache/download/golang.org/x/sync/@v/v0.0.0-20210220032951-036812b2e83c.ziphash"
+      "mkdir -p go/pkg/mod/cache/download/charm.land/bubbles/v2/@v && printf '%s\\n' h1:7r55WzBxpo/R3z98hGmY7KKPd3ET6vsf0Fb9sDHOV60= > go/pkg/mod/cache/download/charm.land/bubbles/v2/@v/v2.1.1.ziphash && printf '%s' '{\"Version\":\"v2.1.1\"}' > go/pkg/mod/cache/download/charm.land/bubbles/v2/@v/v2.1.1.info",
+      "mkdir -p go/pkg/mod/cache/download/charm.land/bubbletea/v2/@v && printf '%s\\n' h1:SxTJMhCAI3lbPmy4SgX5LWZ24AdINr4I6UEqzZvYJuY= > go/pkg/mod/cache/download/charm.land/bubbletea/v2/@v/v2.0.8.ziphash && printf '%s' '{\"Version\":\"v2.0.8\"}' > go/pkg/mod/cache/download/charm.land/bubbletea/v2/@v/v2.0.8.info",
+      "mkdir -p go/pkg/mod/cache/download/charm.land/lipgloss/v2/@v && printf '%s\\n' h1:kbNxgeeUOYv5J0YdpxFjfvf3dFvqH8Aci4zB6xqFtrY= > go/pkg/mod/cache/download/charm.land/lipgloss/v2/@v/v2.0.5.ziphash && printf '%s' '{\"Version\":\"v2.0.5\"}' > go/pkg/mod/cache/download/charm.land/lipgloss/v2/@v/v2.0.5.info",
+      "mkdir -p 'go/pkg/mod/cache/download/github.com/!karpeles!lab/weak/@v' && printf '%s\\n' h1:fNnlPo3aypS9tBzoEQluY13XyUfd/eWaSE/vMvo9s4g= > 'go/pkg/mod/cache/download/github.com/!karpeles!lab/weak/@v/v0.1.1.ziphash' && printf '%s' '{\"Version\":\"v0.1.1\"}' > 'go/pkg/mod/cache/download/github.com/!karpeles!lab/weak/@v/v0.1.1.info'",
+      "mkdir -p 'go/pkg/mod/cache/download/github.com/!make!now!just/heredoc/@v' && printf '%s\\n' h1:cXCdzVdstXyiTqTvfqk9SDHpKNjxuom+DOlyEeQ4pzQ= > 'go/pkg/mod/cache/download/github.com/!make!now!just/heredoc/@v/v1.0.0.ziphash' && printf '%s' '{\"Version\":\"v1.0.0\"}' > 'go/pkg/mod/cache/download/github.com/!make!now!just/heredoc/@v/v1.0.0.info'",
+      "mkdir -p go/pkg/mod/cache/download/github.com/alyraffauf/goxdgdesktop/@v && printf '%s\\n' h1:n5+3AjF2ntvON6W0nN4O5bHDmcjYuFtKVCwBr6ekqj0= > go/pkg/mod/cache/download/github.com/alyraffauf/goxdgdesktop/@v/v0.1.0.ziphash && printf '%s' '{\"Version\":\"v0.1.0\"}' > go/pkg/mod/cache/download/github.com/alyraffauf/goxdgdesktop/@v/v0.1.0.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/atotto/clipboard/@v && printf '%s\\n' h1:EH0zSVneZPSuFR11BlR9YppQTVDbh5+16AmcJi4g1z4= > go/pkg/mod/cache/download/github.com/atotto/clipboard/@v/v0.1.4.ziphash && printf '%s' '{\"Version\":\"v0.1.4\"}' > go/pkg/mod/cache/download/github.com/atotto/clipboard/@v/v0.1.4.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/aymanbagabas/go-udiff/@v && printf '%s\\n' h1:OEIrQ8maEeDBXQDoGCbbTTXYJMYRCRO1fnodZ12Gv5o= > go/pkg/mod/cache/download/github.com/aymanbagabas/go-udiff/@v/v0.4.1.ziphash && printf '%s' '{\"Version\":\"v0.4.1\"}' > go/pkg/mod/cache/download/github.com/aymanbagabas/go-udiff/@v/v0.4.1.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/bits-and-blooms/bitset/@v && printf '%s\\n' h1:95H15Og1clikBrKr/DuzMXkQzECs1M6hhoGXLwLQOZE= > go/pkg/mod/cache/download/github.com/bits-and-blooms/bitset/@v/v1.24.4.ziphash && printf '%s' '{\"Version\":\"v1.24.4\"}' > go/pkg/mod/cache/download/github.com/bits-and-blooms/bitset/@v/v1.24.4.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/charmbracelet/colorprofile/@v && printf '%s\\n' h1:QPa1IWkYI+AOB+fE+mg/5/4HRMZcaXex9t5KX76i20Q= > go/pkg/mod/cache/download/github.com/charmbracelet/colorprofile/@v/v0.4.3.ziphash && printf '%s' '{\"Version\":\"v0.4.3\"}' > go/pkg/mod/cache/download/github.com/charmbracelet/colorprofile/@v/v0.4.3.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/charmbracelet/harmonica/@v && printf '%s\\n' h1:8NxJWRWg/bzKqqEaaeFNipOu77YR5t8aSwG4pgaUBiQ= > go/pkg/mod/cache/download/github.com/charmbracelet/harmonica/@v/v0.2.0.ziphash && printf '%s' '{\"Version\":\"v0.2.0\"}' > go/pkg/mod/cache/download/github.com/charmbracelet/harmonica/@v/v0.2.0.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/charmbracelet/ultraviolet/@v && printf '%s\\n' h1:3FmWoGNWK4STvqg0O0Aeav2T7rodWJAPeF0QpH+8gFw= > go/pkg/mod/cache/download/github.com/charmbracelet/ultraviolet/@v/v0.0.0-20260703014108-f5a850f9c2b7.ziphash && printf '%s' '{\"Version\":\"v0.0.0-20260703014108-f5a850f9c2b7\"}' > go/pkg/mod/cache/download/github.com/charmbracelet/ultraviolet/@v/v0.0.0-20260703014108-f5a850f9c2b7.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/charmbracelet/x/ansi/@v && printf '%s\\n' h1:kzv1kJvjg2S3r9KHo8hDdHFQLEqn4RBCb39dAYC84jI= > go/pkg/mod/cache/download/github.com/charmbracelet/x/ansi/@v/v0.11.7.ziphash && printf '%s' '{\"Version\":\"v0.11.7\"}' > go/pkg/mod/cache/download/github.com/charmbracelet/x/ansi/@v/v0.11.7.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/charmbracelet/x/exp/golden/@v && printf '%s\\n' h1:pk6gmGpCE7F3FcjaOEKYriCvpmIN4+6OS/RD0vm4uIA= > go/pkg/mod/cache/download/github.com/charmbracelet/x/exp/golden/@v/v0.0.0-20250806222409-83e3a29d542f.ziphash && printf '%s' '{\"Version\":\"v0.0.0-20250806222409-83e3a29d542f\"}' > go/pkg/mod/cache/download/github.com/charmbracelet/x/exp/golden/@v/v0.0.0-20250806222409-83e3a29d542f.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/charmbracelet/x/term/@v && printf '%s\\n' h1:xVRT/S2ZcKdhhOuSP4t5cLi5o+JxklsoEObBSgfgZRk= > go/pkg/mod/cache/download/github.com/charmbracelet/x/term/@v/v0.2.2.ziphash && printf '%s' '{\"Version\":\"v0.2.2\"}' > go/pkg/mod/cache/download/github.com/charmbracelet/x/term/@v/v0.2.2.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/charmbracelet/x/termios/@v && printf '%s\\n' h1:o3Q2bT8eqzGnGPOYheoYS8eEleT5ZVNYNy8JawjaNZY= > go/pkg/mod/cache/download/github.com/charmbracelet/x/termios/@v/v0.1.1.ziphash && printf '%s' '{\"Version\":\"v0.1.1\"}' > go/pkg/mod/cache/download/github.com/charmbracelet/x/termios/@v/v0.1.1.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/charmbracelet/x/windows/@v && printf '%s\\n' h1:IofanmuvaxnKHuV04sC0eBy/smG6kIKrWG2/jYn2GuM= > go/pkg/mod/cache/download/github.com/charmbracelet/x/windows/@v/v0.2.2.ziphash && printf '%s' '{\"Version\":\"v0.2.2\"}' > go/pkg/mod/cache/download/github.com/charmbracelet/x/windows/@v/v0.2.2.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/clipperhouse/displaywidth/@v && printf '%s\\n' h1:lBc6kY44VFw+TDx4I8opi/EtL9m20WSEFgwIwO+UVM8= > go/pkg/mod/cache/download/github.com/clipperhouse/displaywidth/@v/v0.11.0.ziphash && printf '%s' '{\"Version\":\"v0.11.0\"}' > go/pkg/mod/cache/download/github.com/clipperhouse/displaywidth/@v/v0.11.0.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/clipperhouse/stringish/@v && printf '%s\\n' h1:+NSqMOr3GR6k1FdRhhnXrLfztGzuG+VuFDfatpWHKCs= > go/pkg/mod/cache/download/github.com/clipperhouse/stringish/@v/v0.1.1.ziphash && printf '%s' '{\"Version\":\"v0.1.1\"}' > go/pkg/mod/cache/download/github.com/clipperhouse/stringish/@v/v0.1.1.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/clipperhouse/uax29/v2/@v && printf '%s\\n' h1:+gs4oBZ2gPfVrKPthwbMzWZDaAFPGYK72F0NJv2v7Vk= > go/pkg/mod/cache/download/github.com/clipperhouse/uax29/v2/@v/v2.7.0.ziphash && printf '%s' '{\"Version\":\"v2.7.0\"}' > go/pkg/mod/cache/download/github.com/clipperhouse/uax29/v2/@v/v2.7.0.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/diamondburned/gotk4-adwaita/pkg/@v && printf '%s\\n' h1:WzOC3KtvrC1hJMz3fbJBg0Ye50nt4Tafor+a/bBHNEA= > go/pkg/mod/cache/download/github.com/diamondburned/gotk4-adwaita/pkg/@v/v0.0.0-20250703085337-e94555b846b6.ziphash && printf '%s' '{\"Version\":\"v0.0.0-20250703085337-e94555b846b6\"}' > go/pkg/mod/cache/download/github.com/diamondburned/gotk4-adwaita/pkg/@v/v0.0.0-20250703085337-e94555b846b6.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v && printf '%s\\n' h1:dN2jYYZ71hFhoKFSn24pQdKWLZb/XDydBt8pEIkFjJo= > go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v/v0.3.2-0.20250703063411-16654385f59a.ziphash && printf '%s' '{\"Version\":\"v0.3.2-0.20250703063411-16654385f59a\"}' > go/pkg/mod/cache/download/github.com/diamondburned/gotk4/pkg/@v/v0.3.2-0.20250703063411-16654385f59a.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/dustin/go-humanize/@v && printf '%s\\n' h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY= > go/pkg/mod/cache/download/github.com/dustin/go-humanize/@v/v1.0.1.ziphash && printf '%s' '{\"Version\":\"v1.0.1\"}' > go/pkg/mod/cache/download/github.com/dustin/go-humanize/@v/v1.0.1.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v && printf '%s\\n' h1:Z9n2FFNUXsshfwJMBgNA0RU6/i7WVaAegv3PtuIHPMs= > go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v/v0.0.0-20180428030007-95032a82bc51.ziphash && printf '%s' '{\"Version\":\"v0.0.0-20180428030007-95032a82bc51\"}' > go/pkg/mod/cache/download/github.com/kballard/go-shellquote/@v/v0.0.0-20180428030007-95032a82bc51.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/kylelemons/godebug/@v && printf '%s\\n' h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0SNc= > go/pkg/mod/cache/download/github.com/kylelemons/godebug/@v/v1.1.0.ziphash && printf '%s' '{\"Version\":\"v1.1.0\"}' > go/pkg/mod/cache/download/github.com/kylelemons/godebug/@v/v1.1.0.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/lucasb-eyer/go-colorful/@v && printf '%s\\n' h1:UtrWVfLdarDgc44HcS7pYloGHJUjHV/4FwW4TvVgFr4= > go/pkg/mod/cache/download/github.com/lucasb-eyer/go-colorful/@v/v1.4.0.ziphash && printf '%s' '{\"Version\":\"v1.4.0\"}' > go/pkg/mod/cache/download/github.com/lucasb-eyer/go-colorful/@v/v1.4.0.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/mattn/go-runewidth/@v && printf '%s\\n' h1:cpokDiIn0MGnhdHwuWnJBITySJ20QyNGnY2kR/ay2DU= > go/pkg/mod/cache/download/github.com/mattn/go-runewidth/@v/v0.0.24.ziphash && printf '%s' '{\"Version\":\"v0.0.24\"}' > go/pkg/mod/cache/download/github.com/mattn/go-runewidth/@v/v0.0.24.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/muesli/cancelreader/@v && printf '%s\\n' h1:3I4Kt4BQjOR54NavqnDogx/MIoWBFa0StPA8ELUXHmA= > go/pkg/mod/cache/download/github.com/muesli/cancelreader/@v/v0.2.2.ziphash && printf '%s' '{\"Version\":\"v0.2.2\"}' > go/pkg/mod/cache/download/github.com/muesli/cancelreader/@v/v0.2.2.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/pelletier/go-toml/v2/@v && printf '%s\\n' h1:mye9XuhQ6gvn5h28+VilKrrPoQVanw5PMw/TB0t5Ec4= > go/pkg/mod/cache/download/github.com/pelletier/go-toml/v2/@v/v2.2.4.ziphash && printf '%s' '{\"Version\":\"v2.2.4\"}' > go/pkg/mod/cache/download/github.com/pelletier/go-toml/v2/@v/v2.2.4.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/rivo/uniseg/@v && printf '%s\\n' h1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ= > go/pkg/mod/cache/download/github.com/rivo/uniseg/@v/v0.4.7.ziphash && printf '%s' '{\"Version\":\"v0.4.7\"}' > go/pkg/mod/cache/download/github.com/rivo/uniseg/@v/v0.4.7.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/sahilm/fuzzy/@v && printf '%s\\n' h1:juByESSS32nVD81vr6tHmKmA/8zde7gE+x5CLxrzXPU= > go/pkg/mod/cache/download/github.com/sahilm/fuzzy/@v/v0.1.3.ziphash && printf '%s' '{\"Version\":\"v0.1.3\"}' > go/pkg/mod/cache/download/github.com/sahilm/fuzzy/@v/v0.1.3.info",
+      "mkdir -p go/pkg/mod/cache/download/github.com/xo/terminfo/@v && printf '%s\\n' h1:JVG44RsyaB9T2KIHavMF/ppJZNG9ZpyihvCd0w101no= > go/pkg/mod/cache/download/github.com/xo/terminfo/@v/v0.0.0-20220910002029-abceb7e1c41e.ziphash && printf '%s' '{\"Version\":\"v0.0.0-20220910002029-abceb7e1c41e\"}' > go/pkg/mod/cache/download/github.com/xo/terminfo/@v/v0.0.0-20220910002029-abceb7e1c41e.info",
+      "mkdir -p go/pkg/mod/cache/download/go4.org/unsafe/assume-no-moving-gc/@v && printf '%s\\n' h1:lGdhQUN/cnWdSH3291CUuxSEqc+AsGTiDxPP3r2J0l4= > go/pkg/mod/cache/download/go4.org/unsafe/assume-no-moving-gc/@v/v0.0.0-20231121144256-b99613f794b6.ziphash && printf '%s' '{\"Version\":\"v0.0.0-20231121144256-b99613f794b6\"}' > go/pkg/mod/cache/download/go4.org/unsafe/assume-no-moving-gc/@v/v0.0.0-20231121144256-b99613f794b6.info",
+      "mkdir -p go/pkg/mod/cache/download/golang.org/x/exp/@v && printf '%s\\n' h1:jtJma62tbqLibJ5sFQz8bKtEM8rJBtfilJ2qTU199MI= > go/pkg/mod/cache/download/golang.org/x/exp/@v/v0.0.0-20231006140011-7918f672742d.ziphash && printf '%s' '{\"Version\":\"v0.0.0-20231006140011-7918f672742d\"}' > go/pkg/mod/cache/download/golang.org/x/exp/@v/v0.0.0-20231006140011-7918f672742d.info",
+      "mkdir -p go/pkg/mod/cache/download/golang.org/x/mod/@v && printf '%s\\n' h1:EGMPT//Ezu+ylkCijjPc+f4Aih7sZvaAr+O3EHBxvZg= > go/pkg/mod/cache/download/golang.org/x/mod/@v/v0.26.0.ziphash && printf '%s' '{\"Version\":\"v0.26.0\"}' > go/pkg/mod/cache/download/golang.org/x/mod/@v/v0.26.0.info",
+      "mkdir -p go/pkg/mod/cache/download/golang.org/x/sync/@v && printf '%s\\n' h1:HLII4xRRTtCRkxYp4HNFF0Js/Og6q2i++KXbg0gHCwM= > go/pkg/mod/cache/download/golang.org/x/sync/@v/v0.21.0.ziphash && printf '%s' '{\"Version\":\"v0.21.0\"}' > go/pkg/mod/cache/download/golang.org/x/sync/@v/v0.21.0.info",
+      "mkdir -p go/pkg/mod/cache/download/golang.org/x/sys/@v && printf '%s\\n' h1:noSf2Fq6F8DBgS+LysIkx7rIExoNHJsxOAtPp4rthXw= > go/pkg/mod/cache/download/golang.org/x/sys/@v/v0.46.0.ziphash && printf '%s' '{\"Version\":\"v0.46.0\"}' > go/pkg/mod/cache/download/golang.org/x/sys/@v/v0.46.0.info",
+      "mkdir -p go/pkg/mod/cache/download/golang.org/x/tools/@v && printf '%s\\n' h1:mBffYraMEf7aa0sB+NuKnuCy8qI/9Bughn8dC2Gu5r0= > go/pkg/mod/cache/download/golang.org/x/tools/@v/v0.35.0.ziphash && printf '%s' '{\"Version\":\"v0.35.0\"}' > go/pkg/mod/cache/download/golang.org/x/tools/@v/v0.35.0.info"
     ]
   }
 ]

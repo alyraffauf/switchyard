@@ -67,17 +67,24 @@ def source_entry(module: dict[str, str], suffix: str) -> dict[str, str]:
     }
 
 
-def ziphash_command(module: dict[str, str]) -> str:
+def cache_setup_command(module: dict[str, str]) -> str:
+    # proxy.golang.org .info files carry a timestamp and are not byte-stable, so
+    # pinning their sha256 eventually drifts and breaks the build. go does not
+    # checksum .info, so synthesize a minimal one locally instead of downloading
+    # it. .ziphash is written here too since go.sum already vouches for it.
     path = module["Path"]
     version = module["Version"]
     escaped_path = go_escape(path)
     escaped_version = go_escape(version)
     cache_dir = f"go/pkg/mod/cache/download/{escaped_path}/@v"
     ziphash = f"{cache_dir}/{escaped_version}.ziphash"
+    info = f"{cache_dir}/{escaped_version}.info"
+    info_json = json.dumps({"Version": version}, separators=(",", ":"))
 
     return (
         f"mkdir -p {shlex.quote(cache_dir)} && "
-        f"printf '%s\\n' {shlex.quote(module['Sum'])} > {shlex.quote(ziphash)}"
+        f"printf '%s\\n' {shlex.quote(module['Sum'])} > {shlex.quote(ziphash)} && "
+        f"printf '%s' {shlex.quote(info_json)} > {shlex.quote(info)}"
     )
 
 
@@ -88,12 +95,12 @@ def main() -> int:
         if "Error" in module:
             print(module["Error"], file=sys.stderr)
             return 1
-        sources.extend(source_entry(module, suffix) for suffix in ("info", "mod", "zip"))
+        sources.extend(source_entry(module, suffix) for suffix in ("mod", "zip"))
 
     sources.append(
         {
             "type": "shell",
-            "commands": [ziphash_command(module) for module in modules],
+            "commands": [cache_setup_command(module) for module in modules],
         }
     )
 
