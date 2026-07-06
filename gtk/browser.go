@@ -26,6 +26,11 @@ type DesktopAction = appbrowser.Action
 
 // detectBrowsers gets metadata from browserscan and an optional live GIO handle.
 func detectBrowsers() []*Browser {
+	installedBrowsers := make(chan []appbrowser.Browser, 1)
+	go func() {
+		installedBrowsers <- browserscan.Installed()
+	}()
+
 	appInfoByID := make(map[string]*gio.AppInfo)
 	for _, appInfo := range gio.AppInfoGetRecommendedForType("x-scheme-handler/http") {
 		if id := appInfo.ID(); id != "" {
@@ -33,7 +38,7 @@ func detectBrowsers() []*Browser {
 		}
 	}
 
-	installed := browserscan.Installed()
+	installed := <-installedBrowsers
 	browsers := make([]*Browser, 0, len(installed))
 	for i := range installed {
 		browserModel := installed[i]
