@@ -127,12 +127,10 @@ func handleSwitchyardURL(app *adw.Application, browsers []*Browser, cfg *Config,
 				return
 			}
 		}
-		// No preferred browser found - show launcher
-		showLauncherWindow(app, sanitized, browsers, cfg)
-		return
+		// No preferred browser found — fall through to standard routing.
 	}
 
-	// No browser specified - use standard routing
+	// No browser specified or none matched — use standard routing.
 	handleURL(app, browsers, cfg, sanitized)
 }
 
@@ -149,6 +147,9 @@ func handleURL(app *adw.Application, browsers []*Browser, cfg *Config, urlStr st
 			launchBrowser(browser, urlStr)
 			return
 		}
+		// Rule matched but browser not found — show launcher.
+		showLauncherWindow(app, urlStr, browsers, cfg)
+		return
 	}
 
 	// No rule matched: fall back to the favorite browser, else prompt.
