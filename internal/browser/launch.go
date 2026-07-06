@@ -31,7 +31,13 @@ func Launch(cmdline, url, activationToken string, inFlatpak bool) error {
 // buildCommand assembles the OS command that launches cmdline for url, or nil
 // when the resolved command line is empty.
 func buildCommand(cmdline, url, activationToken string, inFlatpak bool) *exec.Cmd {
-	cmdline = desktopexec.SubstituteOrAppendURL(cmdline, url)
+	if url != "" {
+		cmdline = desktopexec.SubstituteOrAppendURL(cmdline, url)
+	} else {
+		// Strip field codes. Shell-quoting an empty URL produces "''",
+		// which most browsers open as file:///.
+		cmdline = stripDesktopFieldCodes(cmdline)
+	}
 	if strings.TrimSpace(cmdline) == "" {
 		return nil
 	}
@@ -48,4 +54,14 @@ func buildCommand(cmdline, url, activationToken string, inFlatpak bool) *exec.Cm
 		cmd.Env = append(os.Environ(), activationTokenEnv+"="+activationToken)
 	}
 	return cmd
+}
+
+// stripDesktopFieldCodes removes desktop field codes without shell-quoting.
+// SubstituteURL would produce "''" for an empty URL, which most browsers
+// interpret as file:///.
+func stripDesktopFieldCodes(cmdline string) string {
+	for _, code := range []string{"%u", "%U", "%f", "%F", "%i", "%c", "%k"} {
+		cmdline = strings.ReplaceAll(cmdline, code, "")
+	}
+	return cmdline
 }
