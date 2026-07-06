@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package browser
+package browserscan
 
 import (
 	"os"
 	"strings"
 
 	"github.com/alyraffauf/goxdgdesktop/desktopfile"
+	"github.com/alyraffauf/switchyard/internal/browser"
 )
 
-// LocalizedString resolves key for the current Desktop Entry locale.
-func LocalizedString(file *desktopfile.File, section, key string) string {
+func localizedString(file *desktopfile.File, section, key string) string {
 	for _, candidate := range localeKeyCandidates(key) {
 		if value, ok := file.Get(section, candidate); ok && value != "" {
 			return value
@@ -19,12 +19,11 @@ func LocalizedString(file *desktopfile.File, section, key string) string {
 	return ""
 }
 
-// LocalizedActions resolves each action name for the current locale.
-func LocalizedActions(file *desktopfile.File) []Action {
+func localizedActions(file *desktopfile.File) []browser.Action {
 	actions := file.Actions()
 	for i := range actions {
 		section := desktopfile.ActionSectionStart + actions[i].ID
-		if name := LocalizedString(file, section, "Name"); name != "" {
+		if name := localizedString(file, section, "Name"); name != "" {
 			actions[i].Name = name
 		}
 	}

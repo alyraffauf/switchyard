@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-package browser
+package browserscan
 
 import (
 	"testing"
@@ -20,13 +20,6 @@ Name=New Window
 Name[fr]=Nouvelle fenêtre
 Exec=browser --new-window %u
 `
-
-func clearLocaleEnv(t *testing.T) {
-	t.Helper()
-	for _, env := range []string{"LANGUAGE", "LC_ALL", "LC_MESSAGES", "LANG"} {
-		t.Setenv(env, "")
-	}
-}
 
 func TestLocalizedStringFallback(t *testing.T) {
 	file := desktopfile.Parse([]byte(localeEntry))
@@ -48,7 +41,7 @@ func TestLocalizedStringFallback(t *testing.T) {
 			if tt.lang != "" {
 				t.Setenv("LANG", tt.lang)
 			}
-			if got := LocalizedString(file, desktopfile.EntrySection, "Name"); got != tt.want {
+			if got := localizedString(file, desktopfile.EntrySection, "Name"); got != tt.want {
 				t.Errorf("got %q, want %q", got, tt.want)
 			}
 		})
@@ -61,7 +54,7 @@ func TestLocalizedStringLanguagePriority(t *testing.T) {
 	t.Setenv("LANGUAGE", "de:fr")
 
 	file := desktopfile.Parse([]byte(localeEntry))
-	if got := LocalizedString(file, desktopfile.EntrySection, "Name"); got != "Navigateur Web" {
+	if got := localizedString(file, desktopfile.EntrySection, "Name"); got != "Navigateur Web" {
 		t.Errorf("got %q, want %q", got, "Navigateur Web")
 	}
 }
@@ -71,7 +64,7 @@ func TestLocalizedActions(t *testing.T) {
 	t.Setenv("LANG", "fr_FR.UTF-8")
 
 	file := desktopfile.Parse([]byte(localeEntry))
-	actions := LocalizedActions(file)
+	actions := localizedActions(file)
 	if len(actions) != 1 {
 		t.Fatalf("got %d actions, want 1", len(actions))
 	}

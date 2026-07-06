@@ -105,10 +105,10 @@ func parseBrowser(id, path string) (browser.Browser, bool) {
 
 	return browser.Browser{
 		ID:      id,
-		Name:    browser.LocalizedString(file, desktopfile.EntrySection, "Name"),
+		Name:    localizedString(file, desktopfile.EntrySection, "Name"),
 		Icon:    icon,
 		Exec:    exec,
-		Actions: browser.LocalizedActions(file),
+		Actions: localizedActions(file),
 	}, true
 }
 

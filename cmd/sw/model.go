@@ -10,6 +10,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"charm.land/lipgloss/v2"
 	"github.com/alyraffauf/switchyard/internal/browser"
+	"github.com/alyraffauf/switchyard/internal/browserscan"
 	"github.com/alyraffauf/switchyard/internal/host"
 )
 
@@ -138,7 +139,7 @@ func handleBrowserKey(msg tea.KeyPressMsg, m model) (model, tea.Cmd, bool) {
 		if !ok {
 			return m, nil, true
 		}
-		actions := browser.ListDesktopActions(selected.id)
+		actions := browserscan.ListDesktopActions(selected.id)
 		if len(actions) == 0 {
 			return m, nil, true
 		}
