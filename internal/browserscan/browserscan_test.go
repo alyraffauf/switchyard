@@ -132,15 +132,6 @@ Name=Plain App
 `,
 		},
 		{
-			name: "nodisplay",
-			contents: `[Desktop Entry]
-Type=Application
-Name=Hidden Browser
-NoDisplay=true
-MimeType=x-scheme-handler/http;
-`,
-		},
-		{
 			name: "hidden",
 			contents: `[Desktop Entry]
 Type=Application
@@ -216,13 +207,77 @@ MimeType=x-scheme-handler/http;
 	}
 }
 
+// TestInstalledIncludesNoDisplay guards against regressing the fix for #10:
+// users deliberately set NoDisplay=true on custom per-profile browser entries
+// to hide them from launchers while still wanting Switchyard to detect them.
+func TestInstalledIncludesNoDisplay(t *testing.T) {
+	home, _ := isolatedDirs(t)
+	writeDesktop(t, home, "browser.desktop", `[Desktop Entry]
+Type=Application
+Name=NoDisplay Browser
+NoDisplay=true
+MimeType=x-scheme-handler/http;
+`)
+
+	got := Installed()
+	if len(got) != 1 {
+		t.Fatalf("got %d browsers, want 1: %v", len(got), ids(got))
+	}
+	if got[0].Name != "NoDisplay Browser" {
+		t.Errorf("got %q, want %q", got[0].Name, "NoDisplay Browser")
+	}
+}
+
+// TestInstalledIncludeNoDisplayFalse covers the opt-in launcher-style behavior
+// for other consumers of the parser: NoDisplay=true entries are excluded while
+// ordinary browsers still come through.
+func TestInstalledIncludeNoDisplayFalse(t *testing.T) {
+	home, _ := isolatedDirs(t)
+	writeDesktop(t, home, "hidden.desktop", `[Desktop Entry]
+Type=Application
+Name=NoDisplay Browser
+NoDisplay=true
+MimeType=x-scheme-handler/http;
+`)
+	writeDesktop(t, home, "visible.desktop", `[Desktop Entry]
+Type=Application
+Name=Visible Browser
+MimeType=x-scheme-handler/http;
+`)
+
+	got := ids(Installed(IncludeNoDisplay(false)))
+	want := []string{"visible.desktop"}
+	if len(got) != len(want) || got[0] != want[0] {
+		t.Errorf("got %v, want %v", got, want)
+	}
+}
+
+// TestFindIncludeNoDisplayFalse rejects a NoDisplay entry only when the caller
+// opts out; the default still matches it.
+func TestFindIncludeNoDisplayFalse(t *testing.T) {
+	home, _ := isolatedDirs(t)
+	writeDesktop(t, home, "hidden.desktop", `[Desktop Entry]
+Type=Application
+Name=NoDisplay Browser
+NoDisplay=true
+MimeType=x-scheme-handler/http;
+`)
+
+	if _, ok := Find("hidden.desktop"); !ok {
+		t.Error("default Find should match a NoDisplay browser")
+	}
+	if got, ok := Find("hidden.desktop", IncludeNoDisplay(false)); ok {
+		t.Errorf("Find with IncludeNoDisplay(false) returned %+v, want false", got)
+	}
+}
+
 func TestInstalledShadowingHiddenHomeSuppressesSystem(t *testing.T) {
 	home, system := isolatedDirs(t)
 	// A hidden copy in data-home shadows a valid copy in the system dir.
 	writeDesktop(t, home, "browser.desktop", `[Desktop Entry]
 Type=Application
 Name=Home Browser
-NoDisplay=true
+Hidden=true
 MimeType=x-scheme-handler/http;
 `)
 	writeDesktop(t, system, "browser.desktop", browserEntry)
@@ -339,7 +394,7 @@ func TestFindShadowingRejectedHomeSuppressesSystem(t *testing.T) {
 	writeDesktop(t, home, "browser.desktop", `[Desktop Entry]
 Type=Application
 Name=Hidden Home Browser
-NoDisplay=true
+Hidden=true
 MimeType=x-scheme-handler/http;
 `)
 	writeDesktop(t, system, "browser.desktop", browserEntry)

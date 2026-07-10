@@ -70,15 +70,18 @@ const lsHandlerRankNone = "None"
 
 // Installed returns the installed HTTP(S) browsers, sorted by Name. Switchyard's
 // own entries are excluded; filtering config-hidden browsers is the caller's job.
-func Installed() []browser.Browser {
+// Options are accepted for cross-platform API parity; IncludeNoDisplay is a no-op
+// on macOS, where browsers come from LaunchServices rather than .desktop files.
+func Installed(opts ...Option) []browser.Browser {
 	browsers := scanBrowsers()
 	sortByName(browsers)
 
 	return browsers
 }
 
-// Find returns a displayable HTTP(S) browser by bundle identifier.
-func Find(id string) (browser.Browser, bool) {
+// Find returns a displayable HTTP(S) browser by bundle identifier. Options are
+// accepted for cross-platform API parity but have no effect on macOS.
+func Find(id string, opts ...Option) (browser.Browser, bool) {
 	if isSelf(id) {
 		return browser.Browser{}, false
 	}

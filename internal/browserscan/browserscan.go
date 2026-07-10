@@ -28,7 +28,11 @@ var applicationsDirs = xdg.ApplicationsDirs
 
 // Installed returns the installed HTTP(S) browsers, sorted by Name. Switchyard's
 // own entries are excluded; filtering config-hidden browsers is the caller's job.
-func Installed() []browser.Browser {
+// By default NoDisplay=true browsers are included; pass IncludeNoDisplay(false) to
+// hide them.
+func Installed(opts ...Option) []browser.Browser {
+	options := newScanOptions(opts)
+
 	var browsers []browser.Browser
 	seen := map[string]bool{}
 
@@ -57,7 +61,7 @@ func Installed() []browser.Browser {
 				return nil
 			}
 
-			if parsed, ok := parseBrowser(id, path); ok {
+			if parsed, ok := parseBrowser(id, path, options); ok {
 				browsers = append(browsers, parsed)
 			}
 			return nil
@@ -69,18 +73,21 @@ func Installed() []browser.Browser {
 	return browsers
 }
 
-// Find returns a displayable HTTP(S) browser by desktop file ID.
-func Find(id string) (browser.Browser, bool) {
+// Find returns a displayable HTTP(S) browser by desktop file ID. By default a
+// NoDisplay=true entry still matches; pass IncludeNoDisplay(false) to reject it.
+func Find(id string, opts ...Option) (browser.Browser, bool) {
 	if isSelf(id) {
 		return browser.Browser{}, false
 	}
+
+	options := newScanOptions(opts)
 
 	for _, dir := range applicationsDirs() {
 		path, ok := desktopFilePath(dir, id)
 		if !ok {
 			continue
 		}
-		return parseBrowser(id, path)
+		return parseBrowser(id, path, options)
 	}
 
 	return browser.Browser{}, false
@@ -131,9 +138,9 @@ func desktopID(dir, path string) string {
 	return strings.ReplaceAll(filepath.ToSlash(rel), "/", "-")
 }
 
-// parseBrowser returns the Browser at path, or ok=false if it isn't a
-// displayable HTTP(S) browser.
-func parseBrowser(id, path string) (browser.Browser, bool) {
+// parseBrowser returns the Browser at path, or ok=false if it isn't an HTTP(S)
+// browser the given options accept.
+func parseBrowser(id, path string, options scanOptions) (browser.Browser, bool) {
 	file, err := desktopfile.Read(path)
 	if err != nil {
 		return browser.Browser{}, false
@@ -142,7 +149,10 @@ func parseBrowser(id, path string) (browser.Browser, bool) {
 	if typ, _ := file.Get(desktopfile.EntrySection, "Type"); typ != "Application" {
 		return browser.Browser{}, false
 	}
-	if isTrue(file, "Hidden") || isTrue(file, "NoDisplay") {
+	if isTrue(file, "Hidden") {
+		return browser.Browser{}, false
+	}
+	if !options.includeNoDisplay && isTrue(file, "NoDisplay") {
 		return browser.Browser{}, false
 	}
 	if !handlesHTTP(file) {
