@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Switchyard",
   "description": "Open the current page in Switchyard for browser selection",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "homepage_url": "https://github.com/alyraffauf/Switchyard",
   "permissions": ["activeTab", "contextMenus", "nativeMessaging"],
   "background": {
