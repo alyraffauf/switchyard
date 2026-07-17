@@ -6,7 +6,7 @@ order: 10
 
 Switchyard is a powerful, rules-based browser launcher. Once it is set as your default browser, clicked links pass through Switchyard first. It can then open the link in a specific browser, ask you which browser to use, or rewrite the URL before opening it.
 
-Use it when different parts of your life live in different browsers: work links in Chrome, personal links in Firefox, video links in Brave, or to add  privacy-friendly redirects before anything opens.
+Use it when different parts of your life live in different browsers: work links in Chrome, personal links in Firefox, video links in Brave, or to add privacy-friendly redirects before anything opens.
 
 The basic flow is:
 
@@ -24,3 +24,17 @@ xdg-settings set default-web-browser io.github.alyraffauf.Switchyard.desktop
 ```
 
 Or use your desktop environment's graphical settings to set Switchyard as the default browser.
+
+## Start in the Background
+
+To preload Switchyard without opening its settings window, add one of these commands to your desktop environment's startup applications:
+
+```bash
+# Flatpak installation
+flatpak run io.github.alyraffauf.Switchyard --background
+
+# Native installation
+switchyard --background
+```
+
+The background option keeps Switchyard running for that session even when **Keep running in background** is disabled. If Switchyard is already running, the command exits without opening another window.
