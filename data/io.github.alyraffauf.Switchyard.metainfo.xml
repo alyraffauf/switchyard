@@ -47,6 +47,17 @@
     >io.github.alyraffauf.Switchyard.desktop</launchable>
 
     <releases>
+    <release version="0.17.2" date="2026-07-20">
+    <url
+                type="details"
+            >https://github.com/alyraffauf/switchyard/releases/tag/v0.17.2</url>
+    <description translate="no">
+        <p>This release comes with the following improvements:</p>
+        <ul>
+        <li>Fix crash when saving configuration.</li>
+        </ul>
+    </description>
+    </release>
     <release version="0.17.1" date="2026-07-10">
     <url
                 type="details"
