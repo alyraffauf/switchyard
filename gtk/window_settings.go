@@ -190,6 +190,12 @@ func createSidebar(win *adw.Window, cfg *Config, browsers []*Browser, splitView 
 	return toolbarView
 }
 
+// configMonitor retains a reference to the active GFileMonitor so its Go wrapper
+// isn't gc'd.
+// gotk4 unregisters a signal's closures when the owning Go object is finalized;
+// without this, emitting the "changed" signal after GC panics
+var configMonitor *gio.FileMonitor
+
 func watchConfigFile(cfg *Config, onChange func()) {
 	configFile := gio.NewFileForPath(appconfig.Path())
 	monitorIface, err := configFile.Monitor(context.Background(), gio.FileMonitorNone)
@@ -213,6 +219,11 @@ func watchConfigFile(cfg *Config, onChange func()) {
 					}
 				}
 			})
+
+			if configMonitor != nil {
+				configMonitor.Cancel()
+			}
+			configMonitor = monitor
 		}
 	}
 }
