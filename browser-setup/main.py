@@ -31,8 +31,15 @@ NATIVE_CHROMIUM = [
 
 
 FLATPAK_FIREFOX: dict[str, str] = {
+    "app.zen_browser.zen": ".mozilla",
     "org.mozilla.firefox": ".mozilla",
     "io.gitlab.librewolf-community": ".librewolf",
+}
+
+# Zen's Flatpak persists .zen but Gecko searches .mozilla for per-user
+# native-messaging manifests. Persist that directory explicitly for Zen.
+FLATPAK_FIREFOX_EXTRA_PERSIST = {
+    "app.zen_browser.zen": ".mozilla",
 }
 
 NATIVE_FIREFOX = [".mozilla", ".librewolf"]
@@ -167,15 +174,15 @@ def install(yes: bool = False):
 
         assert flatpak
         for app_id in to_override:
-            granted = run(
-                [
-                    flatpak,
-                    "override",
-                    "--user",
-                    "--talk-name=org.freedesktop.Flatpak",
-                    app_id,
-                ]
-            )
+            override = [
+                flatpak,
+                "override",
+                "--user",
+                "--talk-name=org.freedesktop.Flatpak",
+            ]
+            if persist := FLATPAK_FIREFOX_EXTRA_PERSIST.get(app_id):
+                override.append(f"--persist={persist}")
+            granted = run([*override, app_id])
             if granted:
                 print(f"  Granted: {app_id}")
             else:
