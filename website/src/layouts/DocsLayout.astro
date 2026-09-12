@@ -15,6 +15,20 @@ interface Props {
 const { doc, docs } = Astro.props;
 const hrefFor = (entry: DocsEntry) => `/docs/${entry.id}/`;
 const pageTitle = `${doc.data.title} - Switchyard Docs`;
+const nextDocIds: Record<string, string[]> = {
+  using: ["configuration", "webextension"],
+  configuration: ["using", "uri-scheme"],
+  "home-manager": ["configuration", "nixos-flatpak"],
+  "nixos-flatpak": ["home-manager", "configuration"],
+  "uri-scheme": ["configuration", "webextension"],
+  webextension: ["uri-scheme", "using"],
+  tui: ["using", "configuration"],
+  "prior-art": ["using", "configuration"],
+};
+const nextDocs = (nextDocIds[doc.id] ?? []).flatMap((id) => {
+  const nextDoc = docs.find((entry) => entry.id === id);
+  return nextDoc ? [nextDoc] : [];
+});
 ---
 
 <!doctype html>
@@ -98,6 +112,31 @@ const pageTitle = `${doc.data.title} - Switchyard Docs`;
       <article class="docs-content min-w-0">
         <h1>{doc.data.title}</h1>
         <slot />
+        {
+          nextDocs.length > 0 && (
+            <nav
+              class="mt-12 rounded-xl border border-border bg-bg-alt p-5 md:p-6"
+              aria-labelledby="next-steps-heading"
+            >
+              <h2 id="next-steps-heading" class="!mt-0">
+                Next steps
+              </h2>
+              <div class="grid gap-3 sm:grid-cols-2">
+                {nextDocs.map((nextDoc) => (
+                  <a
+                    href={hrefFor(nextDoc)}
+                    class="group flex items-center justify-between rounded-lg border border-border bg-bg px-4 py-3 font-semibold no-underline transition-colors hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                  >
+                    {nextDoc.data.title}
+                    <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">
+                      →
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </nav>
+          )
+        }
       </article>
     </main>
     <SiteFooter variant="docs" />

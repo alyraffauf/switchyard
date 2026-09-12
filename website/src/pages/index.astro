@@ -41,6 +41,7 @@ const features = [
     title: "Automatic Routing",
     description:
       "Create rules by domain or regex. Links open in the right browser automatically.",
+    href: "/docs/configuration/",
   },
   {
     icon: "lucide:sliders-horizontal",
@@ -59,6 +60,7 @@ const features = [
     title: "Custom URLs",
     description:
       "Encode rules directly with switchyard:// links. Perfect for notes and to-dos.",
+    href: "/docs/uri-scheme/",
   },
   {
     icon: "lucide:star",
@@ -298,19 +300,30 @@ const installBg = "bg-bg";
           class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-10 max-w-[400px] md:max-w-none mx-auto"
         >
           {
-            features.map((feature) => (
-              <div class="text-center p-4 md:p-8">
-                <div class="w-11 h-11 md:w-12 md:h-12 mx-auto mb-4 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center text-white">
-                  <Icon name={feature.icon} class="w-5 h-5 md:w-6 md:h-6" />
-                </div>
-                <h3 class="text-base md:text-lg font-bold mb-2">
-                  {feature.title}
-                </h3>
-                <p class="text-text-muted text-sm leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            ))
+            features.map((feature) => {
+              const FeatureCard = feature.href ? "a" : "div";
+
+              return (
+                <FeatureCard
+                  href={feature.href}
+                  class:list={[
+                    "block text-center p-4 md:p-8 rounded-xl transition-colors",
+                    feature.href &&
+                      "group hover:bg-bg-alt focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2",
+                  ]}
+                >
+                  <div class="w-11 h-11 md:w-12 md:h-12 mx-auto mb-4 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center text-white">
+                    <Icon name={feature.icon} class="w-5 h-5 md:w-6 md:h-6" />
+                  </div>
+                  <h3 class="text-base md:text-lg font-bold mb-2 group-hover:text-primary transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p class="text-text-muted text-sm leading-relaxed">
+                    {feature.description}
+                  </p>
+                </FeatureCard>
+              );
+            })
           }
         </div>
       </div>
@@ -396,7 +409,14 @@ const installBg = "bg-bg";
               <div class="w-8 h-8 md:w-9 md:h-9 shrink-0 text-primary">
                 <Icon name="lucide:app-window" class="w-full h-full" />
               </div>
-              <h3 class="text-base md:text-lg font-bold">Browser Extension</h3>
+              <h3 class="text-base md:text-lg font-bold">
+                <a
+                  href="/docs/webextension/"
+                  class="transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                >
+                  Browser Extension
+                </a>
+              </h3>
             </div>
             <p class="text-text-muted text-sm mb-4">
               Open in Switchyard with one click.
