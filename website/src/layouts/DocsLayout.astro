@@ -36,7 +36,12 @@ const structuredData = {
     {
       "@type": "BreadcrumbList",
       itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Switchyard", item: SITE_URL },
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Switchyard",
+          item: SITE_URL,
+        },
         {
           "@type": "ListItem",
           position: 2,
@@ -93,12 +98,8 @@ const nextDocs = (nextDocIds[doc.id] ?? []).flatMap((id) => {
       ]}
     />
 
-    <main
-      class="w-full max-w-[1200px] mx-auto px-4 md:px-8 py-8 md:py-12 grid grid-cols-1 md:grid-cols-[260px_minmax(0,1fr)] gap-8 md:gap-12 flex-1"
-    >
-      <aside
-        class="md:sticky md:top-16 md:self-start border-b md:border-b-0 md:border-r border-border pb-6 md:pb-0 md:pr-6"
-      >
+    <main class="w-full max-w-[1200px] mx-auto px-4 md:px-8 py-8 md:py-12 grid grid-cols-1 md:grid-cols-[260px_minmax(0,1fr)] gap-8 md:gap-12 flex-1">
+      <aside class="md:sticky md:top-16 md:self-start border-b md:border-b-0 md:border-r border-border pb-6 md:pb-0 md:pr-6">
         <a
           href="/docs/"
           class="flex items-center gap-2.5 text-text hover:text-primary transition-colors"
@@ -111,71 +112,70 @@ const nextDocs = (nextDocIds[doc.id] ?? []).flatMap((id) => {
           browser extension.
         </p>
 
-        <label for="docs-page" class="sr-only">Docs page</label>
+        <label for="docs-page" class="sr-only">
+          Docs page
+        </label>
         <select
           id="docs-page"
           class="block md:hidden w-full min-w-0 rounded-lg border border-border bg-bg px-3 py-2.5 text-sm font-medium text-text shadow-sm focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
         >
-          {
-            docs.map((entry) => (
-              <option value={hrefFor(entry)} selected={entry.id === doc.id}>
-                {entry.data.title}
-              </option>
-            ))
-          }
+          {docs.map((entry) => (
+            <option value={hrefFor(entry)} selected={entry.id === doc.id}>
+              {entry.data.title}
+            </option>
+          ))}
         </select>
 
         <nav
           class="hidden md:flex md:flex-col gap-1 border-t border-border pt-4"
           aria-label="Docs"
         >
-          {
-            docs.map((entry) => (
-              <a
-                href={hrefFor(entry)}
-                aria-current={entry.id === doc.id ? "page" : undefined}
-                class:list={[
-                  "shrink-0 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-bg-alt hover:text-text",
-                  entry.id === doc.id
-                    ? "bg-bg-alt text-primary font-semibold"
-                    : "text-text-muted",
-                ]}
-              >
-                {entry.data.title}
-              </a>
-            ))
-          }
+          {docs.map((entry) => (
+            <a
+              href={hrefFor(entry)}
+              aria-current={entry.id === doc.id ? "page" : undefined}
+              class:list={[
+                "shrink-0 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-bg-alt hover:text-text",
+                entry.id === doc.id
+                  ? "bg-bg-alt text-primary font-semibold"
+                  : "text-text-muted",
+              ]}
+            >
+              {entry.data.title}
+            </a>
+          ))}
         </nav>
       </aside>
 
       <article class="docs-content min-w-0">
         <h1>{doc.data.title}</h1>
         <slot />
-        {
-          nextDocs.length > 0 && (
-            <nav
-              class="mt-12 rounded-xl border border-border bg-bg-alt p-5 md:p-6"
-              aria-labelledby="next-steps-heading"
-            >
-              <h2 id="next-steps-heading" class="!mt-0">
-                Next steps
-              </h2>
-              <div class="grid gap-3 sm:grid-cols-2">
-                {nextDocs.map((nextDoc) => (
-                  <a
-                    href={hrefFor(nextDoc)}
-                    class="group flex items-center justify-between rounded-lg border border-border bg-bg px-4 py-3 font-semibold no-underline transition-colors hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+        {nextDocs.length > 0 && (
+          <nav
+            class="mt-12 rounded-xl border border-border bg-bg-alt p-5 md:p-6"
+            aria-labelledby="next-steps-heading"
+          >
+            <h2 id="next-steps-heading" class="!mt-0">
+              Next steps
+            </h2>
+            <div class="grid gap-3 sm:grid-cols-2">
+              {nextDocs.map((nextDoc) => (
+                <a
+                  href={hrefFor(nextDoc)}
+                  class="group flex items-center justify-between rounded-lg border border-border bg-bg px-4 py-3 font-semibold no-underline transition-colors hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                >
+                  {nextDoc.data.title}
+                  <span
+                    aria-hidden="true"
+                    class="transition-transform group-hover:translate-x-0.5"
                   >
-                    {nextDoc.data.title}
-                    <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">
-                      →
-                    </span>
-                  </a>
-                ))}
-              </div>
-            </nav>
-          )
-        }
+                    →
+                  </span>
+                </a>
+              ))}
+            </div>
+          </nav>
+        )}
       </article>
     </main>
     <SiteFooter variant="docs" />
