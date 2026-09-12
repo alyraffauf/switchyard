@@ -4,12 +4,25 @@ import { getCollection } from "astro:content";
 import SiteFooter from "../../components/SiteFooter.astro";
 import SiteHeader from "../../components/SiteHeader.astro";
 import Logo from "../../components/Logo.astro";
-import { DEV_URL } from "../../site";
+import SeoHead from "../../components/SeoHead.astro";
+import { DEV_URL, SITE_URL } from "../../site";
 
 const docs = (await getCollection("docs")).sort(
   (a, b) =>
     a.data.order - b.data.order || a.data.title.localeCompare(b.data.title),
 );
+const pageTitle = "Switchyard Docs";
+const pageDescription =
+  "Guides for browser rules, URL redirections, custom URI links, the browser extension, and more.";
+const canonicalUrl = `${SITE_URL}/docs/`;
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: pageTitle,
+  description: pageDescription,
+  url: canonicalUrl,
+  isPartOf: { "@type": "WebSite", name: "Switchyard", url: SITE_URL },
+};
 ---
 
 <!doctype html>
@@ -17,10 +30,11 @@ const docs = (await getCollection("docs")).sort(
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Switchyard Docs</title>
-    <meta
-      name="description"
-      content="Guides for browser rules, URL redirections, custom URI links, the browser extension, and more."
+    <SeoHead
+      title={pageTitle}
+      description={pageDescription}
+      canonicalUrl={canonicalUrl}
+      structuredData={structuredData}
     />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <meta name="theme-color" content="#4f895d" />

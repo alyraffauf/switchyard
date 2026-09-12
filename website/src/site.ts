@@ -1,3 +1,4 @@
+export const SITE_URL = "https://switchyard.aly.codes";
 export const REPO_URL = "https://github.com/alyraffauf/switchyard";
 export const DONATE_URL = "https://ko-fi.com/alyraffauf";
 export const FLATHUB_URL =

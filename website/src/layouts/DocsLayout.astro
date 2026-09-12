@@ -3,7 +3,8 @@ import type { CollectionEntry } from "astro:content";
 import SiteFooter from "../components/SiteFooter.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import Logo from "../components/Logo.astro";
-import { DEV_URL } from "../site";
+import SeoHead from "../components/SeoHead.astro";
+import { DEV_URL, SITE_URL } from "../site";
 
 type DocsEntry = CollectionEntry<"docs">;
 
@@ -15,6 +16,43 @@ interface Props {
 const { doc, docs } = Astro.props;
 const hrefFor = (entry: DocsEntry) => `/docs/${entry.id}/`;
 const pageTitle = `${doc.data.title} - Switchyard Docs`;
+const pageDescription = doc.data.description ?? "Switchyard documentation.";
+const canonicalUrl = `${SITE_URL}${hrefFor(doc)}`;
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      headline: doc.data.title,
+      description: pageDescription,
+      url: canonicalUrl,
+      mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
+      isPartOf: {
+        "@type": "WebSite",
+        name: "Switchyard Docs",
+        url: `${SITE_URL}/docs/`,
+      },
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Switchyard", item: SITE_URL },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Docs",
+          item: `${SITE_URL}/docs/`,
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: doc.data.title,
+          item: canonicalUrl,
+        },
+      ],
+    },
+  ],
+};
 const nextDocIds: Record<string, string[]> = {
   using: ["configuration", "webextension"],
   configuration: ["using", "uri-scheme"],
@@ -36,12 +74,13 @@ const nextDocs = (nextDocIds[doc.id] ?? []).flatMap((id) => {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{pageTitle}</title>
-    {
-      doc.data.description && (
-        <meta name="description" content={doc.data.description} />
-      )
-    }
+    <SeoHead
+      title={pageTitle}
+      description={pageDescription}
+      canonicalUrl={canonicalUrl}
+      type="article"
+      structuredData={structuredData}
+    />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <meta name="theme-color" content="#4f895d" />
   </head>
