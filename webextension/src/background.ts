@@ -23,6 +23,15 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
+chrome.commands.onCommand.addListener((command) => {
+  if (command !== "open-in-switchyard") return;
+
+  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+    if (tab?.id == null || !tab.url || !ROUTABLE.test(tab.url)) return;
+    openInSwitchyard(tab.url, tab.id);
+  });
+});
+
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   const tabId = tab?.id;
   if (tabId == null) return;

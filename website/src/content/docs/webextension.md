@@ -17,6 +17,12 @@ The browser extension stays simple by making use of our [URI Scheme](/docs/uri-s
 
 With [desktop integration](#desktop-integration) enabled, the extension can also ask Switchyard for your installed browsers and display them directly in the popup for one-click launching.
 
+## Keyboard Shortcut
+
+The Firefox extension supports `Ctrl+Shift+U` (`Command+Shift+U` on macOS) to open the current page in Switchyard. Firefox users can change this shortcut from **about:addons → Extensions → the gear menu → Manage Extension Shortcuts**.
+
+The shortcut only acts on regular HTTP(S) pages. Firefox does not allow extensions to redirect protected pages such as built-in browser pages or the Add-ons Manager.
+
 ## Desktop Integration
 
 The Switchyard extension can also show your installed browsers directly in the popup, letting you send the current tab to a specific browser in one click. This requires installing a native messaging host on your system.

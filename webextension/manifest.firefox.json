@@ -20,6 +20,15 @@
       "48": "icons/switchyard-48.png"
     }
   },
+  "commands": {
+    "open-in-switchyard": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+U",
+        "mac": "Command+Shift+U"
+      },
+      "description": "Open the current page in Switchyard"
+    }
+  },
   "browser_specific_settings": {
     "gecko": { "id": "switchyard@alyraffauf.github.io" }
   }
