@@ -23,6 +23,9 @@ func assertDefaultConfig(t *testing.T, config *Config) {
 	if !config.StayAlive {
 		t.Fatal("StayAlive default should be true")
 	}
+	if config.AutoCloseAfterCopy {
+		t.Fatal("AutoCloseAfterCopy default should be false")
+	}
 	if config.RemoveTrackingParameters {
 		t.Fatal("RemoveTrackingParameters default should be false")
 	}
@@ -81,6 +84,19 @@ func TestLoadReturnsReadError(t *testing.T) {
 	}
 
 	assertDefaultConfig(t, config)
+}
+
+func TestLoadReadsAutoCloseAfterCopy(t *testing.T) {
+	configPath := writeTestConfig(t, "auto_close_after_copy = true\n")
+	config, err := Load(configPath)
+
+	if err != nil {
+		t.Fatalf("Load() error = %v", err)
+	}
+
+	if !config.AutoCloseAfterCopy {
+		t.Fatal("Load() did not honor auto_close_after_copy")
+	}
 }
 
 func TestLoadKeepsDefaultsForOmittedFields(t *testing.T) {

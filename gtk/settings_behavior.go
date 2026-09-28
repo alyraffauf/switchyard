@@ -61,6 +61,12 @@ func createBehaviorPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.W
 	stayAliveRow.SetActive(cfg.StayAlive)
 	behaviorGroup.Add(stayAliveRow)
 
+	autoCloseAfterCopyRow := adw.NewSwitchRow()
+	autoCloseAfterCopyRow.SetTitle("Auto-close after copying link")
+	autoCloseAfterCopyRow.SetSubtitle("Close the launcher after copying the URL with Ctrl+C")
+	autoCloseAfterCopyRow.SetActive(cfg.AutoCloseAfterCopy)
+	behaviorGroup.Add(autoCloseAfterCopyRow)
+
 	content.Append(behaviorGroup)
 
 	checkDefaultRow.Connect("notify::active", func() {
@@ -85,6 +91,11 @@ func createBehaviorPage(win *adw.Window, browsers []*Browser, cfg *Config) gtk.W
 
 	stayAliveRow.Connect("notify::active", func() {
 		cfg.StayAlive = stayAliveRow.Active()
+		saveConfigWithFlag(cfg)
+	})
+
+	autoCloseAfterCopyRow.Connect("notify::active", func() {
+		cfg.AutoCloseAfterCopy = autoCloseAfterCopyRow.Active()
 		saveConfigWithFlag(cfg)
 	})
 

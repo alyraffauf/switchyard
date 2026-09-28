@@ -233,6 +233,7 @@ func createLauncherBottomBar(urlEntry *gtk.Entry, onClose func()) *gtk.Box {
 func createURLEntry(url string) *gtk.Entry {
 	urlEntry := gtk.NewEntry()
 	urlEntry.SetText(url)
+	urlEntry.SelectRegion(0, len([]rune(url)))
 	urlEntry.SetEditable(true)
 	urlEntry.SetCanFocus(true)
 	urlEntry.SetAlignment(0.5)

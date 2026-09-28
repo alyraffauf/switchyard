@@ -18,6 +18,7 @@ type Config struct {
 	ShowAppNames             bool                  `toml:"show_app_names"`
 	ForceDarkMode            bool                  `toml:"force_dark_mode"`
 	StayAlive                bool                  `toml:"stay_alive"`
+	AutoCloseAfterCopy       bool                  `toml:"auto_close_after_copy"`
 	RemoveTrackingParameters bool                  `toml:"remove_tracking_parameters"`
 	Redirections             []routing.Redirection `toml:"redirections,omitempty"`
 	Rules                    []routing.Rule        `toml:"rules"`
@@ -42,6 +43,7 @@ func NewDefault() *Config {
 		ShowAppNames:             false,
 		ForceDarkMode:            true,
 		StayAlive:                true,
+		AutoCloseAfterCopy:       false,
 		RemoveTrackingParameters: false,
 		Rules:                    []routing.Rule{},
 	}

@@ -82,7 +82,29 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 	win.SetContent(mainBox)
 
 	keyController := gtk.NewEventControllerKey()
+	keyController.SetPropagationPhase(gtk.PhaseCapture)
 	keyController.ConnectKeyPressed(func(keyval, keycode uint, state gdk.ModifierType) bool {
+		if keyval == gdk.KEY_c && state&gdk.ControlMask != 0 {
+			start, end, ok := urlEntry.SelectionBounds()
+			if !ok || start == end {
+				// Preserve the normal Ctrl+C behavior when no URL text is selected.
+				return false
+			}
+
+			urlRunes := []rune(urlEntry.Text())
+			if start < 0 || end > len(urlRunes) || start >= end {
+				return false
+			}
+
+			if display := gdk.DisplayGetDefault(); display != nil {
+				display.Clipboard().SetText(string(urlRunes[start:end]))
+			}
+			if cfg.AutoCloseAfterCopy {
+				win.Close()
+			}
+			return true
+		}
+
 		// Ctrl+[1-9] selects a browser by position.
 		if keyval >= gdk.KEY_1 && keyval <= gdk.KEY_9 && state&gdk.ControlMask != 0 {
 			idx := int(keyval - gdk.KEY_1)
