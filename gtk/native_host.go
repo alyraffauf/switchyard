@@ -9,9 +9,10 @@ import (
 	"encoding/json"
 	"io"
 	"os"
-	"sort"
 	"strings"
 	"sync"
+
+	appconfig "github.com/alyraffauf/switchyard/internal/config"
 )
 
 // Config save state shared with ui_helpers.go's debounced writer.
@@ -54,7 +55,8 @@ func runNativeMessagingHost() {
 }
 
 func listInstalledBrowsers() []browserSummary {
-	browsers := detectBrowsers()
+	cfg, _ := appconfig.Load(appconfig.Path())
+	browsers := filterAndSortBrowsers(detectBrowsers(), cfg)
 	out := make([]browserSummary, 0, len(browsers))
 	for _, b := range browsers {
 		// detectBrowsers skips the currently-running variant; drop the other
@@ -64,7 +66,6 @@ func listInstalledBrowsers() []browserSummary {
 		}
 		out = append(out, browserSummary{b.ID, b.Name})
 	}
-	sort.Slice(out, func(i, j int) bool { return out[i].Name < out[j].Name })
 	return out
 }
 
