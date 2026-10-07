@@ -38,7 +38,9 @@ function launch(url: string, tabId: number, browser?: string) {
 function App() {
   const [tab, setTab] = useState<chrome.tabs.Tab | null>(null);
   const [browsers, setBrowsers] = useState<Browser[]>(getCachedBrowsers);
-  const [loaded, setLoaded] = useState(false);
+  const [integrationStatus, setIntegrationStatus] = useState<
+    "loading" | "connected" | "unavailable"
+  >("loading");
 
   const fetching = useRef(false);
 
@@ -58,13 +60,13 @@ function App() {
       (resp) => {
         fetching.current = false;
         if (chrome.runtime.lastError) {
-          setLoaded(true);
+          setIntegrationStatus("unavailable");
           return;
         }
         const list = (resp as { browsers: Browser[] })?.browsers ?? [];
         cacheLocal(list);
         setBrowsers(list);
-        setLoaded(true);
+        setIntegrationStatus("connected");
       },
     );
   }, [tab]);
@@ -90,10 +92,13 @@ function App() {
         />
         Switchyard
       </button>
-      {((loaded && browsers.length === 0) || browsers.length > 0) && (
+      {(integrationStatus !== "loading" || browsers.length > 0) && (
         <div className="separator" />
       )}
-      {loaded && browsers.length === 0 && (
+      {integrationStatus === "connected" && browsers.length === 0 && (
+        <div className="hint">No visible browsers</div>
+      )}
+      {integrationStatus === "unavailable" && browsers.length === 0 && (
         <div className="hint">
           <a
             href="https://switchyard.aly.codes/docs/webextension/#desktop-integration"
