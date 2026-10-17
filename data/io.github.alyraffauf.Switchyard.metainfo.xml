@@ -47,6 +47,17 @@
     >io.github.alyraffauf.Switchyard.desktop</launchable>
 
     <releases>
+    <release version="0.18.0" date="2026-10-17">
+    <url
+                type="details"
+            >https://github.com/alyraffauf/switchyard/releases/tag/v0.18.0</url>
+    <description translate="no">
+        <ul>
+        <li>Updated to GNOME 51.</li>
+        <li>Added Ctrl+C copying.</li>
+        </ul>
+    </description>
+    </release>
     <release version="0.17.2" date="2026-07-20">
     <url
                 type="details"
