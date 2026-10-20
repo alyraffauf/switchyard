@@ -39,7 +39,7 @@ nix run github:alyraffauf/switchyard
 
 ### Building from Source
 
-For non-Flatpak builds, requires Go 1.24+, GTK4/libadwaita development libraries, and [just](https://github.com/casey/just).
+Non-Flatpak builds require Go 1.27.3+, GTK4/libadwaita development libraries, and [just](https://github.com/casey/just).
 
 ```bash
 just install-deps # For Fedora

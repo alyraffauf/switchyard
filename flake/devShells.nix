@@ -1,6 +1,7 @@
 _: {
   perSystem = {
     config,
+    goToolchain,
     lib,
     pkgs,
     ...
@@ -10,7 +11,7 @@ _: {
         (with pkgs; [
           glib
           gobject-introspection
-          go
+          goToolchain
           gtk4
           just
           libadwaita

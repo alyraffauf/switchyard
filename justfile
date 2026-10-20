@@ -14,7 +14,7 @@ install-deps:
 
 # Install Flatpak dependencies
 install-flatpak-deps:
-    flatpak install flathub org.gnome.Platform//51 org.gnome.Sdk//51 org.freedesktop.Sdk.Extension.golang//26.08
+    flatpak install flathub org.gnome.Platform//51 org.gnome.Sdk//51
 
 # Build the application
 build:
