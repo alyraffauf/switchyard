@@ -4,6 +4,8 @@
 package gtk
 
 import (
+	"context"
+	"fmt"
 	"net/url"
 	"os"
 	"strings"
@@ -11,6 +13,7 @@ import (
 	appconfig "github.com/alyraffauf/switchyard/internal/config"
 	"github.com/alyraffauf/switchyard/internal/host"
 	"github.com/alyraffauf/switchyard/internal/routing"
+	"github.com/alyraffauf/switchyard/internal/startup"
 	"github.com/diamondburned/gotk4-adwaita/pkg/adw"
 	"github.com/diamondburned/gotk4/pkg/gdk/v4"
 	"github.com/diamondburned/gotk4/pkg/gio/v2"
@@ -21,26 +24,44 @@ import (
 // Run starts the Switchyard GTK application and blocks until it exits.
 func Run() {
 	app := adw.NewApplication(getAppID(), gio.ApplicationHandlesOpen)
+	mode := startup.LaunchMode{}
 
 	app.AddMainOption("native-host", 0, glib.OptionFlagNone, glib.OptionArgNone,
 		"Run as native-messaging host (invoked by browsers)", "")
+	app.AddMainOption("background", 0, glib.OptionFlagNone, glib.OptionArgNone,
+		"Start without opening a window", "")
 
 	app.ConnectHandleLocalOptions(func(options *glib.VariantDict) int {
 		if options.Contains("native-host") {
 			runNativeMessagingHost()
 			return 0
 		}
+		if options.Contains("background") {
+			mode.Background = true
+			if err := app.Register(context.Background()); err != nil {
+				fmt.Fprintf(os.Stderr, "Error: could not start Switchyard in the background: %v\n", err)
+				return 1
+			}
+			if mode.ShouldHandleLocally(app.IsRemote()) {
+				return 0
+			}
+		}
 		return -1
 	})
 
 	app.ConnectActivate(func() {
 		cfg, _ := appconfig.Load(appconfig.Path())
-		if cfg.StayAlive {
+		shouldHold := mode.ShouldHold(cfg.StayAlive)
+		shouldShowWindow := mode.ShouldShowWindow()
+		mode.CompleteActivation()
+
+		if shouldHold {
 			app.Hold()
 		}
 		setupApp(cfg)
-		browsers := detectBrowsers()
-		showSettingsWindow(app, browsers, cfg)
+		if shouldShowWindow {
+			showSettingsWindow(app, detectBrowsers(), cfg)
+		}
 	})
 
 	app.ConnectOpen(func(files []gio.Filer, hint string) {

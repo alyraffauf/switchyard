@@ -24,3 +24,17 @@ xdg-settings set default-web-browser io.github.alyraffauf.Switchyard.desktop
 ```
 
 Or use your desktop environment's graphical settings to set Switchyard as the default browser.
+
+## Start in the Background
+
+To preload Switchyard without opening its settings window, add one of these commands to your desktop environment's startup applications:
+
+```bash
+# Flatpak installation
+flatpak run io.github.alyraffauf.Switchyard --background
+
+# Native installation
+switchyard --background
+```
+
+The background option keeps Switchyard running for that session even when **Keep running in background** is disabled. If Switchyard is already running, the command exits without opening another window.
