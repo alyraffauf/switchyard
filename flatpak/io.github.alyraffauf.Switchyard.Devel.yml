@@ -2,6 +2,8 @@ app-id: io.github.alyraffauf.Switchyard.Devel
 runtime: org.gnome.Platform
 runtime-version: "51"
 sdk: org.gnome.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.golang
 command: switchyard
 
 finish-args:
@@ -24,28 +26,6 @@ finish-args:
   - --filesystem=xdg-data/applications:ro
   - --filesystem=xdg-data/flatpak:ro
 modules:
-  # Pin the patched compiler until the SDK extension catches up.
-  - name: golang
-    buildsystem: simple
-    build-commands:
-      - mkdir -p /app/lib/sdk/golang
-      - cp -a go/. /app/lib/sdk/golang/
-    cleanup:
-      - "*"
-    sources:
-      - type: archive
-        url: https://go.dev/dl/go1.27.3.linux-amd64.tar.gz
-        sha256: 65efbc80fdc1fa2cd2631cad5b481777a68e8725f34e89f50fc6ac714e379b40
-        dest: go
-        only-arches:
-          - x86_64
-      - type: archive
-        url: https://go.dev/dl/go1.27.3.linux-arm64.tar.gz
-        sha256: a06e99309dbcbdca1a8ccd2282c3ee146e55930886e26b4f1193269587165f49
-        dest: go
-        only-arches:
-          - aarch64
-
   - name: glib
     buildsystem: meson
     config-opts:
@@ -60,9 +40,9 @@ modules:
   - name: switchyard
     buildsystem: simple
     build-options:
-      prepend-path: /app/lib/sdk/golang/bin
+      prepend-path: /usr/lib/sdk/golang/bin
       env:
-        GOROOT: /app/lib/sdk/golang
+        GOROOT: /usr/lib/sdk/golang
         GOTOOLCHAIN: local
         # Use flatpak-builder's cache directory for Go cache
         GOPATH: /run/build/switchyard/go
