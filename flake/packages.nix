@@ -17,7 +17,7 @@
         # both Linux and macOS.
         sw = pkgs.callPackage ../nix/sw.nix {inherit buildGoModule vendorHash;};
       }
-      // pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
+      // pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
         default = self'.packages.switchyard;
 
         # Flatpak/XDG desktop integration installer -- Linux-only concepts.
@@ -32,7 +32,7 @@
         # GTK GUI (cmd/switchyard), Linux-only.
         switchyard = pkgs.callPackage ../nix/switchyard.nix {inherit buildGoModule vendorHash;};
       }
-      // pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
+      // pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
         default = self'.packages.sw;
       };
   };

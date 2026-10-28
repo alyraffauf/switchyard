@@ -10,7 +10,7 @@ in {
   options.programs.switchyard = {
     enable = lib.mkEnableOption "Switchyard browser launcher";
 
-    package = lib.mkPackageOption self.packages.${pkgs.system} "switchyard" {};
+    package = lib.mkPackageOption self.packages.${pkgs.stdenv.hostPlatform.system} "switchyard" {};
 
     setAsDefaultBrowser = lib.mkOption {
       type = lib.types.bool;

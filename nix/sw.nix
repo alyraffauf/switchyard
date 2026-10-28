@@ -14,7 +14,7 @@ buildGoModule {
   # Darwin's browser scanner calls NSWorkspace via cgo; Linux's is pure Go,
   # so CGO stays off there for a fully static binary.
   env.CGO_ENABLED =
-    if stdenv.isDarwin
+    if stdenv.hostPlatform.isDarwin
     then "1"
     else "0";
 
