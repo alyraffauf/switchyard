@@ -47,6 +47,18 @@
     >io.github.alyraffauf.Switchyard.desktop</launchable>
 
     <releases>
+    <release version="0.18.1" date="2026-10-27">
+    <url
+                type="details"
+            >https://github.com/alyraffauf/switchyard/releases/tag/v0.18.1</url>
+    <description translate="no">
+        <ul>
+        <li>Fixed the missing context menu in the Chromium extension.</li>
+        <li>Updated the Go toolchain to 1.27.3.</li>
+        <li>Updated Nix packaging.</li>
+        </ul>
+    </description>
+    </release>
     <release version="0.18.0" date="2026-10-17">
     <url
                 type="details"
