@@ -22,17 +22,17 @@ build:
 
 # Install to system
 install: build
-    install -Dm755 switchyard {{DESTDIR}}{{BINDIR}}/switchyard
-    install -Dm644 data/{{APPID}}.desktop {{DESTDIR}}{{DATADIR}}/applications/{{APPID}}.desktop
-    install -Dm644 data/{{APPID}}.metainfo.xml {{DESTDIR}}{{DATADIR}}/metainfo/{{APPID}}.metainfo.xml
-    install -Dm644 data/icons/hicolor/scalable/apps/{{APPID}}.svg {{DESTDIR}}{{DATADIR}}/icons/hicolor/scalable/apps/{{APPID}}.svg
+    install -Dm755 switchyard {{quote(DESTDIR + BINDIR + '/switchyard')}}
+    install -Dm644 data/{{APPID}}.desktop {{quote(DESTDIR + DATADIR + '/applications/' + APPID + '.desktop')}}
+    install -Dm644 data/{{APPID}}.metainfo.xml {{quote(DESTDIR + DATADIR + '/metainfo/' + APPID + '.metainfo.xml')}}
+    install -Dm644 data/icons/hicolor/scalable/apps/{{APPID}}.svg {{quote(DESTDIR + DATADIR + '/icons/hicolor/scalable/apps/' + APPID + '.svg')}}
 
 # Uninstall from system
 uninstall:
-    rm -f {{DESTDIR}}{{BINDIR}}/switchyard
-    rm -f {{DESTDIR}}{{DATADIR}}/applications/{{APPID}}.desktop
-    rm -f {{DESTDIR}}{{DATADIR}}/metainfo/{{APPID}}.metainfo.xml
-    rm -f {{DESTDIR}}{{DATADIR}}/icons/hicolor/scalable/apps/{{APPID}}.svg
+    rm -f {{quote(DESTDIR + BINDIR + '/switchyard')}}
+    rm -f {{quote(DESTDIR + DATADIR + '/applications/' + APPID + '.desktop')}}
+    rm -f {{quote(DESTDIR + DATADIR + '/metainfo/' + APPID + '.metainfo.xml')}}
+    rm -f {{quote(DESTDIR + DATADIR + '/icons/hicolor/scalable/apps/' + APPID + '.svg')}}
 
 # Clean build artifacts
 clean:
