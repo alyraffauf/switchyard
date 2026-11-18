@@ -62,8 +62,7 @@ func parseRule(line string) (adGuardRule, bool) {
 		line = rest
 	}
 
-	parts := strings.Split(line, "$")
-	urlPattern := parts[0]
+	urlPattern, options, hasOptions := strings.Cut(line, "$")
 
 	if urlPattern != "" {
 		pattern := regexp.QuoteMeta(urlPattern)
@@ -75,8 +74,8 @@ func parseRule(line string) (adGuardRule, bool) {
 		}
 	}
 
-	if len(parts) > 1 {
-		for opt := range strings.SplitSeq(parts[1], ",") {
+	if hasOptions {
+		for opt := range strings.SplitSeq(options, ",") {
 			if paramValue, ok := strings.CutPrefix(opt, "removeparam="); ok {
 				if strings.HasPrefix(paramValue, "/") && strings.HasSuffix(paramValue, "/") {
 					if re, err := regexp.Compile("(?i)" + paramValue[1:len(paramValue)-1]); err == nil {
