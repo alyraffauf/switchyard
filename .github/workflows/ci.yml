@@ -75,6 +75,9 @@ jobs:
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-51
       options: --privileged
+      volumes:
+        # Flatpak renames old SDK checkouts during updates. Some runners reject this on overlayfs.
+        - /var/lib/flatpak
     steps:
       - uses: actions/checkout@v7
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
