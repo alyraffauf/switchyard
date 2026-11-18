@@ -123,7 +123,7 @@ func showLauncherWindow(app *adw.Application, initialURL string, browsers []*Bro
 	})
 	win.AddController(keyController)
 
-	actionGroup := setupLauncherActions(win, app, filteredBrowsers, url, func() { win.Close() })
+	actionGroup := setupLauncherActions(win, app, browsers, url, func() { win.Close() })
 	win.InsertActionGroup("win", actionGroup)
 
 	win.Present()
