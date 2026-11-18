@@ -104,7 +104,7 @@ func findDesktopFile(id string) string {
 
 func desktopFilePath(dir, id string) (string, bool) {
 	path := filepath.Join(dir, id)
-	if _, err := os.Stat(path); err == nil {
+	if info, err := os.Stat(path); err == nil && !info.IsDir() {
 		return path, true
 	}
 
