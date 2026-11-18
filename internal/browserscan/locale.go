@@ -12,10 +12,18 @@ import (
 	"github.com/alyraffauf/switchyard/internal/browser"
 )
 
+var desktopStringEscapes = strings.NewReplacer(
+	`\s`, " ",
+	`\n`, "\n",
+	`\t`, "\t",
+	`\r`, "\r",
+	`\\`, `\`,
+)
+
 func localizedString(file *desktopfile.File, section, key string) string {
 	for _, candidate := range localeKeyCandidates(key) {
 		if value, ok := file.Get(section, candidate); ok && value != "" {
-			return value
+			return desktopStringEscapes.Replace(value)
 		}
 	}
 	return ""
