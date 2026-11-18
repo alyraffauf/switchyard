@@ -50,7 +50,7 @@ func applyWildcardRedirection(rawURL string, redirection Redirection) string {
 	if !ok {
 		return rawURL
 	}
-	return compiledRegex.ReplaceAllString(rawURL, redirection.Replace)
+	return compiledRegex.ReplaceAllLiteralString(rawURL, redirection.Replace)
 }
 
 func applyRegexRedirection(rawURL string, redirection Redirection) string {
