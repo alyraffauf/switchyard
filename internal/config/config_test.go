@@ -65,14 +65,23 @@ func TestLoadUsesDefaultsWhenConfigIsMissing(t *testing.T) {
 }
 
 func TestLoadUsesDefaultsWhenConfigIsInvalid(t *testing.T) {
-	configPath := writeTestConfig(t, "prompt_on_click = [invalid\n")
+	for _, document := range []struct {
+		name string
+		toml string
+	}{
+		{"invalid first field", "prompt_on_click = [invalid\n"},
+		{"type error after a valid preference", "prompt_on_click = false\nauto_close_after_copy = 'sometimes'\n"},
+	} {
+		t.Run(document.name, func(t *testing.T) {
+			configPath := writeTestConfig(t, document.toml)
+			config, err := Load(configPath)
+			if err == nil {
+				t.Fatal("Load() expected an invalid config error")
+			}
 
-	config, err := Load(configPath)
-	if err == nil {
-		t.Fatal("Load() expected invalid TOML error")
+			assertDefaultConfig(t, config)
+		})
 	}
-
-	assertDefaultConfig(t, config)
 }
 
 func TestLoadReturnsReadError(t *testing.T) {
