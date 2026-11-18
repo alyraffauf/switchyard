@@ -14,7 +14,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-func showBrowserActionsMenu(btn *gtk.Button, browser *Browser, url string) {
+func showBrowserActionsMenu(btn *gtk.Button, browser *Browser) {
 	if len(browser.Actions) == 0 {
 		return
 	}
@@ -43,7 +43,7 @@ func showShortcutsDialog(parent *adw.Window) {
 	dialog.Present(parent)
 }
 
-func setupLauncherActions(win *adw.Window, app *adw.Application, browsers []*Browser, url string, onClose func()) *gio.SimpleActionGroup {
+func setupLauncherActions(win *adw.Window, app *adw.Application, browsers []*Browser, currentURL func() string, onClose func()) *gio.SimpleActionGroup {
 	actionGroup := gio.NewSimpleActionGroup()
 
 	settingsAction := gio.NewSimpleAction("settings", nil)
@@ -107,7 +107,7 @@ func setupLauncherActions(win *adw.Window, app *adw.Application, browsers []*Bro
 
 		for _, action := range selectedBrowser.Actions {
 			if action.ID == actionID {
-				launchBrowserAction(selectedBrowser, action, url)
+				launchBrowserAction(selectedBrowser, action, currentURL())
 				onClose()
 				return
 			}

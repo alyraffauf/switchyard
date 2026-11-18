@@ -8,7 +8,7 @@ import (
 	"github.com/diamondburned/gotk4/pkg/gtk/v4"
 )
 
-func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, cfg *Config) {
+func showLauncherWindow(app *adw.Application, initialURL string, browsers []*Browser, cfg *Config) {
 	filteredBrowsers := filterAndSortBrowsers(browsers, cfg)
 
 	win := adw.NewWindow()
@@ -19,7 +19,8 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 	mainBox := gtk.NewBox(gtk.OrientationVertical, 0)
 
 	// Created early so button handlers can capture it.
-	urlEntry := createURLEntry(url)
+	urlEntry := createURLEntry(initialURL)
+	url := urlEntry.Text
 
 	contentBox := createLauncherContentBox()
 	launcherFlow := createLauncherFlowBox()
@@ -34,7 +35,7 @@ func showLauncherWindow(app *adw.Application, url string, browsers []*Browser, c
 			win.Close()
 		},
 		OnRightClick: func(btn *gtk.Button, browser *Browser) {
-			showBrowserActionsMenu(btn, browser, urlEntry.Text())
+			showBrowserActionsMenu(btn, browser)
 		},
 	}
 
