@@ -16,4 +16,13 @@ fi
 
 PY_URL="https://raw.githubusercontent.com/alyraffauf/Switchyard/refs/heads/master/browser-setup/main.py"
 
-curl -fsSL "$PY_URL" | python3 - "$@"
+installer=$(mktemp "${TMPDIR:-/tmp}/switchyard-browser-setup.XXXXXXXX")
+trap 'rm -f -- "$installer"' EXIT
+curl -fsSL "$PY_URL" > "$installer"
+
+# With bash -s, stdin carries this shell script. Read answers from the terminal.
+if [[ -z "${BASH_SOURCE[0]-}" ]] && { exec 3</dev/tty; } 2>/dev/null; then
+  python3 "$installer" "$@" <&3
+else
+  python3 "$installer" "$@"
+fi
