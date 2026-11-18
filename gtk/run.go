@@ -80,9 +80,11 @@ func Run() {
 
 // setupApp initializes app-wide settings like dark mode and icon paths
 func setupApp(cfg *Config) {
+	scheme := adw.ColorSchemeDefault
 	if cfg.ForceDarkMode {
-		adw.StyleManagerGetDefault().SetColorScheme(adw.ColorSchemeForceDark)
+		scheme = adw.ColorSchemeForceDark
 	}
+	adw.StyleManagerGetDefault().SetColorScheme(scheme)
 
 	// Add host system icon paths when running in Flatpak
 	if host.InFlatpak() {
