@@ -159,13 +159,12 @@ func parseBrowser(id, path string, options scanOptions) (browser.Browser, bool) 
 		return browser.Browser{}, false
 	}
 
-	icon, _ := file.Get(desktopfile.EntrySection, "Icon")
 	exec, _ := file.Get(desktopfile.EntrySection, "Exec")
 
 	return browser.Browser{
 		ID:      id,
 		Name:    localizedString(file, desktopfile.EntrySection, "Name"),
-		Icon:    icon,
+		Icon:    localizedString(file, desktopfile.EntrySection, "Icon"),
 		Exec:    exec,
 		Actions: localizedActions(file),
 	}, true
