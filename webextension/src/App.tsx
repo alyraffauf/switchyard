@@ -59,11 +59,11 @@ function App() {
       { action: "listBrowsers" },
       (resp) => {
         fetching.current = false;
-        if (chrome.runtime.lastError) {
+        const list = (resp as { browsers?: Browser[] } | undefined)?.browsers;
+        if (chrome.runtime.lastError || !Array.isArray(list)) {
           setIntegrationStatus("unavailable");
           return;
         }
-        const list = (resp as { browsers: Browser[] })?.browsers ?? [];
         cacheLocal(list);
         setBrowsers(list);
         setIntegrationStatus("connected");
