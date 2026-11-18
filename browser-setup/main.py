@@ -10,6 +10,8 @@ import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+SWITCHYARD_APP_ID = "io.github.alyraffauf.Switchyard"
+
 FLATPAK_CHROMIUM: dict[str, str] = {
     "com.brave.Browser": "BraveSoftware/Brave-Browser",
     "com.google.Chrome": "google-chrome",
@@ -68,8 +70,12 @@ def flatpak_installed(flatpak: str | None, id: str) -> bool:
 def find_switchyard(flatpak: str | None) -> str | None:
     switchyard = shutil.which("switchyard")
 
-    if flatpak and flatpak_installed(flatpak, "io.github.alyraffauf.Switchyard"):
-        return f"{flatpak} run io.github.alyraffauf.Switchyard"
+    if flatpak:
+        if flatpak_installed(flatpak, SWITCHYARD_APP_ID):
+            return f"{flatpak} run {SWITCHYARD_APP_ID}"
+        devel_app_id = f"{SWITCHYARD_APP_ID}.Devel"
+        if switchyard is None and flatpak_installed(flatpak, devel_app_id):
+            return f"{flatpak} run {devel_app_id}"
 
     return switchyard
 
