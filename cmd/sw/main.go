@@ -125,27 +125,15 @@ func main() {
 		rawURL = os.Args[1]
 	}
 
+	var browserPrefs []string
 	if u, err := url.Parse(rawURL); err == nil && u.Scheme == "switchyard" {
-		targetURL, browserPrefs, err := routing.ParseSwitchyardURL(rawURL)
+		targetURL, prefs, err := routing.ParseSwitchyardURL(rawURL)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Invalid switchyard URL: %v\n", err)
 			os.Exit(1)
 		}
-		allBrowsers := browserscan.Installed()
-		for _, browserPreference := range browserPrefs {
-			if launchOrLog(allBrowsers, browserPreference, targetURL) {
-				return
-			}
-
-			if strings.HasSuffix(browserPreference, ".desktop") {
-				continue
-			}
-
-			if launchOrLog(allBrowsers, browserPreference+".desktop", targetURL) {
-				return
-			}
-		}
 		rawURL = targetURL
+		browserPrefs = prefs
 	}
 
 	cfg, _ := config.Load(config.Path())
@@ -161,6 +149,20 @@ func main() {
 	allBrowsers := browserscan.Installed()
 
 	if sanitized != "" {
+		for _, browserPreference := range browserPrefs {
+			if launchOrLog(allBrowsers, browserPreference, sanitized) {
+				return
+			}
+
+			if strings.HasSuffix(browserPreference, ".desktop") {
+				continue
+			}
+
+			if launchOrLog(allBrowsers, browserPreference+".desktop", sanitized) {
+				return
+			}
+		}
+
 		if browserID, alwaysAsk, matched := cfg.MatchRule(sanitized); matched {
 			if !alwaysAsk && launchOrLog(allBrowsers, browserID, sanitized) {
 				return
