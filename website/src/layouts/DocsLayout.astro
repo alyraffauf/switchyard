@@ -94,7 +94,8 @@ const nextDocs = (nextDocIds[doc.id] ?? []).flatMap((id) => {
       items={[
         { href: DEV_URL, label: "Aly Raffauf", icon: "lucide:rose" },
         { href: "/", label: "Switchyard", switchyardIcon: true },
-        { href: "/docs/", label: "Docs", current: true },
+        { href: "/docs/", label: "Docs" },
+        { href: hrefFor(doc), label: doc.data.title, current: true },
       ]}
     />
 
