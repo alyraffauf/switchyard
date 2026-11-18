@@ -61,7 +61,7 @@ func Load(path string) (*Config, error) {
 	}
 
 	if err := toml.Unmarshal(data, settings); err != nil {
-		return settings, err
+		return NewDefault(), err
 	}
 
 	applyTrackingParameterCompatibility(settings, data)
