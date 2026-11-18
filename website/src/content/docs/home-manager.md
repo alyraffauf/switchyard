@@ -30,6 +30,8 @@ Add the flake to your inputs and import the module:
 ```nix
 # home.nix
 { ... }: {
+  xdg.mimeApps.enable = true;
+
   programs.switchyard = {
     enable = true;
     setAsDefaultBrowser = true;
@@ -37,11 +39,13 @@ Add the flake to your inputs and import the module:
 }
 ```
 
+Enable `xdg.mimeApps` so Home Manager writes the default browser entries to `mimeapps.list`.
+
 ## Options
 
 - **`enable`** _(bool, default `false`)_ — Install Switchyard and enable the module.
 - **`package`** _(package, default `switchyard`)_ — The Switchyard derivation to install.
-- **`setAsDefaultBrowser`** _(bool, default `true`)_ — Register Switchyard as the default handler for `x-scheme-handler/http`, `x-scheme-handler/https`, and `text/html` via `xdg.mimeApps`.
+- **`setAsDefaultBrowser`** _(bool, default `true`)_ — Register Switchyard as the default handler for `x-scheme-handler/http`, `x-scheme-handler/https`, and `text/html` when `xdg.mimeApps.enable` is true.
 - **`settings`** _(TOML, default `{}`)_ — Contents of `~/.config/switchyard/config.toml`. Freeform; any key from Switchyard's `Config` struct is accepted, omitted keys fall back to built-in defaults.
 
 ## Declarative Configuration
