@@ -148,7 +148,9 @@ func handleBrowserKey(msg tea.KeyPressMsg, m model) (model, tea.Cmd, bool) {
 		for index, action := range actions {
 			items[index] = actionItem{name: action.Name, exec: action.Exec}
 		}
-		return m, m.actionList.SetItems(items), true
+		cmd := m.actionList.SetItems(items)
+		m.actionList.ResetSelected()
+		return m, cmd, true
 	}
 
 	return m, nil, false
