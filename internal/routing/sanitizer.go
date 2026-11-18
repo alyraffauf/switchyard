@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/url"
 	"regexp"
+	"slices"
 	"strings"
 	"sync"
 )
@@ -104,44 +105,44 @@ func RemoveTrackingParameters(rawURL string) string {
 }
 
 func removeTrackingParametersWithRules(rawURL string, u *url.URL, rules []adGuardRule) string {
-	query := u.Query()
-	changed := false
-
-	for parameter := range query {
-		shouldRemove := false
-		isWhitelisted := false
-
-		for _, rule := range rules {
-			if rule.urlRegex != nil && !rule.urlRegex.MatchString(rawURL) {
-				continue
-			}
-
-			matchesParameter := false
-			if rule.parameterName == "*" || rule.parameterName == parameter {
-				matchesParameter = true
-			} else if rule.parameterRegex != nil && rule.parameterRegex.MatchString(parameter) {
-				matchesParameter = true
-			}
-
-			if matchesParameter {
-				if rule.isException {
-					isWhitelisted = true
-					break
-				}
-				shouldRemove = true
-			}
+	// Filter the raw fields so the surviving values keep their order and encoding.
+	fields := strings.Split(u.RawQuery, "&")
+	fieldCount := len(fields)
+	fields = slices.DeleteFunc(fields, func(field string) bool {
+		if field == "" || strings.Contains(field, ";") {
+			return false
 		}
-
-		if shouldRemove && !isWhitelisted {
-			query.Del(parameter)
-			changed = true
+		key, value, _ := strings.Cut(field, "=")
+		parameter, err := url.QueryUnescape(key)
+		if err != nil {
+			return false
 		}
-	}
-
-	if !changed {
+		if _, err := url.QueryUnescape(value); err != nil {
+			return false
+		}
+		return shouldRemoveTrackingParameter(parameter, rawURL, rules)
+	})
+	if len(fields) == fieldCount {
 		return rawURL
 	}
-
-	u.RawQuery = query.Encode()
+	u.RawQuery = strings.Join(fields, "&")
 	return u.String()
+}
+
+func shouldRemoveTrackingParameter(parameter, rawURL string, rules []adGuardRule) bool {
+	shouldRemove := false
+	for _, rule := range rules {
+		if rule.urlRegex != nil && !rule.urlRegex.MatchString(rawURL) {
+			continue
+		}
+		matchesParameter := rule.parameterName == "*" || rule.parameterName == parameter ||
+			rule.parameterRegex != nil && rule.parameterRegex.MatchString(parameter)
+		if matchesParameter {
+			if rule.isException {
+				return false
+			}
+			shouldRemove = true
+		}
+	}
+	return shouldRemove
 }
